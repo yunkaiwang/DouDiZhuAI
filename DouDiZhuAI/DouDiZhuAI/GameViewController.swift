@@ -9,10 +9,16 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+//class popoverTableViewController: UITableViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
 
 class GameViewController: UIViewController, UITextFieldDelegate  {
 
     @IBOutlet weak var nameInput: UITextField!
+    @IBOutlet weak var loginBtn: UIButton!
+    @IBAction func loginBtn(_ sender: Any) {
+        performSegue(withIdentifier: "login", sender: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -32,7 +38,7 @@ class GameViewController: UIViewController, UITextFieldDelegate  {
             view.showsNodeCount = true
         }
         
-        nameInput.delegate = self
+        self.nameInput.delegate = self
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:))))
     }
 
