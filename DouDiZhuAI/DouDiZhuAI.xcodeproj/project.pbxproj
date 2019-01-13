@@ -14,7 +14,6 @@
 		3FA947C321E4324700F6A51E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA947C221E4324700F6A51E /* GameScene.swift */; };
 		3FA947C521E4324700F6A51E /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA947C421E4324700F6A51E /* GameViewController.swift */; };
 		3FA947C821E4324700F6A51E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3FA947C621E4324700F6A51E /* Main.storyboard */; };
-		3FA947CA21E4324800F6A51E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FA947C921E4324800F6A51E /* Assets.xcassets */; };
 		3FA947CD21E4324800F6A51E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3FA947CB21E4324800F6A51E /* LaunchScreen.storyboard */; };
 		3FA947D821E4324800F6A51E /* DouDiZhuAITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA947D721E4324800F6A51E /* DouDiZhuAITests.swift */; };
 /* End PBXBuildFile section */
@@ -38,7 +37,6 @@
 		3FA947C221E4324700F6A51E /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		3FA947C421E4324700F6A51E /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		3FA947C721E4324700F6A51E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		3FA947C921E4324800F6A51E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3FA947CC21E4324800F6A51E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3FA947CE21E4324800F6A51E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3FA947D321E4324800F6A51E /* DouDiZhuAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DouDiZhuAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,7 +90,6 @@
 				3FA947C421E4324700F6A51E /* GameViewController.swift */,
 				3FA947C621E4324700F6A51E /* Main.storyboard */,
 				3F7938FD21E6C9AD003A590F /* CardView.swift */,
-				3FA947C921E4324800F6A51E /* Assets.xcassets */,
 				3FA947CB21E4324800F6A51E /* LaunchScreen.storyboard */,
 				3FA947CE21E4324800F6A51E /* Info.plist */,
 			);
@@ -190,7 +187,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3FA947C821E4324700F6A51E /* Main.storyboard in Resources */,
-				3FA947CA21E4324800F6A51E /* Assets.xcassets in Resources */,
 				3FA947CD21E4324800F6A51E /* LaunchScreen.storyboard in Resources */,
 				3FA947C121E4324600F6A51E /* Actions.sks in Resources */,
 			);
