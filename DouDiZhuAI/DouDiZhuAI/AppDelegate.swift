@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  DouDiZhuAI
 //
-//  Created by yunkai wang on 2019-01-07.
+//  Created by yunkai wang on 2019-01-12.
 //  Copyright © 2019 yunkai wang. All rights reserved.
 //
 
