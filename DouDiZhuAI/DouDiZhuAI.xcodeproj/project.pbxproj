@@ -11,7 +11,6 @@
 		3F79391021EAE019003A590F /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3F79390F21EAE019003A590F /* Actions.sks */; };
 		3F79391221EAE019003A590F /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79391121EAE019003A590F /* GameScene.swift */; };
 		3F79391721EAE019003A590F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391521EAE019003A590F /* Main.storyboard */; };
-		3F79391921EAE01B003A590F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391821EAE01B003A590F /* Assets.xcassets */; };
 		3F79391C21EAE01B003A590F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391A21EAE01B003A590F /* LaunchScreen.storyboard */; };
 		3F79392621EAE873003A590F /* LoginSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392521EAE873003A590F /* LoginSceneController.swift */; };
 		3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392721EBBEDF003A590F /* GameSceneViewController.swift */; };
@@ -23,6 +22,8 @@
 		3F79393421EC1A3A003A590F /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393321EC1A3A003A590F /* utilities.swift */; };
 		3F79393621EC1F17003A590F /* FTButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393521EC1F17003A590F /* FTButtonNode.swift */; };
 		3F79393A21EC3089003A590F /* DouDiZhuGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393921EC3089003A590F /* DouDiZhuGame.swift */; };
+		3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394321ED818A003A590F /* CardButtonNode.swift */; };
+		3F79394621F02814003A590F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F79394521F02814003A590F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,7 +32,6 @@
 		3F79390F21EAE019003A590F /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		3F79391121EAE019003A590F /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		3F79391621EAE019003A590F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		3F79391821EAE01B003A590F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3F79391B21EAE01B003A590F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F79391D21EAE01B003A590F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F79392521EAE873003A590F /* LoginSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSceneController.swift; sourceTree = "<group>"; };
@@ -44,6 +44,8 @@
 		3F79393321EC1A3A003A590F /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
 		3F79393521EC1F17003A590F /* FTButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTButtonNode.swift; sourceTree = "<group>"; };
 		3F79393921EC3089003A590F /* DouDiZhuGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuGame.swift; sourceTree = "<group>"; };
+		3F79394321ED818A003A590F /* CardButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardButtonNode.swift; sourceTree = "<group>"; };
+		3F79394521F02814003A590F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 			children = (
 				3F79390B21EAE019003A590F /* AppDelegate.swift */,
 				3F79390F21EAE019003A590F /* Actions.sks */,
+				3F79394521F02814003A590F /* Assets.xcassets */,
 				3F79391121EAE019003A590F /* GameScene.swift */,
 				3F79392921EC1363003A590F /* Deck.swift */,
 				3F79393321EC1A3A003A590F /* utilities.swift */,
@@ -90,9 +93,9 @@
 				3F79393521EC1F17003A590F /* FTButtonNode.swift */,
 				3F79392721EBBEDF003A590F /* GameSceneViewController.swift */,
 				3F79392521EAE873003A590F /* LoginSceneController.swift */,
-				3F79391821EAE01B003A590F /* Assets.xcassets */,
 				3F79391A21EAE01B003A590F /* LaunchScreen.storyboard */,
 				3F79391D21EAE01B003A590F /* Info.plist */,
+				3F79394321ED818A003A590F /* CardButtonNode.swift */,
 			);
 			path = DouDiZhuAI;
 			sourceTree = "<group>";
@@ -156,8 +159,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F79391721EAE019003A590F /* Main.storyboard in Resources */,
-				3F79391921EAE01B003A590F /* Assets.xcassets in Resources */,
 				3F79391C21EAE01B003A590F /* LaunchScreen.storyboard in Resources */,
+				3F79394621F02814003A590F /* Assets.xcassets in Resources */,
 				3F79391021EAE019003A590F /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,6 +178,7 @@
 				3F79393A21EC3089003A590F /* DouDiZhuGame.swift in Sources */,
 				3F79393021EC1958003A590F /* NumCard.swift in Sources */,
 				3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */,
+				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
 				3F79392A21EC1363003A590F /* Deck.swift in Sources */,
 				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,

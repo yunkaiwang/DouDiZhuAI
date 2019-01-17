@@ -35,10 +35,10 @@ class DouDiZhuGame {
         
         for i in 0..<playerCardArr.count {
             playerCardArr[i].sort()
-            for card in playerCardArr[i] {
-                print(card.getIdentifier())
-            }
-            print("\n")
         }
+    }
+    
+    func getPlayerCards()->[[Card]] {
+        return self.playerCardArr
     }
 }

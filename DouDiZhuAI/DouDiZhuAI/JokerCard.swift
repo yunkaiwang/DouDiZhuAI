@@ -16,19 +16,13 @@ class JokerCard: Card {
     init(type: JokerType) {
         self.type = type
         var identifier: String
-        var texture: SKTexture
         switch type {
         case .black:
             identifier = "black_joker"
         case .red:
             identifier = "red_joker"
         }
-        texture = SKTexture(imageNamed: identifier)
-        super.init(identifier: identifier, texture: texture)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(identifier: identifier)
     }
     
     func isRedJoker()->Bool {

@@ -9,16 +9,11 @@
 import Foundation
 import SpriteKit
 
-class Card: SKSpriteNode {
+class Card {
     private var identifier: String = ""
     
-    init(identifier:String, texture: SKTexture) {
+    init(identifier:String) {
         self.identifier = identifier
-        super.init(texture: texture, color: SKColor.clear, size: texture.size())
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
     }
     
     func getIdentifier()->String {

@@ -17,12 +17,7 @@ class NumCard: Card {
         self.suit = suit
         self.num = num
         let identifier = String(num) + "_of_" + suit
-        let texture = SKTexture(imageNamed: identifier)
-        super.init(identifier: identifier, texture: texture)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(identifier: identifier)
     }
     
     func getNum()->Int {

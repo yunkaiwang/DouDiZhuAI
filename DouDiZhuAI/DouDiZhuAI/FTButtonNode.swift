@@ -44,6 +44,7 @@ class FTButtonNode: SKSpriteNode {
         self.label = SKLabelNode(fontNamed: "Helvetica");
         
         super.init(texture: defaultTexture, color: UIColor.white, size: defaultTexture.size())
+        
         isUserInteractionEnabled = true
         
         //Creating and adding a blank label, centered on the button
