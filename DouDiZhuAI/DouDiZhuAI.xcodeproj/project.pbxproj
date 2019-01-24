@@ -27,6 +27,8 @@
 		3F79394821F2C061003A590F /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394721F2C061003A590F /* Player.swift */; };
 		3F79394A21F2C0BE003A590F /* ComputerPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394921F2C0BE003A590F /* ComputerPlayer.swift */; };
 		3F79394C21F2C586003A590F /* HumanPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394B21F2C586003A590F /* HumanPlayer.swift */; };
+		3F79394E21FA5003003A590F /* extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394D21FA5003003A590F /* extension.swift */; };
+		3F79395021FA5108003A590F /* PlayerNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394F21FA5108003A590F /* PlayerNum.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +54,8 @@
 		3F79394721F2C061003A590F /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		3F79394921F2C0BE003A590F /* ComputerPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputerPlayer.swift; sourceTree = "<group>"; };
 		3F79394B21F2C586003A590F /* HumanPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumanPlayer.swift; sourceTree = "<group>"; };
+		3F79394D21FA5003003A590F /* extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extension.swift; sourceTree = "<group>"; };
+		3F79394F21FA5108003A590F /* PlayerNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNum.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,8 +92,10 @@
 				3F79390F21EAE019003A590F /* Actions.sks */,
 				3F79394521F02814003A590F /* Assets.xcassets */,
 				3F79391121EAE019003A590F /* GameScene.swift */,
+				3F79394D21FA5003003A590F /* extension.swift */,
 				3F79394B21F2C586003A590F /* HumanPlayer.swift */,
 				3F79394721F2C061003A590F /* Player.swift */,
+				3F79394F21FA5108003A590F /* PlayerNum.swift */,
 				3F79394921F2C0BE003A590F /* ComputerPlayer.swift */,
 				3F79392921EC1363003A590F /* Deck.swift */,
 				3F79393321EC1A3A003A590F /* utilities.swift */,
@@ -189,12 +195,14 @@
 				3F79393A21EC3089003A590F /* DouDiZhuGame.swift in Sources */,
 				3F79394821F2C061003A590F /* Player.swift in Sources */,
 				3F79393021EC1958003A590F /* NumCard.swift in Sources */,
+				3F79394E21FA5003003A590F /* extension.swift in Sources */,
 				3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */,
 				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
 				3F79392A21EC1363003A590F /* Deck.swift in Sources */,
 				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,
 				3F79392621EAE873003A590F /* LoginSceneController.swift in Sources */,
+				3F79395021FA5108003A590F /* PlayerNum.swift in Sources */,
 				3F79390C21EAE019003A590F /* AppDelegate.swift in Sources */,
 				3F79393221EC196F003A590F /* JokerCard.swift in Sources */,
 			);

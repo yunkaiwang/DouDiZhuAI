@@ -10,17 +10,13 @@ import Foundation
 
 class Player {
     private var cards: [Card]
+    private var playerNum: PlayerNum
     internal var beLandlord: Bool
     internal var pillageLandlord: Bool
     
-    init(cards: [Card]) {
-        self.cards = cards
-        self.beLandlord = false
-        self.pillageLandlord = false
-    }
-    
-    init() {
+    init(num: PlayerNum) {
         self.cards = []
+        self.playerNum = num
         self.beLandlord = false
         self.pillageLandlord = false
     }
@@ -53,5 +49,9 @@ class Player {
     
     func wantToPillageLandlord()->Bool {
         return self.pillageLandlord
+    }
+    
+    func getPlayerNum()->PlayerNum {
+        return self.playerNum
     }
 }

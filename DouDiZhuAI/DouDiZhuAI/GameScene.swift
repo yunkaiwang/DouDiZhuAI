@@ -32,6 +32,7 @@ class GameScene: SKScene {
     let LandlordCard2 = SKSpriteNode(imageNamed: "back_small")
     let LandlordCard3 = SKSpriteNode(imageNamed: "back_small")
     let countDownLabel = SKLabelNode(text: "0")
+    let landlordLabel = SKLabelNode(text: "L")
     
     private var cur_player: Player? = nil
     private var countDown: Int = 0
@@ -59,6 +60,12 @@ class GameScene: SKScene {
         countDownLabel.position = CGPoint(x: 600, y: 150)
         countDownLabel.isHidden = true
         self.addChild(countDownLabel)
+        
+        landlordLabel.name = "landlordLabel"
+        landlordLabel.fontColor = UIColor.black
+        landlordLabel.fontSize = 30
+        landlordLabel.isHidden = true
+        self.addChild(landlordLabel)
         
         setButtonAttributes()
         
@@ -211,8 +218,12 @@ class GameScene: SKScene {
     }
     
     func resetTable() {
-        startGameButton.isHidden = true
+//        startGameButton.isHidden = true
+        landlordLabel.isHidden = true
         playerCardContainer.isHidden = false
+        player1CurrentPlay.removeAllChildren()
+        player2CurrentPlay.removeAllChildren()
+        player3CurrentPlay.removeAllChildren()
         
         LandlordCard1.texture = SKTexture(imageNamed: "back_small")
         LandlordCard2.texture = SKTexture(imageNamed: "back_small")
@@ -263,6 +274,7 @@ class GameScene: SKScene {
     }
     
     func startNewGameSinceNoPlayerChooseToBeLandlord() {
+        print("new game started")
         startGame()
     }
     
@@ -288,12 +300,29 @@ class GameScene: SKScene {
         playerContainer.addChild(display)
     }
     
-    func updateLandlordCard(landlordID: Int) {
-        if landlordID == 0 {
+    func updateLandlordCard(landlordNum: PlayerNum) {
+        print("L is elected", landlordNum)
+        switch landlordNum {
+        case .one:
             self.displayPlayerCards()
-        } else {
+        default:
             player2CardCount.text = String(game!.getPlayer2CardCount())
             player3CardCount.text = String(game!.getPlayer3CardCount())
         }
+        self.displayLandlordCard(landlordNum: landlordNum)
+    }
+    
+    func displayLandlordCard(landlordNum: PlayerNum) {
+        var position: CGPoint
+        switch landlordNum {
+        case .one:
+            position = CGPoint(x: 200, y: 100)
+        case .two:
+            position = CGPoint(x: self.frame.minX + 75, y: 320)
+        default:
+            position = CGPoint(x: self.frame.maxX - 75, y: 320)
+        }
+        self.landlordLabel.position = position
+        self.landlordLabel.isHidden = false
     }
 }

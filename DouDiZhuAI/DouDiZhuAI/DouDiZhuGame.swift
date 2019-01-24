@@ -12,9 +12,9 @@ import Foundation
 class DouDiZhuGame {
     private var deck: Deck = Deck()
     private var playerCardArr: [[Card]] = [[]]
-    private var player1: HumanPlayer = HumanPlayer()
-    private var player2: ComputerPlayer = ComputerPlayer()
-    private var player3: ComputerPlayer = ComputerPlayer()
+    private var player1: HumanPlayer = HumanPlayer(num: PlayerNum.one)
+    private var player2: ComputerPlayer = ComputerPlayer(num: PlayerNum.two)
+    private var player3: ComputerPlayer = ComputerPlayer(num: PlayerNum.three)
     private var landlord: Player?
     private var gameScene: GameScene
     private var pillagingLandlord: Bool
@@ -192,13 +192,13 @@ class DouDiZhuGame {
             self.beLandlordDecision[0] = true
             if self.beLandlordDecision[1] && self.beLandlordDecision[2] {
                 // since it's not pillaging landlord, so any of the two previous player must decide to not be the landlord as if they have decided, so current player can be safely picked as landlord
-                self.setLandlordAndStartGame(landlord: player1, playerNum: 0)
+                self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
             } else {
                 if self.beLandlordDecision[2] { // player 3 has decided but it's not in the pillaging process so player 3 must have decided to not be the landlord
                     self.letPlayerDecideLandlord(playerNum: 1)
                     let decision = player2.wantToPillageLandlord()
                     if !decision {
-                        self.setLandlordAndStartGame(landlord: player1, playerNum: 0)
+                        self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
                     } else {
                         self.letPlayerDecideLandlord(playerNum: 1) // if player 2 wants to pillage landlord, then player 1 has to choose if he wants to pillage again
                     }
@@ -209,7 +209,7 @@ class DouDiZhuGame {
                     let player2_decision = player2.wantToPillageLandlord()
                     let player3_decision = player3.wantToPillageLandlord()
                     if !player2_decision && !player3_decision { // both two players don't want to pillage the landlord
-                        self.setLandlordAndStartGame(landlord: player1, playerNum: 0)
+                        self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
                     } else { // at least one of the player wants to pillage the landlord, so we need to let player 1 decide again if he wants to pillage the landlord
                         self.letPlayerDecideLandlord(playerNum: 0)
                     }
@@ -220,17 +220,17 @@ class DouDiZhuGame {
             self.pillageLandlordDecision[0] = true
             
             if self.pillageLandlordDecision[1] && self.pillageLandlordDecision[2] {
-                self.setLandlordAndStartGame(landlord: player1, playerNum: 0)
+                self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
             } else if !self.pillageLandlordDecision[1] && self.pillageLandlordDecision[2] { // player 2 had not decided to pillage or not, player 3 did, if we are in this case, then player 2 must be the player who first wants to be the landlord
                 letPlayerDecideLandlord(playerNum: 1)
                 let decision = player2.wantToPillageLandlord()
                         
                 if decision {
-                    self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                    self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                 } else if player3.wantToPillageLandlord() {
-                    self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                    self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                 } else {
-                    self.setLandlordAndStartGame(landlord: player1, playerNum: 0)
+                    self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
                 }
             } else { // if we are here, then it means that both player2 and player 3 must have not decided yet, and the only possibility when we are in this case is that player 3 is the first one who decided to be the landlord
                 letPlayerDecideLandlord(playerNum: 1)
@@ -238,9 +238,9 @@ class DouDiZhuGame {
                 let decision = player3.wantToPillageLandlord()
                     
                 if decision {
-                    self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                    self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                 } else {
-                    self.setLandlordAndStartGame(landlord: player1, playerNum: 0)
+                    self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
                 }
             }
         }
@@ -262,7 +262,7 @@ class DouDiZhuGame {
                     if !decision {
                         self.gameScene.startNewGameSinceNoPlayerChooseToBeLandlord()
                     } else {
-                        self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                        self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                     }
                 } else { // player 3 has not decided as well, so only player 1 has made the choice
                     self.letPlayerDecideLandlord(playerNum: 1)
@@ -274,14 +274,14 @@ class DouDiZhuGame {
                         player3.chooseToPillageLandlord()
                         player3_decision = player3.wantToPillageLandlord()
                         if !player3_decision {
-                            self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                            self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                         } else {
                             player2.chooseToPillageLandlord()
                             let player2_decision = player2.wantToPillageLandlord()
                             if player2_decision {
-                                self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                                self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                             } else {
-                                self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                                self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                             }
                         }
                     } else {
@@ -290,7 +290,7 @@ class DouDiZhuGame {
                         if !player3_decision {
                             self.gameScene.startNewGameSinceNoPlayerChooseToBeLandlord()
                         } else {
-                            self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                            self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                         }
                     }
                 }
@@ -302,39 +302,51 @@ class DouDiZhuGame {
             if self.pillageLandlordDecision[2] && !self.pillageLandlordDecision[1] {
                 let player3_decision = player3.wantToPillageLandlord()
                 if !player3_decision {
-                    self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                    self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                 } else {
                     letPlayerDecideLandlord(playerNum: 1)
                     let player2_decision = player2.wantToPillageLandlord()
                     if player2_decision {
-                        self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                        self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                     } else {
-                        self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                        self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                     }
                 }
             } else {
                 letPlayerDecideLandlord(playerNum: 1)
                 let player2_decision = player2.wantToPillageLandlord()
                 if !player2_decision {
-                    self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                    self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                 } else {
                     letPlayerDecideLandlord(playerNum: 2)
                     let player3_decision = player3.wantToPillageLandlord()
                     if player3_decision {
-                        self.setLandlordAndStartGame(landlord: player3, playerNum: 2)
+                        self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
                     } else {
-                        self.setLandlordAndStartGame(landlord: player2, playerNum: 1)
+                        self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
                     }
                 }
             }
         }
     }
     
-    func setLandlordAndStartGame(landlord: Player, playerNum: Int) {
+    func setLandlordAndStartGame(landlordNum: PlayerNum) {
+        var landlord: Player, currentPlayerNum: Int
+        switch landlordNum {
+        case .one:
+            landlord = player1
+            currentPlayerNum = 0
+        case .two:
+            landlord = player2
+            currentPlayerNum = 1
+        default:
+            landlord = player3
+            currentPlayerNum = 2
+        }
         self.landlord = landlord
-        self.landlord?.addLandlordCard(newCards: getLandlordCards())
-        self.gameScene.updateLandlordCard(landlordID: playerNum)
-        self.currentPlayerNum = playerNum
+        self.landlord!.addLandlordCard(newCards: getLandlordCards())
+        self.gameScene.updateLandlordCard(landlordNum: landlordNum)
+        self.currentPlayerNum = currentPlayerNum
         self.runGame()
     }
 }
