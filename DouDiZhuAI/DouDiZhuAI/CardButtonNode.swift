@@ -9,9 +9,14 @@
 import SpriteKit
 
 class CardButtonNode: FTButtonNode {
-    private var isClicked: Bool = false
+    private var card: Card
+    private var isClicked: Bool
+    private var game: DouDiZhuGame
     
-    init(normalTexture defaultTexture: SKTexture!) {
+    init(normalTexture defaultTexture: SKTexture!, card: Card, game: DouDiZhuGame) {
+        self.card = card
+        self.game = game
+        self.isClicked = false
         super.init(normalTexture: defaultTexture, selectedTexture: defaultTexture, disabledTexture: nil)
         self.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(CardButtonNode.CardClicked))
     }
@@ -21,6 +26,7 @@ class CardButtonNode: FTButtonNode {
     }
     
     @objc func CardClicked() {
+        self.game.cardIsClicked(card: self.card)
         if !isClicked {
             self.position.y += CGFloat(20)
             isClicked = true
@@ -28,6 +34,10 @@ class CardButtonNode: FTButtonNode {
             self.position.y -= CGFloat(20)
             isClicked = false
         }
+    }
+    
+    func getIdentifier()->String {
+        return self.card.getIdentifier()
     }
 }
 

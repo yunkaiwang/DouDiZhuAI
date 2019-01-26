@@ -54,4 +54,15 @@ class Player {
     func getPlayerNum()->PlayerNum {
         return self.playerNum
     }
+    
+    func makePlay(cards: [Card]) {
+        for selected_card in cards {
+            for i in 0..<self.cards.count {
+                if self.cards[i].getIdentifier() == selected_card.getIdentifier() {
+                    self.cards.remove(at: i)
+                    break
+                }
+            }
+        }
+    }
 }

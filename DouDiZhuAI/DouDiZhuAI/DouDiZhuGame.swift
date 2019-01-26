@@ -21,6 +21,9 @@ class DouDiZhuGame {
     private var beLandlordDecision:[Bool]
     private var pillageLandlordDecision:[Bool]
     private var currentPlayerNum:Int
+    private var userSelectedCards:[Card]
+    private var playerCardButtons:[CardButtonNode]
+    private var currentPlay: Play
     
     init(scene: GameScene) {
         self.landlord = nil
@@ -29,6 +32,9 @@ class DouDiZhuGame {
         self.beLandlordDecision = [false, false, false]
         self.pillageLandlordDecision = [false, false, false]
         self.currentPlayerNum = -1
+        self.userSelectedCards = []
+        self.playerCardButtons = []
+        self.currentPlay = Play.none
     }
     
     func newGame() {
@@ -38,11 +44,16 @@ class DouDiZhuGame {
         self.beLandlordDecision = [false, false, false]
         self.pillageLandlordDecision = [false, false, false]
         self.currentPlayerNum = -1
+        self.userSelectedCards = []
+        self.playerCardButtons = []
+        self.currentPlay = Play.none
         splitCards(cards: newCards)
         
         player1.startNewGame(cards: playerCardArr[0])
         player2.startNewGame(cards: playerCardArr[1])
         player3.startNewGame(cards: playerCardArr[2])
+        
+        self.createPlayerCards()
     }
     
     func splitCards(cards: [Card]) {
@@ -68,14 +79,26 @@ class DouDiZhuGame {
     }
     
     func runGame() {
+        if isGameOver() {
+            self.gameScene.gameOver()
+        }
         
+        self.gameScene.clearCurrentPlay()
+        self.gameScene.showPlayButtons()
+        self.gameScene.disablePassButton()
     }
     
-    func getPlayerCards()->[Card] {
-        return self.player1.getCards()
+    func createPlayerCards() {
+        let playerCards: [Card] = player1.getCards()
+        for i in 0..<playerCards.count {
+            let newCard = CardButtonNode(normalTexture: SKTexture(imageNamed: playerCards[i].getIdentifier()), card: playerCards[i], game: self)
+            newCard.position = CGPoint(x: 200 - (playerCards.count - 17) * 13 + 25 * i, y: 50)
+            self.playerCardButtons.append(newCard)
+        }
+        self.gameScene.displayPlayerCards(cards: self.playerCardButtons)
     }
     
-    func getLandlordCards()->[Card] {
+    private func getLandlordCards()->[Card] {
         return self.playerCardArr[3]
     }
     
@@ -155,7 +178,7 @@ class DouDiZhuGame {
                 decision = player2.wantToBeLandlord()
                 text = "Be landlord"
             }
-            self.gameScene.displayPlayerDecision(playerNum: 1, decision: decision ? text : "Be a farmer")
+            self.gameScene.displayPlayerDecision(playerNum: player2.getPlayerNum(), decision: decision ? text : "Be a farmer")
         } else {
             var decision: Bool
             var text: String
@@ -168,7 +191,7 @@ class DouDiZhuGame {
                 decision = player3.wantToBeLandlord()
                 text = "Be landlord"
             }
-            self.gameScene.displayPlayerDecision(playerNum: 2, decision: decision ? text : "Be a farmer")
+            self.gameScene.displayPlayerDecision(playerNum: player3.getPlayerNum(), decision: decision ? text : "Be a farmer")
         }
     }
     
@@ -185,7 +208,7 @@ class DouDiZhuGame {
     }
     
     func playerChooseToBeLandlord() {
-        self.gameScene.displayPlayerDecision(playerNum: 0, decision: self.pillagingLandlord ? "Pillage landlord" : "Be landlord")
+        self.gameScene.displayPlayerDecision(playerNum: player1.getPlayerNum(), decision: self.pillagingLandlord ? "Pillage landlord" : "Be landlord")
         if !self.pillagingLandlord {
             player1.decideToBeLandlord(decision: true)
             self.pillagingLandlord = true
@@ -247,7 +270,7 @@ class DouDiZhuGame {
     }
     
     func playerChooseToBeFarmer() {
-        self.gameScene.displayPlayerDecision(playerNum: 0, decision: "Be a farmer")
+        self.gameScene.displayPlayerDecision(playerNum: player1.getPlayerNum(), decision: "Be a farmer")
         
         if !self.pillagingLandlord {
             player1.decideToBeLandlord(decision: false)
@@ -345,8 +368,84 @@ class DouDiZhuGame {
         }
         self.landlord = landlord
         self.landlord!.addLandlordCard(newCards: getLandlordCards())
-        self.gameScene.updateLandlordCard(landlordNum: landlordNum)
+        if landlordNum == PlayerNum.one {
+            for card in self.playerCardButtons {
+                card.removeFromParent()
+            }
+            self.playerCardButtons = []
+            createPlayerCards()
+        }
+        
+        self.gameScene.revealLandloardCard(cards: self.getLandlordCards())
+        self.gameScene.updateLandlord(landlordNum: landlordNum)
         self.currentPlayerNum = currentPlayerNum
         self.runGame()
+    }
+    
+    func isCurrentPlayValid(cards: [Card])->Bool {
+        switch currentPlay {
+        case .none:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func cardIsClicked(card: Card) {
+        var isSelected: Bool = true
+            
+        for i in 0..<self.userSelectedCards.count {
+            if card.getIdentifier() == self.userSelectedCards[i].getIdentifier() {
+                self.userSelectedCards.remove(at: i)
+                isSelected = false
+                break
+            }
+        }
+            
+        if isSelected {
+            self.userSelectedCards.append(card)
+        }
+        
+        if currentPlayerNum == 0 {
+            if isCurrentPlayValid(cards: self.userSelectedCards) {
+                self.gameScene.enablePlayButton()
+            }
+        }
+    }
+    
+    func playButtonClicked() {
+        print("play button is clicked")
+//        if self.currentPlayerNum != 0 {
+//            return
+//        }
+        
+        self.player1.makePlay(cards: self.userSelectedCards)
+        self.gameScene.displayPlayerPlay(playerNum: player1.getPlayerNum(), cards: self.userSelectedCards)
+        
+        for selected_card in self.userSelectedCards {
+            for i in 0..<self.playerCardButtons.count {
+                if self.playerCardButtons[i].getIdentifier() == selected_card.getIdentifier() {
+                    self.playerCardButtons[i].removeFromParent()
+                    self.playerCardButtons.remove(at: i)
+                    break
+                }
+            }
+        }
+        
+        self.userSelectedCards = []
+        
+        for i in 0..<self.playerCardButtons.count {
+            playerCardButtons[i].position = CGPoint(x: 200 - (self.playerCardButtons.count - 17) * 13 + 25 * i, y: 50)
+        }
+        
+        self.runGame()
+    }
+    
+    func hintButtonClicked() {
+        
+    }
+    
+    func passButtonClicked() {
+        
     }
 }

@@ -19,7 +19,7 @@ class GameScene: SKScene {
     
     let playButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: SKTexture(imageNamed: "disabledBtn"))
     let hintButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
-    let passButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
+    let passButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: SKTexture(imageNamed: "disabledBtn"))
     
     let playerCardContainer = SKSpriteNode(color: .clear, size: CGSize(width: 200, height: 100))
 
@@ -27,6 +27,7 @@ class GameScene: SKScene {
     let player2CardCount = SKLabelNode(text: "17")
     let player3Card = SKSpriteNode(imageNamed: "back")
     let player3CardCount = SKLabelNode(text: "17")
+    let gameOverMsg = SKLabelNode(text: "")
     
     let LandlordCard1 = SKSpriteNode(imageNamed: "back_small")
     let LandlordCard2 = SKSpriteNode(imageNamed: "back_small")
@@ -34,7 +35,6 @@ class GameScene: SKScene {
     let countDownLabel = SKLabelNode(text: "0")
     let landlordLabel = SKLabelNode(text: "L")
     
-    private var cur_player: Player? = nil
     private var countDown: Int = 0
     private var timer: Timer? = nil
     private var game: DouDiZhuGame? = nil
@@ -55,6 +55,12 @@ class GameScene: SKScene {
         player2CardCount.fontColor = UIColor.black
         player3CardCount.fontColor = UIColor.black
         
+        gameOverMsg.position = CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 75)
+        gameOverMsg.fontColor = UIColor.black
+        gameOverMsg.fontSize = 50
+        self.addChild(gameOverMsg)
+        gameOverMsg.isHidden = true
+        
         countDownLabel.name = "countDownLabel"
         countDownLabel.fontColor = UIColor.black
         countDownLabel.position = CGPoint(x: 600, y: 150)
@@ -72,6 +78,9 @@ class GameScene: SKScene {
         self.addChild(startGameButton)
         self.addChild(beLandlordButton)
         self.addChild(notBeLandlordButton)
+        self.addChild(playButton)
+        self.addChild(hintButton)
+        self.addChild(passButton)
         self.addChild(playerCardContainer)
         
         self.addChild(player1CurrentPlay)
@@ -121,6 +130,7 @@ class GameScene: SKScene {
         LandlordCard3.isHidden = true
         
         hideBeLandlordActionButtons()
+        hidePlayButtons()
     }
     
     func setButtonAttributes() {
@@ -145,43 +155,37 @@ class GameScene: SKScene {
         notBeLandlordButton.zPosition = 1
         notBeLandlordButton.name = "notBeLandlordBtn"
 
-        playButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.startGame))
-        playButton.setButtonLabel(title: "Start game!", font: "Arial", fontSize: 12)
-        playButton.position = CGPoint(x: self.frame.midX,y: self.frame.midY)
-        playButton.size = CGSize(width: 100, height: 20)
+        playButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.playButtonClicked))
+        playButton.setButtonLabel(title: "Play", font: "Arial", fontSize: 12)
+        playButton.position = CGPoint(x: self.frame.midX - 150,y: 130)
+        playButton.size = CGSize(width: 100, height: 30)
         playButton.zPosition = 1
-        playButton.name = "startGameBtn"
+        playButton.name = "playBtn"
 
-        hintButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.startGame))
-        hintButton.setButtonLabel(title: "Start game!", font: "Arial", fontSize: 12)
-        hintButton.position = CGPoint(x: self.frame.midX,y: self.frame.midY)
-        hintButton.size = CGSize(width: 100, height: 20)
+        hintButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.hintButtonClicked))
+        hintButton.setButtonLabel(title: "Hint", font: "Arial", fontSize: 12)
+        hintButton.position = CGPoint(x: self.frame.midX,y: 130)
+        hintButton.size = CGSize(width: 100, height: 30)
         hintButton.zPosition = 1
-        hintButton.name = "startGameBtn"
+        hintButton.name = "hintBtn"
 
-        passButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.startGame))
-        passButton.setButtonLabel(title: "Start game!", font: "Arial", fontSize: 12)
-        passButton.position = CGPoint(x: self.frame.midX,y: self.frame.midY)
-        passButton.size = CGSize(width: 100, height: 20)
+        passButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.passButtonClicked))
+        passButton.setButtonLabel(title: "Pass", font: "Arial", fontSize: 12)
+        passButton.position = CGPoint(x: self.frame.midX + 150,y: 130)
+        passButton.size = CGSize(width: 100, height: 30)
         passButton.zPosition = 1
-        passButton.name = "startGameBtn"
+        passButton.name = "passBtn"
     }
     
     @objc func startGame() {
         resetTable()
         game!.newGame()
-        self.displayPlayerCards()
         game!.startGame()
     }
     
-    func displayPlayerCards() {
-        playerCardContainer.removeAllChildren()
-        let playerCards: [Card] = game!.getPlayerCards()
-        for i in 0..<playerCards.count {
-            let newCard = CardButtonNode(normalTexture: SKTexture(imageNamed: playerCards[i].getIdentifier()))
-            self.playerCardContainer.addChild(newCard)
-            let x = 200 - (playerCards.count - 17) * 13 + 25 * i
-            newCard.position = CGPoint(x: CGFloat(x), y: CGFloat(50))
+    func displayPlayerCards(cards: [CardButtonNode]) {
+        for i in 0..<cards.count {
+            self.playerCardContainer.addChild(cards[i])
         }
     }
     
@@ -192,8 +196,7 @@ class GameScene: SKScene {
         countDownLabel.text = String(countDown)
     }
     
-    func revealLandloardCard() {
-        var cards:[Card] = game!.getLandlordCards()
+    func revealLandloardCard(cards: [Card]) {
         LandlordCard1.texture = SKTexture(imageNamed: cards[0].getIdentifier())
         LandlordCard2.texture = SKTexture(imageNamed: cards[1].getIdentifier())
         LandlordCard3.texture = SKTexture(imageNamed: cards[2].getIdentifier())
@@ -209,6 +212,34 @@ class GameScene: SKScene {
         notBeLandlordButton.isHidden = false
     }
     
+    func hidePlayButtons() {
+        playButton.isHidden = true
+        hintButton.isHidden = true
+        passButton.isHidden = true
+    }
+    
+    func showPlayButtons() {
+        playButton.isHidden = false
+        hintButton.isHidden = false
+        passButton.isHidden = false
+    }
+    
+    func disablePlayButton() {
+        playButton.isEnabled = false
+    }
+    
+    func enablePlayButton() {
+        playButton.isEnabled = true
+    }
+    
+    func disablePassButton() {
+        passButton.isEnabled = false
+    }
+    
+    func enablePassButton() {
+        passButton.isEnabled = true
+    }
+    
     func setBeLandlordButtonText(pillage: Bool) {
         if pillage {
             beLandlordButton.setButtonLabel(title: "Pillage landlord!", font: "Arial", fontSize: 12)
@@ -218,12 +249,11 @@ class GameScene: SKScene {
     }
     
     func resetTable() {
-//        startGameButton.isHidden = true
+        gameOverMsg.isHidden = true
+        startGameButton.isHidden = true
         landlordLabel.isHidden = true
         playerCardContainer.isHidden = false
-        player1CurrentPlay.removeAllChildren()
-        player2CurrentPlay.removeAllChildren()
-        player3CurrentPlay.removeAllChildren()
+        playerCardContainer.removeAllChildren()
         
         LandlordCard1.texture = SKTexture(imageNamed: "back_small")
         LandlordCard2.texture = SKTexture(imageNamed: "back_small")
@@ -240,6 +270,8 @@ class GameScene: SKScene {
         player3Card.isHidden = false
         player2CardCount.isHidden = false
         player3CardCount.isHidden = false
+        
+        self.clearCurrentPlay()
     }
     
     @objc func timePassed() {
@@ -278,18 +310,27 @@ class GameScene: SKScene {
         startGame()
     }
     
-    func getPlayerPlayDisplayPosition(playerNum: Int)->CGPoint {
-        if playerNum == 0 {
-            return CGPoint(x: self.frame.midX, y: 150)
-        } else if playerNum == 1 {
+    func getPlayerPlayDisplayPosition(playerNum: PlayerNum)->CGPoint {
+        switch playerNum {
+        case .one:
+            return CGPoint(x: self.frame.midX, y: 180)
+        case .two:
             return CGPoint(x: self.frame.minX + 150, y: 250)
-        } else {
+        default:
             return CGPoint(x: self.frame.maxX - 150, y: 250)
         }
     }
     
-    func displayPlayerDecision(playerNum: Int, decision: String) {
-        let playerContainer = playerNum == 0 ? player1CurrentPlay : (playerNum == 1 ? player2CurrentPlay : player3CurrentPlay)
+    func displayPlayerDecision(playerNum: PlayerNum, decision: String) {
+        var playerContainer: SKSpriteNode;
+        switch playerNum {
+        case .one:
+            playerContainer = player1CurrentPlay
+        case .two:
+            playerContainer = player2CurrentPlay
+        default:
+            playerContainer = player3CurrentPlay
+        }
         
         playerContainer.removeAllChildren()
         let display: SKLabelNode = SKLabelNode(text: decision)
@@ -300,29 +341,63 @@ class GameScene: SKScene {
         playerContainer.addChild(display)
     }
     
-    func updateLandlordCard(landlordNum: PlayerNum) {
-        print("L is elected", landlordNum)
-        switch landlordNum {
+    func displayPlayerPlay(playerNum: PlayerNum, cards: [Card]) {
+        var playerContainer: SKSpriteNode;
+        switch playerNum {
         case .one:
-            self.displayPlayerCards()
+            playerContainer = player1CurrentPlay
+        case .two:
+            playerContainer = player2CurrentPlay
         default:
-            player2CardCount.text = String(game!.getPlayer2CardCount())
-            player3CardCount.text = String(game!.getPlayer3CardCount())
+            playerContainer = player3CurrentPlay
         }
-        self.displayLandlordCard(landlordNum: landlordNum)
+        
+        playerContainer.removeAllChildren()
+        let position = self.getPlayerPlayDisplayPosition(playerNum: playerNum)
+        for i in 0..<cards.count {
+            let card: SKSpriteNode = SKSpriteNode(imageNamed: cards[i].getIdentifier() + "_small")
+            card.position = CGPoint(x: position.x + CGFloat((i - cards.count / 2) * 15), y:position.y)
+            playerContainer.addChild(card)
+        }
     }
     
-    func displayLandlordCard(landlordNum: PlayerNum) {
+    func updateLandlord(landlordNum: PlayerNum) {
         var position: CGPoint
         switch landlordNum {
         case .one:
-            position = CGPoint(x: 200, y: 100)
+            position = CGPoint(x: 150, y: 100)
         case .two:
             position = CGPoint(x: self.frame.minX + 75, y: 320)
+            player2CardCount.text = String(game!.getPlayer2CardCount())
         default:
             position = CGPoint(x: self.frame.maxX - 75, y: 320)
+            player3CardCount.text = String(game!.getPlayer3CardCount())
         }
         self.landlordLabel.position = position
         self.landlordLabel.isHidden = false
+    }
+    
+    func clearCurrentPlay() {
+        player1CurrentPlay.removeAllChildren()
+        player2CurrentPlay.removeAllChildren()
+        player3CurrentPlay.removeAllChildren()
+    }
+    
+    @objc func playButtonClicked() {
+        self.game!.playButtonClicked()
+    }
+    
+    @objc func hintButtonClicked() {
+        self.game!.hintButtonClicked()
+    }
+    
+    @objc func passButtonClicked() {
+        self.game!.passButtonClicked()
+    }
+    
+    func gameOver() {
+        gameOverMsg.text = self.game!.getWinner()! + " wins!"
+        gameOverMsg.isHidden = false
+        startGameButton.isHidden = false
     }
 }

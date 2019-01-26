@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51D921FBF26D002AC4A0 /* Play.swift */; };
 		3F79390C21EAE019003A590F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79390B21EAE019003A590F /* AppDelegate.swift */; };
 		3F79391021EAE019003A590F /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3F79390F21EAE019003A590F /* Actions.sks */; };
 		3F79391221EAE019003A590F /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79391121EAE019003A590F /* GameScene.swift */; };
@@ -32,6 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3F6A51D921FBF26D002AC4A0 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
 		3F79390821EAE019003A590F /* DouDiZhuAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DouDiZhuAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F79390B21EAE019003A590F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3F79390F21EAE019003A590F /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				3F79392F21EC1958003A590F /* NumCard.swift */,
 				3F79392D21EC1832003A590F /* JokerType.swift */,
 				3F79393921EC3089003A590F /* DouDiZhuGame.swift */,
+				3F6A51D921FBF26D002AC4A0 /* Play.swift */,
 				3F79391521EAE019003A590F /* Main.storyboard */,
 				3F79393521EC1F17003A590F /* FTButtonNode.swift */,
 				3F79392721EBBEDF003A590F /* GameSceneViewController.swift */,
@@ -198,6 +201,7 @@
 				3F79394E21FA5003003A590F /* extension.swift in Sources */,
 				3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */,
 				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
+				3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
 				3F79392A21EC1363003A590F /* Deck.swift in Sources */,
 				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,
