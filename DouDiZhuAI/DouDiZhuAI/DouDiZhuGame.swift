@@ -83,7 +83,7 @@ class DouDiZhuGame {
             self.gameScene.gameOver()
         }
         
-//        self.gameScene.clearCurrentPlay()
+//        self.gameScene.clearCurrentPlayerPlay(currentPlayerNum: self.currentPlayerNum)
         self.gameScene.showPlayButtons()
         self.gameScene.disablePassButton()
     }
@@ -419,9 +419,6 @@ class DouDiZhuGame {
         }
         
         let res = checkPlay(cards: self.userSelectedCards)
-        
-        print("play button is clicked and res is", res)
-        
         if res == Play.invalid || res == Play.none {
             return
         } else if res != Play.bomb && res != Play.rocket && currentPlay != Play.none && res != currentPlay {
@@ -453,10 +450,39 @@ class DouDiZhuGame {
     }
     
     func hintButtonClicked() {
+//        if self.currentPlayerNum != 0 {
+//            return
+//        }
         
+        for selected_card in self.userSelectedCards {
+            for i in 0..<self.playerCardButtons.count {
+                if self.playerCardButtons[i].getIdentifier() == selected_card.getIdentifier() {
+                    self.playerCardButtons[i].CardClicked()
+                }
+            }
+        }
+        
+        self.userSelectedCards = []
+        
+        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.solo, lastPlayedCards: [NumCard(suit: "clubs", num: 3)])
+        
+        for selected_card in suggested_cards {
+            for i in 0..<self.playerCardButtons.count {
+                if self.playerCardButtons[i].getIdentifier() == selected_card.getIdentifier() {
+                    self.playerCardButtons[i].CardClicked()
+                }
+            }
+        }
+        
+        print("suggested card is ", suggested_cards)
+        self.userSelectedCards = suggested_cards
     }
     
     func passButtonClicked() {
-        
+        if self.currentPlayerNum != 0 {
+            return
+        }
+        self.currentPlayerNum = 1
+        self.runGame()
     }
 }

@@ -383,6 +383,17 @@ class GameScene: SKScene {
         player3CurrentPlay.removeAllChildren()
     }
     
+    func clearCurrentPlayerPlay(currentPlayerNum: Int) {
+        switch currentPlayerNum {
+        case 0:
+            player1CurrentPlay.removeAllChildren()
+        case 1:
+            player2CurrentPlay.removeAllChildren()
+        default:
+            player3CurrentPlay.removeAllChildren()
+        }
+    }
+    
     @objc func playButtonClicked() {
         self.game!.playButtonClicked()
     }

@@ -32,4 +32,16 @@ class JokerCard: Card {
     func isBlackJoker()->Bool {
         return self.type == JokerType.black
     }
+    
+    static func < (lhs: JokerCard, rhs: JokerCard) -> Bool {
+        return lhs.isBlackJoker()
+    }
+    
+    static func == (lhs: JokerCard, rhs: JokerCard) -> Bool {
+        return lhs.getIdentifier() == rhs.getIdentifier()
+    }
+    
+    static func > (lhs: JokerCard, rhs: JokerCard) -> Bool {
+        return lhs.isRedJoker()
+    }
 }

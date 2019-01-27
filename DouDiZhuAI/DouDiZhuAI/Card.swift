@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-class Card {
+class Card: Comparable {
     private var identifier: String = ""
     
     init(identifier:String) {
@@ -20,4 +20,57 @@ class Card {
         return self.identifier
     }
     
+    static func < (lhs: Card, rhs: Card) -> Bool {
+        if let card1 = lhs as? JokerCard {
+            if let card2 = rhs as? JokerCard {
+                return card1 < card2
+            } else {
+                return false
+            }
+        } else {
+            if rhs is JokerCard {
+                return true
+            } else {
+                let card1 = lhs as! NumCard
+                let card2 = rhs as! NumCard
+                return card1 < card2
+            }
+        }
+    }
+    
+    static func == (lhs: Card, rhs: Card) -> Bool {
+        if let card1 = lhs as? JokerCard {
+            if let card2 = rhs as? JokerCard {
+                return card1 == card2
+            } else {
+                return false
+            }
+        } else {
+            if rhs is JokerCard {
+                return false
+            } else {
+                let card1 = lhs as! NumCard
+                let card2 = rhs as! NumCard
+                return card1 == card2
+            }
+        }
+    }
+    
+    static func > (lhs: Card, rhs: Card) -> Bool {
+        if let card1 = lhs as? JokerCard {
+            if let card2 = rhs as? JokerCard {
+                return card1 > card2
+            } else {
+                return true
+            }
+        } else {
+            if rhs is JokerCard {
+                return false
+            } else {
+                let card1 = lhs as! NumCard
+                let card2 = rhs as! NumCard
+                return card1 > card2
+            }
+        }
+    }
 }

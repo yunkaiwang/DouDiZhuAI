@@ -11,20 +11,32 @@ import SpriteKit
 
 class NumCard: Card {
     private var suit: String = ""
-    private var num: Int = 0
+    private var num: CardNum = CardNum()
     
     init(suit: String, num: Int) {
         self.suit = suit
-        self.num = num
+        self.num = CardNum(num: num)
         let identifier = String(num) + "_of_" + suit
         super.init(identifier: identifier)
     }
     
-    func getNum()->Int {
+    func getNum()->CardNum {
         return self.num
     }
     
     func getSuit()->String {
         return self.suit
+    }
+    
+    static func < (lhs: NumCard, rhs: NumCard) -> Bool {
+        return lhs.getNum() < rhs.getNum()
+    }
+    
+    static func == (lhs: NumCard, rhs: NumCard) -> Bool {
+        return lhs.getNum() == rhs.getNum()
+    }
+    
+    static func > (lhs: NumCard, rhs: NumCard) -> Bool {
+        return lhs.getNum() > rhs.getNum()
     }
 }

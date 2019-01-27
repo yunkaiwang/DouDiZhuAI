@@ -20,14 +20,7 @@ func suitPriority(suit:String)->Int {
     }
 }
 
-func checkPlay(cards:[Card])->Play {
-    // nothing need to be checked for a play with 0 or 1 card, it's always a none or solo
-    if cards.count == 0 {
-        return Play.none
-    } else if cards.count == 1 {
-        return Play.solo
-    }
-    
+func parseCards(cards:[Card])->(numCards:[NumCard], jokerCards:[JokerCard], max:CardNum, min:CardNum, max_card_count: Int, card_count:[CardNum:Int]) {
     // convert all cards into its corresponding card type
     var numCards: [NumCard] = []
     var jokerCards: [JokerCard] = []
@@ -38,10 +31,9 @@ func checkPlay(cards:[Card])->Play {
             jokerCards.append(card as! JokerCard)
         }
     }
-    numCards.sort()
     
-    var min: Int = 14, max: Int = 3, max_card_count = 0
-    var card_count = [Int: Int]()
+    var min: CardNum = CardNum(num: 2), max: CardNum = CardNum(num: 3), max_card_count = 0
+    var card_count = [CardNum: Int]()
     for card in numCards {
         if card_count.keys.contains(card.getNum()) {
             card_count[card.getNum()] = 1 + card_count[card.getNum()]!
@@ -52,19 +44,89 @@ func checkPlay(cards:[Card])->Play {
             max_card_count = card_count[card.getNum()]!
         }
         
-        if card.getNum() < 3 {
-            if card.getNum() > max {
-                max = card.getNum()
-            }
-        } else {
-            if card.getNum() < min {
-                min = card.getNum()
-            }
-            if max > 2 && card.getNum() > max {
-                max = card.getNum()
+        if card.getNum() < min {
+            min = card.getNum()
+        }
+        if card.getNum() > max {
+            max = card.getNum()
+        }
+    }
+    
+    return (numCards, jokerCards, max, min, max_card_count, card_count)
+}
+
+func suggestSoloPlay(playerCards: [Card], lastPlayedCard: Card)->[Card] {
+    let playerCards_parsed = parseCards(cards: playerCards)
+    
+    var smallest_card: Card? = nil
+    let min_card_count: Int = playerCards_parsed.card_count.values.min()!
+    
+    for card in playerCards {
+        if card > lastPlayedCard {
+            if let converted_card = card as? NumCard {
+                if playerCards_parsed.card_count[converted_card.getNum()]! == min_card_count {
+                    if smallest_card == nil || card < smallest_card! {
+                        smallest_card = card
+                    }
+                }
+            } else {
+                if smallest_card == nil || card < smallest_card! {
+                    smallest_card = card
+                }
             }
         }
     }
+    
+    if smallest_card != nil {
+        return [smallest_card!]
+    } else if playerCards_parsed.max_card_count < 4 && playerCards_parsed.jokerCards.count < 2 {
+        return []
+    }
+    
+    // find the smallest bomb that player have
+    var found_bomb: Bool = false
+    var smallest_bomb_num = CardNum(num: 2)
+    for (num, count) in playerCards_parsed.card_count {
+        if count == 4 {
+            found_bomb = true
+            if num < smallest_bomb_num {
+                smallest_bomb_num = num
+            }
+        }
+    }
+    
+    if found_bomb {
+        // find the group of cards that makes up the bomb
+        var bomb:[Card] = []
+        for card in playerCards_parsed.numCards {
+            if card.getNum() == smallest_bomb_num {
+                bomb.append(card)
+            }
+        }
+        return bomb
+    } else {
+        return playerCards_parsed.jokerCards
+    }
+}
+
+func suggestPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card])->[Card] {
+    if currentPlay == Play.solo {
+        return suggestSoloPlay(playerCards: playerCards, lastPlayedCard: lastPlayedCards[0])
+    }
+    
+    return []
+}
+
+func checkPlay(cards:[Card])->Play {
+    // nothing need to be checked for a play with 0 or 1 card, it's always a none or solo
+    if cards.count == 0 {
+        return Play.none
+    } else if cards.count == 1 {
+        return Play.solo
+    }
+    
+    let cards_parsed = parseCards(cards: cards)
+    var jokerCards = cards_parsed.jokerCards, min = cards_parsed.min, max = cards_parsed.max, max_card_count = cards_parsed.max_card_count, card_count = cards_parsed.card_count
     
     if cards.count == 2 {
         if jokerCards.count == 2 { // only 2 cards and both are JokerCard, so it's a rocket play
@@ -94,12 +156,7 @@ func checkPlay(cards:[Card])->Play {
                 return Play.invalid
             }
             
-            var rangeSize: Int; // count how many numbers are there in the range, if there are same number of elements in the
-            if max == 1 {
-                rangeSize = 15 - min
-            } else {
-                rangeSize = max - min + 1
-            }
+            let rangeSize = max - min
             
             if rangeSize == cards.count {
                 return Play.soloChain
@@ -111,12 +168,7 @@ func checkPlay(cards:[Card])->Play {
                 return Play.invalid
             }
             
-            var rangeSize: Int; // count how many numbers are there in the range, if there are same number of elements in the
-            if max == 1 {
-                rangeSize = 15 - min
-            } else {
-                rangeSize = max - min + 1
-            }
+            let rangeSize = max - min
             
             if rangeSize == cards.count / 2 {
                 return Play.pairChain
@@ -136,12 +188,7 @@ func checkPlay(cards:[Card])->Play {
                     return Play.invalid
                 }
                 
-                var rangeSize: Int; // count how many numbers are there in the range, if there are same number of elements in the
-                if max == 1 {
-                    rangeSize = 15 - min
-                } else {
-                    rangeSize = max - min + 1
-                }
+                let rangeSize = max - min
                 
                 if rangeSize == cards.count / 3 {
                     return Play.airplane
@@ -220,12 +267,7 @@ func checkPlay(cards:[Card])->Play {
                             return Play.invalid
                         }
                         
-                        var rangeSize: Int; // count how many numbers are there in the range, if there are same number of elements in the
-                        if max == 1 {
-                            rangeSize = 15 - min
-                        } else {
-                            rangeSize = max - min + 1
-                        }
+                        let rangeSize = max - min
                         
                         if rangeSize == bomb_count {
                             return Play.spaceShuttle
@@ -235,20 +277,14 @@ func checkPlay(cards:[Card])->Play {
                     } else {
                         if pair_count == bomb_count * 2 {
                             if bomb_count > 1 {
-                                min = 14; max = 3
+                                min = CardNum(num: 2); max = CardNum(num: 3)
                                 for (num, count) in card_count {
                                     if count == 4 {
-                                        if num < 3 {
-                                            if num > max {
-                                                max = num
-                                            }
-                                        } else {
-                                            if num < min {
-                                                min = num
-                                            }
-                                            if max > 2 && num > max {
-                                                max = num
-                                            }
+                                        if num < min {
+                                            min = num
+                                        }
+                                        if num > max {
+                                            max = num
                                         }
                                     }
                                 }
@@ -256,12 +292,7 @@ func checkPlay(cards:[Card])->Play {
                                 if max == 2 {
                                     return Play.invalid
                                 }
-                                var rangeSize: Int;
-                                if max == 1 {
-                                    rangeSize = 15 - min
-                                } else {
-                                    rangeSize = max - min + 1
-                                }
+                                let rangeSize = max - min
                                 
                                 if rangeSize == bomb_count {
                                     return Play.spaceShuttlePlusFourPair
@@ -272,20 +303,14 @@ func checkPlay(cards:[Card])->Play {
                                 return Play.bombPlusDualPair
                             }
                         } else if pair_count == bomb_count {
-                            min = 14; max = 3
+                            min = CardNum(num: 2); max = CardNum(num: 3)
                             for (num, count) in card_count {
                                 if count == 4 {
-                                    if num < 3 {
-                                        if num > max {
-                                            max = num
-                                        }
-                                    } else {
-                                        if num < min {
-                                            min = num
-                                        }
-                                        if max > 2 && num > max {
-                                            max = num
-                                        }
+                                    if num < min {
+                                        min = num
+                                    }
+                                    if num > max {
+                                        max = num
                                     }
                                 }
                             }
@@ -304,20 +329,14 @@ func checkPlay(cards:[Card])->Play {
                     
                     if solo_count == bomb_count * 2 {
                         if bomb_count > 1 {
-                            min = 14; max = 3
+                            min = CardNum(num: 2); max = CardNum(num: 3)
                             for (num, count) in card_count {
                                 if count == 4 {
-                                    if num < 3 {
-                                        if num > max {
-                                            max = num
-                                        }
-                                    } else {
-                                        if num < min {
-                                            min = num
-                                        }
-                                        if max > 2 && num > max {
-                                            max = num
-                                        }
+                                    if num < min {
+                                        min = num
+                                    }
+                                    if num > max {
+                                        max = num
                                     }
                                 }
                             }
@@ -325,12 +344,7 @@ func checkPlay(cards:[Card])->Play {
                             if max == 2 {
                                 return Play.invalid
                             }
-                            var rangeSize: Int;
-                            if max == 1 {
-                                rangeSize = 15 - min
-                            } else {
-                                rangeSize = max - min + 1
-                            }
+                            let rangeSize = max - min
                             
                             if rangeSize == bomb_count {
                                 return Play.spaceShuttlePlusFourSolo
@@ -385,11 +399,7 @@ extension Array {
                             self.swapAt(i, j)
                         }
                     } else {
-                        if card2.getNum() < 3 && card1.getNum() > 2 {
-                            self.swapAt(i, j)
-                        } else if card2.getNum() < 3 && card1.getNum() < 3 && card2.getNum() > card1.getNum() {
-                            self.swapAt(i, j)
-                        } else if card1.getNum() > 2 && card1.getNum() > 2 && card2.getNum() > card1.getNum() {
+                        if card1.getNum() < card2.getNum() {
                             self.swapAt(i, j)
                         }
                     }
