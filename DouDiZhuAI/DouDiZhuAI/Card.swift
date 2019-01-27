@@ -19,4 +19,5 @@ class Card {
     func getIdentifier()->String {
         return self.identifier
     }
+    
 }

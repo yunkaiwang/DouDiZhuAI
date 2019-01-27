@@ -83,7 +83,7 @@ class DouDiZhuGame {
             self.gameScene.gameOver()
         }
         
-        self.gameScene.clearCurrentPlay()
+//        self.gameScene.clearCurrentPlay()
         self.gameScene.showPlayButtons()
         self.gameScene.disablePassButton()
     }
@@ -414,11 +414,22 @@ class DouDiZhuGame {
     }
     
     func playButtonClicked() {
-        print("play button is clicked")
-//        if self.currentPlayerNum != 0 {
-//            return
-//        }
+        if self.currentPlayerNum != 0 {
+            return
+        }
         
+        let res = checkPlay(cards: self.userSelectedCards)
+        
+        print("play button is clicked and res is", res)
+        
+        if res == Play.invalid || res == Play.none {
+            return
+        } else if res != Play.bomb && res != Play.rocket && currentPlay != Play.none && res != currentPlay {
+            return
+        }
+        if currentPlay == Play.none {
+            currentPlay = res
+        }
         self.player1.makePlay(cards: self.userSelectedCards)
         self.gameScene.displayPlayerPlay(playerNum: player1.getPlayerNum(), cards: self.userSelectedCards)
         
