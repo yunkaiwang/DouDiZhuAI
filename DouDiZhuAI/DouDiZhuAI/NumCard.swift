@@ -10,13 +10,13 @@ import Foundation
 import SpriteKit
 
 class NumCard: Card {
-    private var suit: String = ""
-    private var num: CardNum = CardNum()
+    private var suit: Suit
+    private var num: CardNum
     
-    init(suit: String, num: Int) {
+    init(suit: Suit, num: Int) {
         self.suit = suit
         self.num = CardNum(num: num)
-        let identifier = String(num) + "_of_" + suit
+        let identifier = String(num) + "_of_" + suit.getSuit()
         super.init(identifier: identifier)
     }
     
@@ -24,11 +24,14 @@ class NumCard: Card {
         return self.num
     }
     
-    func getSuit()->String {
+    private func getSuit() -> Suit {
         return self.suit
     }
     
     static func < (lhs: NumCard, rhs: NumCard) -> Bool {
+        if lhs.getNum() == rhs.getNum() {
+            return lhs.getSuit() < rhs.getSuit()
+        }
         return lhs.getNum() < rhs.getNum()
     }
     
@@ -37,6 +40,9 @@ class NumCard: Card {
     }
     
     static func > (lhs: NumCard, rhs: NumCard) -> Bool {
+        if lhs.getNum() == rhs.getNum() {
+            return lhs.getSuit() > rhs.getSuit()
+        }
         return lhs.getNum() > rhs.getNum()
     }
 }

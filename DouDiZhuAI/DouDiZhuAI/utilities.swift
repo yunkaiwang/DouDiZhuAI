@@ -381,28 +381,10 @@ extension Array {
         
         for i in 0..<(count - 1) {
             for j in i+1..<(count) {
-                if self[i] is JokerCard && self[j] is JokerCard  {
-                    let card1 = self[i] as! JokerCard
-                    if card1.isBlackJoker() {
-                        self.swapAt(i, j)
-                    }
-                } else if self[i] is JokerCard {
-                    continue
-                } else if self[j] is JokerCard {
+                let card1 = self[i] as! Card
+                let card2 = self[j] as! Card
+                if card1 < card2 {
                     self.swapAt(i, j)
-                } else {
-                    let card1 = self[i] as! NumCard
-                    let card2 = self[j] as! NumCard
-                    
-                    if card1.getNum() == card2.getNum() {
-                        if suitPriority(suit: card2.getSuit()) > suitPriority(suit: card1.getSuit()) {
-                            self.swapAt(i, j)
-                        }
-                    } else {
-                        if card1.getNum() < card2.getNum() {
-                            self.swapAt(i, j)
-                        }
-                    }
                 }
             }
         }

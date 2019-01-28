@@ -464,7 +464,7 @@ class DouDiZhuGame {
         
         self.userSelectedCards = []
         
-        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.solo, lastPlayedCards: [NumCard(suit: "clubs", num: 3)])
+        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.solo, lastPlayedCards: [NumCard(suit: Suit(type: SuitType.clubs), num: 3)])
         
         for selected_card in suggested_cards {
             for i in 0..<self.playerCardButtons.count {

@@ -16,7 +16,7 @@ class Deck {
     }
     
     func initializeDeckOfCards() {
-        let suits = ["clubs", "diamonds", "hearts", "spades"]
+        let suits = [Suit(type: SuitType.clubs), Suit(type: SuitType.diamonds), Suit(type: SuitType.hearts), Suit(type: SuitType.spades)]
         
         for suit in suits {
             for num in 1...13 {

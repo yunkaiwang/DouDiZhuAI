@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51D921FBF26D002AC4A0 /* Play.swift */; };
 		3F6A51DC21FE55F1002AC4A0 /* CardNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */; };
+		3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */; };
 		3F79390C21EAE019003A590F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79390B21EAE019003A590F /* AppDelegate.swift */; };
 		3F79391021EAE019003A590F /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3F79390F21EAE019003A590F /* Actions.sks */; };
 		3F79391221EAE019003A590F /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79391121EAE019003A590F /* GameScene.swift */; };
@@ -36,6 +37,7 @@
 /* Begin PBXFileReference section */
 		3F6A51D921FBF26D002AC4A0 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
 		3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNum.swift; sourceTree = "<group>"; };
+		3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suit.swift; sourceTree = "<group>"; };
 		3F79390821EAE019003A590F /* DouDiZhuAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DouDiZhuAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F79390B21EAE019003A590F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3F79390F21EAE019003A590F /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				3F79394921F2C0BE003A590F /* ComputerPlayer.swift */,
 				3F79392921EC1363003A590F /* Deck.swift */,
 				3F79393321EC1A3A003A590F /* utilities.swift */,
+				3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */,
 				3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */,
 				3F79392B21EC13B4003A590F /* Card.swift */,
 				3F79393121EC196F003A590F /* JokerCard.swift */,
@@ -206,6 +209,7 @@
 				3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */,
 				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
 				3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */,
+				3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
 				3F79392A21EC1363003A590F /* Deck.swift in Sources */,
 				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,
