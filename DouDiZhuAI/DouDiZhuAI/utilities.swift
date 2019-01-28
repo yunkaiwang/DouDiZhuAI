@@ -8,18 +8,6 @@
 
 import Foundation
 
-func suitPriority(suit:String)->Int {
-    if suit == "spades" {
-        return 4
-    } else if suit == "hearts" {
-        return 3
-    } else if suit == "clubs" {
-        return 2
-    } else {
-        return 1
-    }
-}
-
 func parseCards(cards:[Card])->(numCards:[NumCard], jokerCards:[JokerCard], max:CardNum, min:CardNum, max_card_count: Int, card_count:[CardNum:Int]) {
     // convert all cards into its corresponding card type
     var numCards: [NumCard] = []
