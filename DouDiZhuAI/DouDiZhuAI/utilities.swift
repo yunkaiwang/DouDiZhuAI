@@ -43,30 +43,39 @@ func parseCards(cards:[Card])->(numCards:[NumCard], jokerCards:[JokerCard], max:
     return (numCards, jokerCards, max, min, max_card_count, card_count)
 }
 
-func suggestSoloPlay(playerCards: [Card], lastPlayedCard: Card)->[Card] {
-    let playerCards_parsed = parseCards(cards: playerCards)
+func suggestSPTPlay(playerCards: [Card], lastPlayedCards: [Card], play: Play)->[Card] {
+    if play != Play.solo && play != Play.pair && play != Play.trio {
+        return []
+    }
     
-    var smallest_card: Card? = nil
-    let min_card_count: Int = playerCards_parsed.card_count.values.min()!
+    let playerCards_parsed = parseCards(cards: playerCards)
+    var smallest_cards: [Card] = []
+    var smallest_card_num: CardNum = CardNum(num: -1)
+    let lastPlayedCard = lastPlayedCards[0] as! NumCard
+    let limit = play == Play.solo ? 0 : (play == Play.pair ? 1 : 2)
+    
+    var min_card_count: Int = 4
+    for num in playerCards_parsed.card_count.values {
+        if num > limit {
+            min_card_count = min(min_card_count, num)
+        }
+    }
     
     for card in playerCards {
-        if card > lastPlayedCard {
-            if let converted_card = card as? NumCard {
-                if playerCards_parsed.card_count[converted_card.getNum()]! == min_card_count {
-                    if smallest_card == nil || card < smallest_card! {
-                        smallest_card = card
-                    }
-                }
-            } else {
-                if smallest_card == nil || card < smallest_card! {
-                    smallest_card = card
+        if let converted_card = card as? NumCard {
+            if smallest_card_num == converted_card.getNum() && smallest_cards.count < limit + 1 {
+                smallest_cards.append(converted_card)
+            } else if playerCards_parsed.card_count[converted_card.getNum()]! == min_card_count {
+                if converted_card.getNum() > lastPlayedCard.getNum() && (smallest_cards.count == 0 || converted_card.getNum() < smallest_card_num) {
+                    smallest_cards = [card]
+                    smallest_card_num = converted_card.getNum()
                 }
             }
         }
     }
     
-    if smallest_card != nil {
-        return [smallest_card!]
+    if smallest_cards.count != 0 {
+        return smallest_cards
     } else if playerCards_parsed.max_card_count < 4 && playerCards_parsed.jokerCards.count < 2 {
         return []
     }
@@ -95,14 +104,20 @@ func suggestSoloPlay(playerCards: [Card], lastPlayedCard: Card)->[Card] {
     } else {
         return playerCards_parsed.jokerCards
     }
+
 }
 
 func suggestPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card])->[Card] {
-    if currentPlay == Play.solo {
-        return suggestSoloPlay(playerCards: playerCards, lastPlayedCard: lastPlayedCards[0])
+    switch currentPlay {
+    case .solo:
+        return suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: currentPlay)
+    case .pair:
+        return suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: currentPlay)
+    case .trio:
+        return suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: currentPlay)
+    default:
+        return []
     }
-    
-    return []
 }
 
 func checkPlay(cards:[Card])->Play {
