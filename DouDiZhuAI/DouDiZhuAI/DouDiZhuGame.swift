@@ -49,7 +49,7 @@ class DouDiZhuGame {
         self.currentPlay = Play.none
         splitCards(cards: newCards)
         
-        player1.startNewGame(cards: playerCardArr[0])
+        player1.startNewGame(cards: playerCardArr[0] + playerCardArr[1])
         player2.startNewGame(cards: playerCardArr[1])
         player3.startNewGame(cards: playerCardArr[2])
         
@@ -129,7 +129,8 @@ class DouDiZhuGame {
     }
     
     func chooseLandlord() {
-        self.currentPlayerNum = Int.random(in: 0...2)
+//        self.currentPlayerNum = Int.random(in: 0...2)
+        self.currentPlayerNum = 0
         if currentPlayerNum == 0 {
             letPlayerDecideLandlord(playerNum: 0)
         } else if currentPlayerNum == 1 {
@@ -450,10 +451,6 @@ class DouDiZhuGame {
     }
     
     func hintButtonClicked() {
-//        if self.currentPlayerNum != 0 {
-//            return
-//        }
-        
         for selected_card in self.userSelectedCards {
             for i in 0..<self.playerCardButtons.count {
                 if self.playerCardButtons[i].getIdentifier() == selected_card.getIdentifier() {
@@ -464,17 +461,21 @@ class DouDiZhuGame {
         
         self.userSelectedCards = []
         
-        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.trio, lastPlayedCards: [NumCard(suit: Suit(type: SuitType.clubs), num: 3)])
+        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.bombPlusDualSolo, lastPlayedCards: [NullCard()])
         
+        if suggested_cards.count == 0 {
+            print("no suggested card")
+        }
         for selected_card in suggested_cards {
             for i in 0..<self.playerCardButtons.count {
                 if self.playerCardButtons[i].getIdentifier() == selected_card.getIdentifier() {
                     self.playerCardButtons[i].CardClicked()
+                    print("Suggest card:", selected_card.getIdentifier())
+                    break
                 }
             }
         }
         
-        print("suggested card is ", suggested_cards)
         self.userSelectedCards = suggested_cards
     }
     

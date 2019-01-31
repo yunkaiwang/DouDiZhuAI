@@ -249,8 +249,9 @@ class GameScene: SKScene {
     }
     
     func resetTable() {
+        hidePlayButtons()
         gameOverMsg.isHidden = true
-        startGameButton.isHidden = true
+//        startGameButton.isHidden = true
         landlordLabel.isHidden = true
         playerCardContainer.isHidden = false
         playerCardContainer.removeAllChildren()

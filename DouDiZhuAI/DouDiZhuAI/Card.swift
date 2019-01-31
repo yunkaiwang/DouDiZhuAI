@@ -21,6 +21,11 @@ class Card: Comparable {
     }
     
     static func < (lhs: Card, rhs: Card) -> Bool {
+        if lhs is NullCard {
+            return true
+        } else if rhs is NullCard {
+            return false
+        }
         if let card1 = lhs as? JokerCard {
             if let card2 = rhs as? JokerCard {
                 return card1 < card2
@@ -39,6 +44,9 @@ class Card: Comparable {
     }
     
     static func == (lhs: Card, rhs: Card) -> Bool {
+        if lhs is NullCard || rhs is NullCard {
+            return false
+        }
         if let card1 = lhs as? JokerCard {
             if let card2 = rhs as? JokerCard {
                 return card1 == card2
@@ -57,6 +65,11 @@ class Card: Comparable {
     }
     
     static func > (lhs: Card, rhs: Card) -> Bool {
+        if lhs is NullCard {
+            return false
+        } else if rhs is NullCard {
+            return true
+        }
         if let card1 = lhs as? JokerCard {
             if let card2 = rhs as? JokerCard {
                 return card1 > card2

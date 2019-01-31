@@ -36,7 +36,7 @@ class NumCard: Card {
     }
     
     static func == (lhs: NumCard, rhs: NumCard) -> Bool {
-        return lhs.getNum() == rhs.getNum()
+        return lhs.getNum() == rhs.getNum() && lhs.getSuit() == rhs.getSuit()
     }
     
     static func > (lhs: NumCard, rhs: NumCard) -> Bool {
