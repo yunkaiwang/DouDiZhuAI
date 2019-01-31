@@ -99,29 +99,39 @@ func suggestSPTPlay(playerCards: [Card], lastPlayedCards: [Card], play: Play)->[
 }
 
 func findBomb(playerCards:[Card], lastBomb: [Card])->[Card] {
-    let playerCards_parsed = parseCards(cards: playerCards)
-    
-    if playerCards_parsed.max_card_count < 4 {
-        if playerCards_parsed.jokerCards.count < 2 {
-            return []
-        } else {
-            return playerCards_parsed.jokerCards
+    let limit = lastBomb[0]
+    var remaining_cards: [NumCard] = []
+    var remaining_joker_cards: [JokerCard] = []
+    for card in playerCards {
+        if card is JokerCard {
+            remaining_joker_cards.append(card as! JokerCard)
+        } else if card > limit {
+            remaining_cards.append(card as! NumCard)
         }
     }
     
-    var smallest_card: NumCard? = nil
-    let limit = lastBomb.count == 0 ? NullCard() : lastBomb[0]
+    let playerCards_parsed = parseCards(cards: remaining_cards)
+    
+    if playerCards_parsed.max_card_count < 4 {
+        if remaining_joker_cards.count < 2 {
+            return []
+        } else {
+            return remaining_joker_cards
+        }
+    }
     
     var bomb:[Card] = []
-    for card in playerCards_parsed.numCards {
-        if smallest_card?.getNum() == card.getNum() {
+    var i = 0
+    while i < remaining_cards.count {
+        let card = remaining_cards[remaining_cards.count - i - 1]
+        if playerCards_parsed.card_count[card.getNum()]! == 4 {
             bomb.append(card)
-        } else if playerCards_parsed.card_count[card.getNum()] == 4 {
-            if card > limit && (smallest_card == nil || card < smallest_card!) {
-                bomb = [card]
-                smallest_card = card
-            }
+            bomb.append(remaining_cards[remaining_cards.count - i - 2])
+            bomb.append(remaining_cards[remaining_cards.count - i - 3])
+            bomb.append(remaining_cards[remaining_cards.count - i - 4])
+            break
         }
+        i += playerCards_parsed.card_count[card.getNum()]!
     }
     
     return bomb
@@ -133,15 +143,20 @@ func suggestTrioPlusPlay(playerCards: [Card], play: Play, lastPlayedCards: [Card
         return []
     }
     
-    let lastPlayedCard_parsed = parseCards(cards: lastPlayedCards)
-    var lastTrio: [Card] = []
-    for card in lastPlayedCard_parsed.numCards {
-        if lastPlayedCard_parsed.card_count[card.getNum()]! == 3 {
-            lastTrio.append(card)
+    var suggestedTrio: [Card] = []
+    if lastPlayedCards[0] is NullCard {
+        suggestedTrio = suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: Play.trio)
+    } else {
+        let lastPlayedCard_parsed = parseCards(cards: lastPlayedCards)
+        var lastTrio: [Card] = []
+        for card in lastPlayedCard_parsed.numCards {
+            if lastPlayedCard_parsed.card_count[card.getNum()]! == 3 {
+                lastTrio.append(card)
+            }
         }
+
+        suggestedTrio = suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastTrio, play: Play.trio)
     }
-    
-    let suggestedTrio = suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastTrio, play: Play.trio)
     if suggestedTrio.count == 0 {
         return []
     }
@@ -321,51 +336,59 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
         numTrioCard = lastPlayedCards[0] is NullCard ? 2 : lastPlayedCards.count / 5
         numCardReq = max(10, lastPlayedCards.count)
     }
+    
+    
+    var lastLargestAirplaneCard: Card?
     if lastPlayedCards[0] is NullCard {
         numCardReq = 6
+        lastLargestAirplaneCard = nil
+    } else {
+        let lastPlayedCards_parsed = parseCards(cards: lastPlayedCards)
+        for card in lastPlayedCards {
+            if let card_c = card as? NumCard {
+                if lastPlayedCards_parsed.card_count[card_c.getNum()]! > 2 {
+                    if lastLargestAirplaneCard == nil || card > lastLargestAirplaneCard! {
+                        lastLargestAirplaneCard = card
+                    }
+                }
+            }
+        }
     }
     
     var remaining_cards:[NumCard] = []
     var remaining_joker_cards: [JokerCard] = []
-    var smallestCard: Card = lastPlayedCards[0]
-    for card in lastPlayedCards {
-        if card < smallestCard {
-            smallestCard = card
-        }
-    }
-    
+    var available_airplane_cards: [NumCard] = []
     for card in playerCards {
         if card is JokerCard {
             remaining_joker_cards.append(card as! JokerCard)
-        } else if smallestCard is NullCard {
-            remaining_cards.append(card as! NumCard)
+        } else if lastLargestAirplaneCard == nil {
+            available_airplane_cards.append(card as! NumCard)
         } else {
             let card_c = card as! NumCard
             let lcard_c = lastPlayedCards[0] as! NumCard
             if card_c.getNum() > lcard_c.getNum() {
+                available_airplane_cards.append(card_c)
+            } else {
                 remaining_cards.append(card_c)
             }
         }
     }
     
-    if remaining_joker_cards.count + remaining_cards.count < numCardReq {
+    if remaining_joker_cards.count + remaining_cards.count + available_airplane_cards.count < numCardReq {
         return []
     }
     
-    remaining_cards.sort()
-    var numAirplane: Int = 0
-    var maxAirplane: Int = 0
-    var longestAirplane: [NumCard] = []
-    var curAirplane: [NumCard] = []
-    var usedCardNum: [CardNum] = []
+    available_airplane_cards.sort()
+    var numAirplane: Int = 0, curAirplane: [NumCard] = []
+    var maxAirplane: Int = 0, longestAirplane: [NumCard] = []
     var suggestAddOnCard: [Card] = []
-    var playerCard_parsed = parseCards(cards: remaining_cards)
+    var playerCard_parsed = parseCards(cards: available_airplane_cards)
     var i = 0;
     while true {
-        if i >= remaining_cards.count {
+        if i >= available_airplane_cards.count {
             break
         }
-        let card = remaining_cards[remaining_cards.count - 1 - i]
+        let card = available_airplane_cards[available_airplane_cards.count - 1 - i]
         if card.getNum().getNum() == 2 {
             break
         }
@@ -380,14 +403,12 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
             
             if card.getNum().getNum() != nextCardNum {
                 curAirplane = []
-                usedCardNum = []
                 numAirplane = 0
             }
             
             curAirplane.append(card)
-            curAirplane.append(remaining_cards[remaining_cards.count - 2 - i])
-            curAirplane.append(remaining_cards[remaining_cards.count - 3 - i])
-            usedCardNum.append(card.getNum())
+            curAirplane.append(available_airplane_cards[available_airplane_cards.count - 2 - i])
+            curAirplane.append(available_airplane_cards[available_airplane_cards.count - 3 - i])
             numAirplane += 1
             
             i += playerCard_parsed.card_count[card.getNum()]! - 1
@@ -408,34 +429,33 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
     if !(lastPlayedCards[0] is NullCard) {
         if numAirplane == numTrioCard {
             if currentPlay == Play.airplane {
-                return curAirplane
+                return longestAirplane
             }
         } else {
+            return []
+        }
+    } else {
+        if maxAirplane < 2 {
             return []
         }
     }
     
     for card in longestAirplane {
-        print(card.getIdentifier())
-    }
-    
-    for card in longestAirplane {
-        playerCard_parsed.card_count[card.getNum()] = playerCard_parsed.card_count[card.getNum()]! - 1
-        for i in 0..<remaining_cards.count {
-            if card.getIdentifier() == remaining_cards[i].getIdentifier() {
-                remaining_cards.remove(at: i)
+        for i in 0..<available_airplane_cards.count {
+            if card.getIdentifier() == available_airplane_cards[i].getIdentifier() {
+                available_airplane_cards.remove(at: i)
                 break
             }
         }
     }
     
+    remaining_cards += available_airplane_cards
     if lastPlayedCards[0] is NullCard && remaining_cards.count + remaining_joker_cards.count < maxAirplane && maxAirplane < 5 {
         return longestAirplane
     }
     
     if maxAirplane == 5 {
         if remaining_cards.count == 5 {
-            print("return at 1")
             return playerCards
         } else {
             remaining_cards.append(longestAirplane.popLast()!)
@@ -446,22 +466,20 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
             for i in 0..<maxAirplane - 1 {
                 suggestAddOnCard.append(remaining_cards[i])
             }
-            print("return at 2")
             return suggestAddOnCard + longestAirplane
         }
     } else if maxAirplane == 6 {
         if remaining_cards.count == 1 {
-            print("return at 3")
             return longestAirplane
         } else {
-            print("return at 4")
             return playerCards
         }
     }
     
-    var currentSolo:[Card] = []
-    var currentPair:[Card] = []
+    var currentSolo:[Card] = [], currentPair:[Card] = [], currentTrio:[Card] = [], currentBomb:[Card] = []
     i = 0
+    playerCard_parsed = parseCards(cards: remaining_cards)
+    remaining_cards.sort()
     while i < remaining_cards.count {
         let card = remaining_cards[remaining_cards.count - 1 - i]
         
@@ -471,22 +489,18 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
                 suggestAddOnCard.append(remaining_cards[remaining_cards.count - 2 - i])
                 i += 1
                 if suggestAddOnCard.count / 2 == numTrioCard {
-                    print("return at 5")
                     return longestAirplane + suggestAddOnCard
                 }
             } else if playerCard_parsed.card_count[card.getNum()]! % 2 == 4 {
                 suggestAddOnCard.append(card)
                 suggestAddOnCard.append(remaining_cards[remaining_cards.count - 2 - i])
                 if suggestAddOnCard.count / 2 == numTrioCard {
-                    
-                    print("return at 6")
                     return longestAirplane + suggestAddOnCard
                 }
                 suggestAddOnCard.append(remaining_cards[remaining_cards.count - 3 - i])
                 suggestAddOnCard.append(remaining_cards[remaining_cards.count - 4 - i])
                 i += 3
                 if suggestAddOnCard.count / 2 == numTrioCard {
-                    print("return at 7")
                     return longestAirplane + suggestAddOnCard
                 }
             }
@@ -495,7 +509,6 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
             while j < playerCard_parsed.card_count[card.getNum()]! {
                 suggestAddOnCard.append(remaining_cards[remaining_cards.count - 1 - j - i])
                 if suggestAddOnCard.count == numTrioCard {
-                    print("return at 8")
                     return longestAirplane + suggestAddOnCard
                 }
                 j += 1
@@ -509,20 +522,19 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
                 currentPair.append(remaining_cards[remaining_cards.count - 2 - i])
                 i += 1
             } else if playerCard_parsed.card_count[card.getNum()]! == 3 {
-                currentPair.append(card)
-                currentPair.append(remaining_cards[remaining_cards.count - 2 - i])
-                currentSolo.append(remaining_cards[remaining_cards.count - 3 - i])
+                currentTrio.append(card)
+                currentTrio.append(remaining_cards[remaining_cards.count - 2 - i])
+                currentTrio.append(remaining_cards[remaining_cards.count - 3 - i])
                 i += 2
             } else {
-                currentPair.append(card)
-                currentPair.append(remaining_cards[remaining_cards.count - 2 - i])
-                currentPair.append(remaining_cards[remaining_cards.count - 3 - i])
-                currentPair.append(remaining_cards[remaining_cards.count - 4 - i])
+                currentBomb.append(card)
+                currentBomb.append(remaining_cards[remaining_cards.count - 2 - i])
+                currentBomb.append(remaining_cards[remaining_cards.count - 3 - i])
+                currentBomb.append(remaining_cards[remaining_cards.count - 4 - i])
                 i += 3
             }
             
             if currentPair.count / 2 == maxAirplane {
-                print("return at 9")
                 return longestAirplane + currentPair
             }
         }
@@ -530,28 +542,23 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
     }
     
     if lastPlayedCards[0] is NullCard {
-        if currentSolo.count >= maxAirplane {
-            var j = currentSolo.count
-            while j > maxAirplane {
-                let _ = currentSolo.popLast()
-                j -= 1
-            }
-            
-            print("return at 10")
-            return longestAirplane + currentSolo
-        } else {
+        if currentSolo.count < maxAirplane {
             currentSolo += currentPair
-            suggestAddOnCard = []
-            
-            currentSolo.sort()
-            i = 0
-            while i < maxAirplane {
-                suggestAddOnCard.append(currentSolo.popLast()!)
-                i += 1
-            }
-            print("return at 11")
-            return longestAirplane + suggestAddOnCard
         }
+        if currentSolo.count < maxAirplane {
+            currentSolo += currentTrio
+        }
+        if currentSolo.count < maxAirplane {
+            currentSolo += currentBomb
+        }
+        
+        currentSolo.sort()
+        i = 0
+        while i < maxAirplane {
+            suggestAddOnCard.append(currentSolo.popLast()!)
+            i += 1
+        }
+        return longestAirplane + suggestAddOnCard
     } else if currentPlay == Play.airplanePlusSolo {
         if remaining_joker_cards.count == numTrioCard - suggestAddOnCard.count {
             var cards: [Card] = []
@@ -562,7 +569,6 @@ func suggestAirplanePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
             for card in remaining_joker_cards {
                 cards.append(card)
             }
-            print("return at 12")
             return cards
         }
     }
@@ -573,69 +579,72 @@ func suggestBombPlusPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
     if currentPlay != Play.bombPlusDualSolo && currentPlay != Play.bombPlusDualPair {
         return []
     }
-    let card_l = currentPlay == Play.bombPlusDualSolo ? 6 : 8
-    
-    var remaining_cards:[NumCard] = []
-    var remaining_joker_cards: [JokerCard] = []
-    var smallestCard: Card = lastPlayedCards[0]
-    for card in lastPlayedCards {
-        if card < smallestCard {
-            smallestCard = card
+
+    var lastLargestAirplaneCard: Card?
+    if lastPlayedCards[0] is NullCard {
+        lastLargestAirplaneCard = nil
+    } else {
+        let lastPlayedCards_parsed = parseCards(cards: lastPlayedCards)
+        for card in lastPlayedCards {
+            if let card_c = card as? NumCard {
+                if lastPlayedCards_parsed.card_count[card_c.getNum()]! > 2 {
+                    if lastLargestAirplaneCard == nil || card > lastLargestAirplaneCard! {
+                        lastLargestAirplaneCard = card
+                    }
+                }
+            }
         }
     }
     
+    var remaining_cards:[NumCard] = []
+    var remaining_joker_cards: [JokerCard] = []
+    var available_bomb_cards: [NumCard] = []
     for card in playerCards {
         if card is JokerCard {
             remaining_joker_cards.append(card as! JokerCard)
-        } else if smallestCard is NullCard {
-            remaining_cards.append(card as! NumCard)
+        } else if lastLargestAirplaneCard == nil {
+            available_bomb_cards.append(card as! NumCard)
         } else {
             let card_c = card as! NumCard
             let lcard_c = lastPlayedCards[0] as! NumCard
             if card_c.getNum() > lcard_c.getNum() {
+                available_bomb_cards.append(card_c)
+            } else {
                 remaining_cards.append(card_c)
             }
         }
     }
     
-    if remaining_cards.count < card_l {
-        return []
-    }
-    
-    var playerCard_parsed = parseCards(cards: remaining_cards)
-    
+    var playerCard_parsed = parseCards(cards: available_bomb_cards)
     if playerCard_parsed.max_card_count < 4 {
         return []
     }
     
-    var bomb:[Card] = []
-    var addOn:[Card] = []
+    var bomb:[Card] = [], addOn:[Card] = []
     
-    remaining_cards.sort()
+    available_bomb_cards.sort()
     var i = 0
-    while i < remaining_cards.count {
-        let card = remaining_cards[remaining_cards.count - i - 1]
+    while i < available_bomb_cards.count {
+        let card = available_bomb_cards[available_bomb_cards.count - i - 1]
         
         if playerCard_parsed.card_count[card.getNum()]! == 4 {
             bomb.append(card)
-            bomb.append(remaining_cards[remaining_cards.count - i - 2])
-            bomb.append(remaining_cards[remaining_cards.count - i - 3])
-            bomb.append(remaining_cards[remaining_cards.count - i - 4])
-            remaining_cards.remove(at: remaining_cards.count - i - 1)
-            remaining_cards.remove(at: remaining_cards.count - i - 1)
-            remaining_cards.remove(at: remaining_cards.count - i - 1)
-            remaining_cards.remove(at: remaining_cards.count - i - 1)
-            playerCard_parsed.card_count[card.getNum()] = 0
+            bomb.append(available_bomb_cards[available_bomb_cards.count - i - 2])
+            bomb.append(available_bomb_cards[available_bomb_cards.count - i - 3])
+            bomb.append(available_bomb_cards[available_bomb_cards.count - i - 4])
+            available_bomb_cards.remove(at: available_bomb_cards.count - i - 1)
+            available_bomb_cards.remove(at: available_bomb_cards.count - i - 1)
+            available_bomb_cards.remove(at: available_bomb_cards.count - i - 1)
+            available_bomb_cards.remove(at: available_bomb_cards.count - i - 1)
             break
         }
         i += 1
     }
     
-    var soloArr: [Card] = []
-    var pairArr: [Card] = []
-    var trioArr: [Card] = []
-    var bombArr: [Card] = []
-    
+    var soloArr: [Card] = [], pairArr: [Card] = [], trioArr: [Card] = [], bombArr: [Card] = []
+    remaining_cards += available_bomb_cards
+    playerCard_parsed = parseCards(cards: remaining_cards)
+    remaining_cards.sort()
     i = 0
     while i < remaining_cards.count {
         let card = remaining_cards[remaining_cards.count - 1 - i]
@@ -727,7 +736,288 @@ func suggestBombPlusPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards
     return bomb + addOn
 }
 
+func suggestSpaceShuttlePlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card]) -> [Card] {
+    if currentPlay != Play.spaceShuttle && currentPlay != Play.spaceShuttlePlusFourSolo && currentPlay != Play.spaceShuttlePlusFourPair {
+        return []
+    }
+    
+    var numShuttleNeed: Int;
+    switch currentPlay {
+    case .airplane:
+        numShuttleNeed = lastPlayedCards[0] is NullCard ? 2 : lastPlayedCards.count / 8
+    case .airplanePlusSolo:
+        numShuttleNeed = lastPlayedCards[0] is NullCard ? 2 : lastPlayedCards.count / 12
+    default:
+        numShuttleNeed = lastPlayedCards[0] is NullCard ? 2 : lastPlayedCards.count / 16
+    }
+    
+    var lastLargestAirplaneCard: Card?
+    if lastPlayedCards[0] is NullCard {
+        lastLargestAirplaneCard = nil
+    } else {
+        let lastPlayedCards_parsed = parseCards(cards: lastPlayedCards)
+        for card in lastPlayedCards {
+            if let card_c = card as? NumCard {
+                if lastPlayedCards_parsed.card_count[card_c.getNum()]! > 2 {
+                    if lastLargestAirplaneCard == nil || card > lastLargestAirplaneCard! {
+                        lastLargestAirplaneCard = card
+                    }
+                }
+            }
+        }
+    }
+    
+    var remaining_cards:[NumCard] = []
+    var remaining_joker_cards: [JokerCard] = []
+    var available_bomb_cards: [NumCard] = []
+    for card in playerCards {
+        if card is JokerCard {
+            remaining_joker_cards.append(card as! JokerCard)
+        } else if lastLargestAirplaneCard == nil {
+            available_bomb_cards.append(card as! NumCard)
+        } else {
+            let card_c = card as! NumCard
+            let lcard_c = lastPlayedCards[0] as! NumCard
+            if card_c.getNum() > lcard_c.getNum() {
+                available_bomb_cards.append(card_c)
+            } else {
+                remaining_cards.append(card_c)
+            }
+        }
+    }
+    
+    available_bomb_cards.sort()
+    var numShuttle: Int = 0, curShuttle: [NumCard] = []
+    var maxShuttle: Int = 0, longestShuttle: [NumCard] = []
+    var suggestAddOnCard: [Card] = []
+    var playerCard_parsed = parseCards(cards: available_bomb_cards)
+    if playerCard_parsed.max_card_count < 4 {
+        return []
+    }
+    var i = 0;
+    while true {
+        if i >= available_bomb_cards.count {
+            break
+        }
+        let card = available_bomb_cards[available_bomb_cards.count - 1 - i]
+        if card.getNum().getNum() == 2 {
+            break
+        }
+        if playerCard_parsed.card_count[card.getNum()]! > 3 {
+            var nextCardNum = -1
+            if curShuttle.count != 0 {
+                nextCardNum = curShuttle.last!.getNum().getNum() + 1
+                if nextCardNum > 13 {
+                    nextCardNum = nextCardNum - 13
+                }
+            }
+            if card.getNum().getNum() != nextCardNum {
+                curShuttle = []
+                numShuttle = 0
+            }
+            
+            curShuttle.append(card)
+            curShuttle.append(available_bomb_cards[available_bomb_cards.count - 2 - i])
+            curShuttle.append(available_bomb_cards[available_bomb_cards.count - 3 - i])
+            curShuttle.append(available_bomb_cards[available_bomb_cards.count - 4 - i])
+            numShuttle += 1
+            
+            i += playerCard_parsed.card_count[card.getNum()]! - 1
+            
+            if numShuttle > 1 {
+                if curShuttle.count > longestShuttle.count {
+                    maxShuttle = numShuttle
+                    longestShuttle = curShuttle
+                }
+                if !(lastPlayedCards[0] is NullCard) && numShuttle == numShuttleNeed {
+                    break
+                }
+            }
+        }
+        i += 1
+    }
+    
+    if numShuttle < numShuttleNeed {
+        return []
+    }
+    if !(lastPlayedCards[0] is NullCard) {
+        if numShuttle == numShuttleNeed {
+            if currentPlay == Play.spaceShuttle {
+                return longestShuttle
+            }
+        }
+    }
+    
+    for card in longestShuttle {
+        for i in 0..<available_bomb_cards.count {
+            if card.getIdentifier() == available_bomb_cards[i].getIdentifier() {
+                available_bomb_cards.remove(at: i)
+                break
+            }
+        }
+    }
+    
+    remaining_cards += available_bomb_cards
+    if lastPlayedCards[0] is NullCard && remaining_cards.count + remaining_joker_cards.count < maxShuttle * 2 {
+        return longestShuttle
+    }
+    
+    var currentSolo:[Card] = [], currentPair:[Card] = [], currentTrio:[Card] = [], currentBomb:[Card] = []
+    i = 0
+    playerCard_parsed = parseCards(cards: remaining_cards)
+    remaining_cards.sort()
+    while i < remaining_cards.count {
+        let card = remaining_cards[remaining_cards.count - 1 - i]
+        
+        if currentPlay == Play.spaceShuttlePlusFourPair {
+            if playerCard_parsed.card_count[card.getNum()]! % 2 == 2 {
+                suggestAddOnCard.append(card)
+                suggestAddOnCard.append(remaining_cards[remaining_cards.count - 2 - i])
+                i += 1
+                if suggestAddOnCard.count == numShuttleNeed * 4 {
+                    return longestShuttle + suggestAddOnCard
+                }
+            } else if playerCard_parsed.card_count[card.getNum()]! % 2 == 4 {
+                suggestAddOnCard.append(card)
+                suggestAddOnCard.append(remaining_cards[remaining_cards.count - 2 - i])
+                if suggestAddOnCard.count == numShuttleNeed * 4 {
+                    return longestShuttle + suggestAddOnCard
+                }
+                suggestAddOnCard.append(remaining_cards[remaining_cards.count - 3 - i])
+                suggestAddOnCard.append(remaining_cards[remaining_cards.count - 4 - i])
+                i += 3
+                if suggestAddOnCard.count == numShuttleNeed * 4 {
+                    return longestShuttle + suggestAddOnCard
+                }
+            }
+        } else if currentPlay == Play.airplanePlusSolo {
+            var j = 0
+            while j < playerCard_parsed.card_count[card.getNum()]! {
+                suggestAddOnCard.append(remaining_cards[remaining_cards.count - 1 - j - i])
+                if suggestAddOnCard.count == numShuttleNeed * 2 {
+                    return longestShuttle + suggestAddOnCard
+                }
+                j += 1
+            }
+            i += j
+        } else {
+            if playerCard_parsed.card_count[card.getNum()]! == 1 {
+                currentSolo.append(card)
+            } else if playerCard_parsed.card_count[card.getNum()]! == 2 {
+                currentPair.append(card)
+                currentPair.append(remaining_cards[remaining_cards.count - 2 - i])
+                i += 1
+            } else if playerCard_parsed.card_count[card.getNum()]! == 3 {
+                currentTrio.append(card)
+                currentTrio.append(remaining_cards[remaining_cards.count - 2 - i])
+                currentTrio.append(remaining_cards[remaining_cards.count - 3 - i])
+                i += 2
+            } else {
+                currentBomb.append(card)
+                currentBomb.append(remaining_cards[remaining_cards.count - 2 - i])
+                currentBomb.append(remaining_cards[remaining_cards.count - 3 - i])
+                currentBomb.append(remaining_cards[remaining_cards.count - 4 - i])
+                i += 3
+            }
+            
+            if currentPair.count == maxShuttle * 2 {
+                return longestShuttle + currentPair
+            }
+        }
+        i += 1
+    }
+    
+    if lastPlayedCards[0] is NullCard {
+        if currentSolo.count < maxShuttle * 2 {
+            currentSolo += currentPair
+        }
+        if currentSolo.count < maxShuttle * 2 {
+            currentSolo += currentTrio
+        }
+        if currentSolo.count < maxShuttle * 2 {
+            currentSolo += currentBomb
+        }
+        if currentSolo.count < maxShuttle * 2 {
+            return []
+        }
+        
+        currentSolo.sort()
+        i = 0
+        while i < maxShuttle * 2 {
+            suggestAddOnCard.append(currentSolo.popLast()!)
+            i += 1
+        }
+        return longestShuttle + suggestAddOnCard
+    } else if currentPlay == Play.airplanePlusSolo {
+        if remaining_joker_cards.count == numShuttle * 2 - suggestAddOnCard.count {
+            var cards: [Card] = []
+            cards += suggestAddOnCard
+            for card in longestShuttle {
+                cards.append(card)
+            }
+            for card in remaining_joker_cards {
+                cards.append(card)
+            }
+            return cards
+        }
+    }
+    return []
+}
+
+func suggestNewPlay(playerCards: [Card])->[Card] {
+    let lastPlayedCards: [Card] = [NullCard()]
+    var maxPlay: [Card] = []
+    
+    var curPlay: [Card] = []
+    curPlay = suggestSpaceShuttlePlay(playerCards: playerCards, currentPlay: Play.spaceShuttle, lastPlayedCards: lastPlayedCards)
+    if curPlay.count != 0 {
+        maxPlay = curPlay
+    }
+    curPlay = suggestBombPlusPlay(playerCards: playerCards, currentPlay: Play.bombPlusDualSolo, lastPlayedCards: lastPlayedCards)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestAirplanePlay(playerCards: playerCards, currentPlay: Play.airplane, lastPlayedCards: lastPlayedCards)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestPairChain(playerCards: playerCards, lastPlayedCards: lastPlayedCards)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestSoloChainPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestTrioPlusPlay(playerCards: playerCards, play: Play.trioPlusSolo, lastPlayedCards: lastPlayedCards)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = findBomb(playerCards: playerCards, lastBomb: lastPlayedCards)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: Play.trio)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: Play.pair)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    curPlay = suggestSPTPlay(playerCards: playerCards, lastPlayedCards: lastPlayedCards, play: Play.solo)
+    if curPlay.count > maxPlay.count {
+        maxPlay = curPlay
+    }
+    
+    return maxPlay
+}
+
 func suggestPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card])->[Card] {
+    if currentPlay == Play.none {
+        return suggestNewPlay(playerCards: playerCards)
+    }
+    
     var suggestedCards: [Card] = []
     switch currentPlay {
     case .solo, .pair, .trio:
@@ -742,12 +1032,8 @@ func suggestPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card]
         suggestedCards = suggestAirplanePlay(playerCards: playerCards, currentPlay: currentPlay, lastPlayedCards: lastPlayedCards)
     case .bombPlusDualSolo, .bombPlusDualPair:
         suggestedCards = suggestBombPlusPlay(playerCards: playerCards, currentPlay: currentPlay, lastPlayedCards: lastPlayedCards)
-    case .spaceShuttle:
-        return []
-    case .spaceShuttlePlusFourSolo:
-        return []
-    case .spaceShuttlePlusFourPair:
-        return []
+    case .spaceShuttle, .spaceShuttlePlusFourSolo, .spaceShuttlePlusFourPair:
+        suggestedCards = suggestSpaceShuttlePlay(playerCards: playerCards, currentPlay: currentPlay, lastPlayedCards: lastPlayedCards)
     case .bomb:
         return findBomb(playerCards: playerCards, lastBomb: lastPlayedCards)
     case .rocket: // nothing can be greater than rocket
@@ -757,7 +1043,7 @@ func suggestPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card]
     }
     
     if suggestedCards.count == 0 {
-        return findBomb(playerCards: playerCards, lastBomb: [])
+        return findBomb(playerCards: playerCards, lastBomb: [NullCard()])
     } else {
         return suggestedCards
     }

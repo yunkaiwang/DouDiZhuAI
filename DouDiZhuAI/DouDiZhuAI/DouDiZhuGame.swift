@@ -75,6 +75,10 @@ class DouDiZhuGame {
     }
     
     func startGame() {
+        print()
+        print("new game started")
+        print()
+        print()
         self.chooseLandlord()
     }
     
@@ -461,7 +465,7 @@ class DouDiZhuGame {
         
         self.userSelectedCards = []
         
-        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.bombPlusDualSolo, lastPlayedCards: [NullCard()])
+        let suggested_cards: [Card] = suggestPlay(playerCards: player1.getCards(), currentPlay: Play.none, lastPlayedCards: [NullCard()])
         
         if suggested_cards.count == 0 {
             print("no suggested card")
