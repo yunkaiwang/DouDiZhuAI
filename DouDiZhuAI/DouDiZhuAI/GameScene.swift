@@ -20,6 +20,7 @@ class GameScene: SKScene {
     let playButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: SKTexture(imageNamed: "disabledBtn"))
     let hintButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let passButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: SKTexture(imageNamed: "disabledBtn"))
+    let alert: UIAlertView = UIAlertView(title: nil, message: nil, delegate: nil, cancelButtonTitle: "OK")
     
     let playerCardContainer = SKSpriteNode(color: .clear, size: CGSize(width: 200, height: 100))
 
@@ -38,6 +39,7 @@ class GameScene: SKScene {
     private var countDown: Int = 0
     private var timer: Timer? = nil
     private var game: DouDiZhuGame? = nil
+    public static var gameController: UIViewController?
     
     override init(size: CGSize) {
         super.init(size: size)
@@ -112,6 +114,7 @@ class GameScene: SKScene {
         self.addChild(LandlordCard2)
         self.addChild(LandlordCard3)
         
+        alert.delegate = self
         startGameButton.isHidden = false
         cleanTable()
     }
@@ -134,7 +137,7 @@ class GameScene: SKScene {
     }
     
     func setButtonAttributes() {
-        startGameButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.startGame))
+        startGameButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.joinGame))
         startGameButton.setButtonLabel(title: "Start game!", font: "Arial", fontSize: 12)
         startGameButton.position = CGPoint(x: self.frame.midX,y: self.frame.midY)
         startGameButton.size = CGSize(width: 100, height: 20)
@@ -177,7 +180,11 @@ class GameScene: SKScene {
         passButton.name = "passBtn"
     }
     
-    @objc func startGame() {
+    @objc func joinGame() {
+        Game.sharedInstace.start()
+    }
+    
+    func enterGameScene() {
         resetTable()
         game!.newGame()
         game!.startGame()
@@ -251,7 +258,7 @@ class GameScene: SKScene {
     func resetTable() {
         hidePlayButtons()
         gameOverMsg.isHidden = true
-//        startGameButton.isHidden = true
+        startGameButton.isHidden = true
         landlordLabel.isHidden = true
         playerCardContainer.isHidden = false
         playerCardContainer.removeAllChildren()
@@ -307,8 +314,7 @@ class GameScene: SKScene {
     }
     
     func startNewGameSinceNoPlayerChooseToBeLandlord() {
-        print("new game started")
-        startGame()
+        
     }
     
     func getPlayerPlayDisplayPosition(playerNum: PlayerNum)->CGPoint {
@@ -411,5 +417,11 @@ class GameScene: SKScene {
         gameOverMsg.text = self.game!.getWinner()! + " wins!"
         gameOverMsg.isHidden = false
         startGameButton.isHidden = false
+    }
+    
+    func showAlert(withTitle title: String, message: String) {
+        alert.title = title
+        alert.message = message
+        alert.show()
     }
 }

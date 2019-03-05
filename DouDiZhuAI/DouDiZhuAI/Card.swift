@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SpriteKit
 
 class Card: Comparable {
     private var identifier: String = ""

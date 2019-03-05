@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F1B81C0222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */; };
+		3F1B81C1222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3F1B81CE222C9A74001680B2 /* DouDiZhuClientDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81CD222C9A74001680B2 /* DouDiZhuClientDelegate.swift */; };
+		3F1B81D2222D7B2A001680B2 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D1222D7B2A001680B2 /* GameState.swift */; };
+		3F1B81D4222D7D2C001680B2 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D3222D7D2C001680B2 /* Game.swift */; };
+		3F1B81D6222D835C001680B2 /* MessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D5222D835C001680B2 /* MessageType.swift */; };
+		3F1B820C222E1640001680B2 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B820B222E1640001680B2 /* Message.swift */; };
 		3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51D921FBF26D002AC4A0 /* Play.swift */; };
 		3F6A51DC21FE55F1002AC4A0 /* CardNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */; };
 		3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */; };
@@ -16,7 +23,6 @@
 		3F79391221EAE019003A590F /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79391121EAE019003A590F /* GameScene.swift */; };
 		3F79391721EAE019003A590F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391521EAE019003A590F /* Main.storyboard */; };
 		3F79391C21EAE01B003A590F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391A21EAE01B003A590F /* LaunchScreen.storyboard */; };
-		3F79392621EAE873003A590F /* LoginSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392521EAE873003A590F /* LoginSceneController.swift */; };
 		3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392721EBBEDF003A590F /* GameSceneViewController.swift */; };
 		3F79392A21EC1363003A590F /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392921EC1363003A590F /* Deck.swift */; };
 		3F79392C21EC13B4003A590F /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392B21EC13B4003A590F /* Card.swift */; };
@@ -33,10 +39,50 @@
 		3F79394C21F2C586003A590F /* HumanPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394B21F2C586003A590F /* HumanPlayer.swift */; };
 		3F79394E21FA5003003A590F /* extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394D21FA5003003A590F /* extension.swift */; };
 		3F79395021FA5108003A590F /* PlayerNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394F21FA5108003A590F /* PlayerNum.swift */; };
+		E970AD61EB1B46D0C64D5804 /* Pods_DouDiZhuAI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		3F1B81BE222C920C001680B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3F1B819C222C8F06001680B2;
+			remoteInfo = DouDiZhuSharedLibrary;
+		};
+		3F1B81C2222C921A001680B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F1B819B222C8F06001680B2;
+			remoteInfo = DouDiZhuSharedLibrary;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3F1B814D22153192001680B2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3F1B81C1222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		3F6A51D921FBF26D002AC4A0 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
+		2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DouDiZhuAI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = DouDiZhuAI.xcodeproj; sourceTree = "<group>"; };
+		3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DouDiZhuSharedLibrary.xcodeproj; path = ../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary.xcodeproj; sourceTree = "<group>"; };
+		3F1B81CD222C9A74001680B2 /* DouDiZhuClientDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuClientDelegate.swift; sourceTree = "<group>"; };
+		3F1B81D1222D7B2A001680B2 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		3F1B81D3222D7D2C001680B2 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		3F1B81D5222D835C001680B2 /* MessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageType.swift; sourceTree = "<group>"; };
+		3F1B820B222E1640001680B2 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		3F6A51D921FBF26D002AC4A0 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Play.swift; path = ../../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary/Play.swift; sourceTree = "<group>"; };
 		3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNum.swift; sourceTree = "<group>"; };
 		3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suit.swift; sourceTree = "<group>"; };
 		3F6A51DF22016735002AC4A0 /* NullCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NullCard.swift; sourceTree = "<group>"; };
@@ -47,7 +93,6 @@
 		3F79391621EAE019003A590F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3F79391B21EAE01B003A590F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F79391D21EAE01B003A590F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3F79392521EAE873003A590F /* LoginSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSceneController.swift; sourceTree = "<group>"; };
 		3F79392721EBBEDF003A590F /* GameSceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneViewController.swift; sourceTree = "<group>"; };
 		3F79392921EC1363003A590F /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		3F79392B21EC13B4003A590F /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
@@ -64,6 +109,8 @@
 		3F79394B21F2C586003A590F /* HumanPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumanPlayer.swift; sourceTree = "<group>"; };
 		3F79394D21FA5003003A590F /* extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extension.swift; sourceTree = "<group>"; };
 		3F79394F21FA5108003A590F /* PlayerNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNum.swift; sourceTree = "<group>"; };
+		4586AC69F28375089889FFEB /* Pods-DouDiZhuAI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DouDiZhuAI.release.xcconfig"; path = "Target Support Files/Pods-DouDiZhuAI/Pods-DouDiZhuAI.release.xcconfig"; sourceTree = "<group>"; };
+		742E9561ACCBB6F91A553257 /* Pods-DouDiZhuAI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DouDiZhuAI.debug.xcconfig"; path = "Target Support Files/Pods-DouDiZhuAI/Pods-DouDiZhuAI.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,17 +118,46 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F1B81C0222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Frameworks */,
+				E970AD61EB1B46D0C64D5804 /* Pods_DouDiZhuAI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F1B81472215314A001680B2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3F1B81B8222C91DA001680B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3F1B81BB222C920B001680B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		3F7938FF21EAE019003A590F = {
 			isa = PBXGroup;
 			children = (
+				3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */,
+				3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */,
 				3F79390A21EAE019003A590F /* DouDiZhuAI */,
 				3F79390921EAE019003A590F /* Products */,
+				3F1B81472215314A001680B2 /* Frameworks */,
+				5FD8DD3C5E3D70E2519042ED /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -115,16 +191,29 @@
 				3F79392F21EC1958003A590F /* NumCard.swift */,
 				3F79392D21EC1832003A590F /* JokerType.swift */,
 				3F79393921EC3089003A590F /* DouDiZhuGame.swift */,
+				3F1B81D3222D7D2C001680B2 /* Game.swift */,
 				3F6A51D921FBF26D002AC4A0 /* Play.swift */,
 				3F79391521EAE019003A590F /* Main.storyboard */,
 				3F79393521EC1F17003A590F /* FTButtonNode.swift */,
 				3F79392721EBBEDF003A590F /* GameSceneViewController.swift */,
-				3F79392521EAE873003A590F /* LoginSceneController.swift */,
 				3F79391A21EAE01B003A590F /* LaunchScreen.storyboard */,
 				3F79391D21EAE01B003A590F /* Info.plist */,
 				3F79394321ED818A003A590F /* CardButtonNode.swift */,
+				3F1B81CD222C9A74001680B2 /* DouDiZhuClientDelegate.swift */,
+				3F1B820B222E1640001680B2 /* Message.swift */,
+				3F1B81D5222D835C001680B2 /* MessageType.swift */,
+				3F1B81D1222D7B2A001680B2 /* GameState.swift */,
 			);
 			path = DouDiZhuAI;
+			sourceTree = "<group>";
+		};
+		5FD8DD3C5E3D70E2519042ED /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				742E9561ACCBB6F91A553257 /* Pods-DouDiZhuAI.debug.xcconfig */,
+				4586AC69F28375089889FFEB /* Pods-DouDiZhuAI.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,13 +223,17 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F79392021EAE01B003A590F /* Build configuration list for PBXNativeTarget "DouDiZhuAI" */;
 			buildPhases = (
+				ECEA668BAC88F3AE8BF24C76 /* [CP] Check Pods Manifest.lock */,
 				3F79390421EAE019003A590F /* Sources */,
 				3F79390521EAE019003A590F /* Frameworks */,
 				3F79390621EAE019003A590F /* Resources */,
+				3F1B814D22153192001680B2 /* Embed Frameworks */,
+				9D91469FAA73FFE6A1639B5A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3F1B81C3222C921A001680B2 /* PBXTargetDependency */,
 			);
 			name = DouDiZhuAI;
 			productName = DouDiZhuAI;
@@ -173,12 +266,32 @@
 			mainGroup = 3F7938FF21EAE019003A590F;
 			productRefGroup = 3F79390921EAE019003A590F /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 3F1B81B8222C91DA001680B2 /* Products */;
+					ProjectRef = 3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */;
+				},
+				{
+					ProductGroup = 3F1B81BB222C920B001680B2 /* Products */;
+					ProjectRef = 3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				3F79390721EAE019003A590F /* DouDiZhuAI */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = DouDiZhuSharedLibrary.framework;
+			remoteRef = 3F1B81BE222C920C001680B2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3F79390621EAE019003A590F /* Resources */ = {
@@ -194,6 +307,53 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		9D91469FAA73FFE6A1639B5A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DouDiZhuAI/Pods-DouDiZhuAI-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DouDiZhuAI/Pods-DouDiZhuAI-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ECEA668BAC88F3AE8BF24C76 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DouDiZhuAI-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		3F79390421EAE019003A590F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -206,25 +366,37 @@
 				3F79394C21F2C586003A590F /* HumanPlayer.swift in Sources */,
 				3F79394A21F2C0BE003A590F /* ComputerPlayer.swift in Sources */,
 				3F79392C21EC13B4003A590F /* Card.swift in Sources */,
+				3F1B81D6222D835C001680B2 /* MessageType.swift in Sources */,
 				3F79393A21EC3089003A590F /* DouDiZhuGame.swift in Sources */,
+				3F1B820C222E1640001680B2 /* Message.swift in Sources */,
 				3F79394821F2C061003A590F /* Player.swift in Sources */,
 				3F79393021EC1958003A590F /* NumCard.swift in Sources */,
 				3F79394E21FA5003003A590F /* extension.swift in Sources */,
 				3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */,
 				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
+				3F1B81CE222C9A74001680B2 /* DouDiZhuClientDelegate.swift in Sources */,
 				3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */,
 				3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */,
+				3F1B81D4222D7D2C001680B2 /* Game.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
 				3F79392A21EC1363003A590F /* Deck.swift in Sources */,
 				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,
-				3F79392621EAE873003A590F /* LoginSceneController.swift in Sources */,
 				3F79395021FA5108003A590F /* PlayerNum.swift in Sources */,
+				3F1B81D2222D7B2A001680B2 /* GameState.swift in Sources */,
 				3F79390C21EAE019003A590F /* AppDelegate.swift in Sources */,
 				3F79393221EC196F003A590F /* JokerCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3F1B81C3222C921A001680B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = DouDiZhuSharedLibrary;
+			targetProxy = 3F1B81C2222C921A001680B2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		3F79391521EAE019003A590F /* Main.storyboard */ = {
@@ -364,7 +536,9 @@
 		};
 		3F79392121EAE01B003A590F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 742E9561ACCBB6F91A553257 /* Pods-DouDiZhuAI.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 363F7V5MM3;
@@ -382,7 +556,9 @@
 		};
 		3F79392221EAE01B003A590F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4586AC69F28375089889FFEB /* Pods-DouDiZhuAI.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 363F7V5MM3;
