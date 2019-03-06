@@ -8,20 +8,14 @@
 
 import Foundation
 
+import Foundation
+
 class JokerCard: Card {
-    
-    private var type = JokerType.black
+    private var type: JokerType
     
     init(type: JokerType) {
         self.type = type
-        var identifier: String
-        switch type {
-        case .black:
-            identifier = "black_joker"
-        case .red:
-            identifier = "red_joker"
-        }
-        super.init(identifier: identifier)
+        super.init(identifier: type.rawValue)
     }
     
     required init(from decoder: Decoder) throws {

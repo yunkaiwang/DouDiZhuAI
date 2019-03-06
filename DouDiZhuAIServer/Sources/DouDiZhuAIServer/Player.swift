@@ -4,31 +4,19 @@
 //  Created by yunkai wang on 2019-03-04.
 //
 
+import PerfectWebSockets
 import Foundation
 
-public enum PlayerError: Error {
-    case creationFailed
-}
-
-public class Player: Hashable, Codable {
+public class Player: Hashable {
     public let id: String
     private var cards: [Card] = []
     private var beLandlord: Bool = false
+    private var playerNum: PlayerNum = .none
+    private var socket: WebSocket? = nil
     
-    public init() {
+    public init(_ socket: WebSocket?) {
         self.id = NSUUID().uuidString
-    }
-    
-    public init(json: [String: Any]) throws {
-        guard let id = json["id"] as? String else {
-            throw PlayerError.creationFailed
-        }
-        
-        self.id = id
-    }
-    
-    func getNumCard()->Int {
-        return self.cards.count
+        self.socket = socket
     }
     
     func getCards()->[Card] {
@@ -44,11 +32,23 @@ public class Player: Hashable, Codable {
         self.cards.sort()
     }
     
-    public func pass() { }
-    
-    public func decideToBeLandlord(decision: Bool) {
-        self.beLandlord = decision
+    func getPlayerNum() -> PlayerNum {
+        return self.playerNum
     }
+    
+    func setPlayerNum(playerNum: PlayerNum) {
+        self.playerNum = playerNum
+    }
+    
+    func getSocket() -> WebSocket? {
+        return self.socket
+    }
+    
+    public func getNumCard()->Int {
+        return self.cards.count
+    }
+    
+    public func pass() { }
     
     public var hashValue: Int {
         return self.id.hashValue

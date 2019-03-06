@@ -9,6 +9,7 @@
 import Foundation
 
 enum JokerType: String {
-    case black = "black"
-    case red = "red"
+    case black = "black_joker"
+    case red = "red_joker"
 }
+

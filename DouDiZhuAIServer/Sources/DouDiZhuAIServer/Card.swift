@@ -6,7 +6,7 @@
 
 import Foundation
 
-class Card: Comparable, Codable {
+public class Card: Comparable, Codable {
     private var identifier: String = ""
     
     init(identifier:String) {
@@ -17,7 +17,7 @@ class Card: Comparable, Codable {
         return self.identifier
     }
     
-    static func < (lhs: Card, rhs: Card) -> Bool {
+    public static func < (lhs: Card, rhs: Card) -> Bool {
         if lhs is NullCard {
             return true
         } else if rhs is NullCard {
@@ -40,7 +40,7 @@ class Card: Comparable, Codable {
         }
     }
     
-    static func == (lhs: Card, rhs: Card) -> Bool {
+    public static func == (lhs: Card, rhs: Card) -> Bool {
         if lhs is NullCard || rhs is NullCard {
             return false
         }
@@ -61,7 +61,7 @@ class Card: Comparable, Codable {
         }
     }
     
-    static func > (lhs: Card, rhs: Card) -> Bool {
+    public static func > (lhs: Card, rhs: Card) -> Bool {
         if lhs is NullCard {
             return false
         } else if rhs is NullCard {

@@ -7,8 +7,9 @@
 
 import Foundation
 
-enum PlayerNum {
-    case one
+enum PlayerNum: Int {
+    case none = 0
+    case one = 1
     case two
     case three
 }

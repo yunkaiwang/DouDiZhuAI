@@ -18,35 +18,45 @@ class DouDiZhuGame {
     
     private var timer: Timer? = nil
     private var deck: Deck = Deck.shared
-    private var playerSocketInfo: [Player: WebSocket?] = [:]
     private var playerAddedAIPlayers: [Player: [Player]] = [:]
-    private var activePlayer: Player?
-    private var landlord: Player?
-    private var currentPlayerNum:Int
-    private var currentPlay: Play
+    private var activePlayer: Player? = nil
+    private var landlord: Player? = nil
+    private var currentPlay: Play = .none
+    private (set) var state: GameState = .created
+    private var players: [Player] = []
     
-    private var pillagingLandlord: Bool
-    private var beLandlordDecision:[Bool]
-    private var pillageLandlordDecision:[Bool]
-    
-    private var players: [Player] {
-        return Array(self.playerSocketInfo.keys)
+    private var availablePlayerNums: [PlayerNum] {
+        var playerNums: [PlayerNum] = []
+        var player1Used: Bool = false, player2Used: Bool = false, player3Used: Bool = false
+        for player in self.players {
+            if player.getPlayerNum() == .one {
+                player1Used = true
+            } else if player.getPlayerNum() == .two {
+                player2Used = true
+            } else if player.getPlayerNum() == .two {
+                player2Used = true
+            }
+        }
+        if !player1Used {
+            playerNums.append(PlayerNum.one)
+        }
+        if !player2Used {
+            playerNums.append(PlayerNum.two)
+        }
+        if !player3Used {
+            playerNums.append(PlayerNum.three)
+        }
+        return playerNums
     }
     
-    private init() { // singleton
-        self.landlord = nil
-        self.pillagingLandlord = false
-        self.beLandlordDecision = [false, false, false]
-        self.pillageLandlordDecision = [false, false, false]
-        self.currentPlayerNum = -1
-        self.currentPlay = Play.none
-    }
+    
+    private init() { } // singleton
     
     func playerForSocket(_ aSocket: WebSocket) -> Player? {
         var aPlayer: Player? = nil
         
-        self.playerSocketInfo.forEach { (player, socket) in
-            if aSocket == socket {
+        self.players.forEach { player in
+            if aSocket == player.getSocket() {
                 aPlayer = player
             }
         }
@@ -54,22 +64,21 @@ class DouDiZhuGame {
         return aPlayer
     }
     
-    func handlePlayerLeft(player: Player) throws {
-        if self.playerSocketInfo[player] != nil {
-            self.playerSocketInfo.removeValue(forKey: player)
-            for AIPlayer in playerAddedAIPlayers[player]! {
-                self.playerSocketInfo.removeValue(forKey: AIPlayer)
-            }
-            
+    func handlePlayerLeft(_ player: Player) throws {
+        self.removePlayer(player)
+        for AIPlayer in playerAddedAIPlayers[player]! {
+            self.removePlayer(AIPlayer)
+        }
+        self.playerAddedAIPlayers.removeValue(forKey: player)
+        self.state = .created
 //            let message = Message.gameEnd(player: player)
 //            try notifyPlayers(message: message)
-        }
     }
     
-    public func handleNewUserJoin(socket: WebSocket) throws {
-        let player = Player()
+    public func handleNewUserJoin(_ socket: WebSocket) throws {
+        let player = Player(socket)
         
-        if try self.handleJoin(player: player, socket: socket) {
+        if try self.handleJoin(player) {
             var playerIDs: [String] = []
             for p in self.players {
                 if p.id != player.id {
@@ -85,44 +94,46 @@ class DouDiZhuGame {
         }
     }
     
-    public func handleAddAIPlayer(socket: WebSocket) throws {
-        let AIPlayer = Player()
-        if try self.handleJoin(player: AIPlayer, socket: nil) {
+    public func handleAddAIPlayer(_ socket: WebSocket) throws {
+        let aiPlayer = AIPlayer()
+        if try self.handleJoin(aiPlayer) {
             let player = playerForSocket(socket)
             if player == nil {
                 print("Cannot find the player, this should never happen")
                 return
             }
             
-            playerAddedAIPlayers[player!]!.append(AIPlayer)
-            try notifyPlayers(message: Message.newUserJoined(player: AIPlayer))
+            playerAddedAIPlayers[player!]!.append(aiPlayer)
+            try notifyPlayers(message: Message.newUserJoined(player: aiPlayer))
         } else {
             try notifyPlayer(message: Message.addAIPlayerFailed(), socket: socket)
         }
     }
     
-    public func handleStartGame(socket: WebSocket) throws {
-        if self.playerSocketInfo.count < 3 {
+    public func handleStartGame(_ socket: WebSocket) throws {
+        if self.state != .created || self.players.count < 3 {
             try notifyPlayer(message: Message.startGameFailed(), socket: socket)
         }
-        self.newGame()
+        try self.newGame()
     }
     
-    private func newGame() {
+    private func newGame() throws {
         deck.newGame()
+
+        self.state = .started
         self.landlord = nil
-        self.pillagingLandlord = false
-        self.beLandlordDecision = [false, false, false]
-        self.pillageLandlordDecision = [false, false, false]
-        self.currentPlayerNum = -1
         self.currentPlay = Play.none
         
-        for i in 0..<self.players.count {
-            self.players[i].startNewGame(cards: deck.getPlayerCard(playerNum: i))
+        for player in self.players {
+            player.startNewGame(cards: deck.getPlayerCard(playerNum: player.getPlayerNum()))
+            try self.notifyPlayer(message: Message.startGame(player: player, cards: deck.getPlayerCard(playerNum: player.getPlayerNum())), socket: player.getSocket())
         }
     }
     
     private func isGameOver()->Bool {
+        if self.state != .inProgress { // game can only end when the game is in progress
+            return false
+        }
         for i in 0..<self.players.count {
             if self.players[i].getNumCard() == 0 {
                 return true
@@ -132,10 +143,10 @@ class DouDiZhuGame {
     }
     
     private func getWinner()->String? {
-        if !isGameOver() || landlord == nil {
+        if self.state != .inProgress {
             return nil
         } else {
-            if landlord!.getNumCard() == 0 {
+            if landlord?.getNumCard() == 0 {
                 return "Landlord"
             } else {
                 return "Farmer"
@@ -143,23 +154,19 @@ class DouDiZhuGame {
         }
     }
     
-    private func setLandlordAndStartGame(landlordNum: PlayerNum) {
-        var landlord: Player, currentPlayerNum: Int
+    private func setLandlordAndStartGame(_ landlordNum: PlayerNum) {
+        var landlord: Player
         switch landlordNum {
         case .one:
             landlord = self.players[0]
-            currentPlayerNum = 0
         case .two:
             landlord = self.players[1]
-            currentPlayerNum = 1
         default:
             landlord = self.players[2]
-            currentPlayerNum = 2
         }
         self.landlord = landlord
         self.landlord?.addLandlordCard(newCards: deck.getLandlordCard())
         
-        self.currentPlayerNum = currentPlayerNum
         self.runGame()
     }
     
@@ -403,7 +410,7 @@ class DouDiZhuGame {
         return self.players.filter({ $0 != self.activePlayer }).first
     }
     
-    private func notifyPlayer(message: Message, socket: WebSocket) throws {
+    private func notifyPlayer(message: Message, socket: WebSocket?) throws {
         let jsonEncoder = JSONEncoder()
         let jsonData = try jsonEncoder.encode(message)
         
@@ -411,7 +418,7 @@ class DouDiZhuGame {
             throw GameError.failedToSerializeMessageToJsonString(message: message)
         }
         
-        socket.sendStringMessage(string: jsonString, final: true, completion: {
+        socket?.sendStringMessage(string: jsonString, final: true, completion: {
             print("did send message: \(message.type)")
         })
     }
@@ -424,20 +431,43 @@ class DouDiZhuGame {
             throw GameError.failedToSerializeMessageToJsonString(message: message)
         }
         
-        self.playerSocketInfo.values.forEach({
-            $0?.sendStringMessage(string: jsonString, final: true, completion: {
+        self.players.forEach({
+            $0.getSocket()?.sendStringMessage(string: jsonString, final: true, completion: {
                 print("did send message: \(message.type)")
             })
         })
     }
     
-    private func handleJoin(player: Player, socket: WebSocket?) throws -> Bool {
-        if self.playerSocketInfo.count > 3 {
+    private func handleJoin(_ player: Player) throws -> Bool {
+        if self.players.count > 3 {
             return false
         }
         
-        self.playerSocketInfo[player] = socket
+        player.setPlayerNum(playerNum: self.availablePlayerNums[0])
+        self.players.append(player)
         return true
+    }
+    
+    private func removePlayer(_ player: Player) {
+        for i in 0..<self.players.count {
+            if self.players[i].id == player.id {
+                self.players.remove(at: i)
+                return
+            }
+        }
+    }
+    
+    private func getNextPlayerNum(_ playerNum: PlayerNum) -> PlayerNum {
+        switch playerNum {
+        case .none:
+            return .one
+        case .one:
+            return .two
+        case .two:
+            return .three
+        default:
+            return .one
+        }
     }
 }
 

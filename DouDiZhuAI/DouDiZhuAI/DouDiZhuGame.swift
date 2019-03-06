@@ -38,16 +38,6 @@ class DouDiZhuGame {
         return self.state != GameState.disconnected
     }
     
-    public func createPlayerCards() {
-        //        let playerCards: [Card] = player1.getCards()
-        //        for i in 0..<playerCards.count {
-        //            let newCard = CardButtonNode(normalTexture: SKTexture(imageNamed: playerCards[i].getIdentifier()), card: playerCards[i], game: self)
-        //            newCard.position = CGPoint(x: 200 - (playerCards.count - 17) * 13 + 25 * i, y: 50)
-        //            self.playerCardButtons.append(newCard)
-        //        }
-        //        self.gameScene.displayPlayerCards(cards: self.playerCardButtons)
-    }
-    
     public func letPlayerDecideLandlord() {
         //        if playerNum == 0 {
         //            if self.pillagingLandlord {
@@ -185,6 +175,17 @@ class DouDiZhuGame {
         }
     }
     
+    private func createPlayerCards() {
+        let playerCards: [Card] = self.player?.getCards() ?? []
+        for i in 0..<playerCards.count {
+            let newCard = CardButtonNode(normalTexture: SKTexture(imageNamed: playerCards[i].getIdentifier()), card: playerCards[i], game: self)
+            newCard.position = CGPoint(x: 200 - (playerCards.count - 17) * 13 + 25 * i, y: 50)
+            self.playerCardButtons.append(newCard)
+        }
+        DouDiZhuGame.gameScene?.resetTable()
+        DouDiZhuGame.gameScene?.displayPlayerCards(cards: self.playerCardButtons)
+    }
+    
     private init() { /* singleton */ }
 }
 
@@ -236,6 +237,19 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             return
         case .startGameFailed:
             DouDiZhuGame.gameScene?.showAlert(withTitle: "Start failed", message: "Failed to start the game, please try again")
+            return
+        case .gameStarted:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            if playerID != self.player?.id {
+                print("The given player id doesn't match current player id, this should never happen")
+                return
+            }
+            self.player?.startNewGame(cards: message.cards)
+            self.createPlayerCards()
             return
         case .gameEnd:
             if let winningPlayer = message.playerID {

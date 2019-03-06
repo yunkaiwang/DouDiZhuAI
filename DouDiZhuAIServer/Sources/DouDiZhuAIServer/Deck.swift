@@ -13,18 +13,25 @@ class Deck {
     
     // public
     
-    func newGame() {
+    public func newGame() {
         deck.shuffle()
+        self.splitCard()
     }
     
-    func getPlayerCard(playerNum: Int) -> [Card] {
-        if playerNum < 0 || playerNum > 2 {
+    public func getPlayerCard(playerNum: PlayerNum) -> [Card] {
+        switch playerNum {
+        case .none:
             return []
+        case .one:
+            return self.playerCards[0]
+        case .two:
+            return self.playerCards[1]
+        default:
+            return self.playerCards[2]
         }
-        return self.playerCards[playerNum]
     }
     
-    func getLandlordCard() -> [Card] {
+    public func getLandlordCard() -> [Card] {
         return self.playerCards[3]
     }
     
@@ -48,22 +55,20 @@ class Deck {
     }
     
     private func splitCard() {
-        playerCards = [[Card]]()
-        
         var cardOwner = Array(repeating: 0, count: 17)
         cardOwner.append(contentsOf: Array(repeating: 1, count: 17))
         cardOwner.append(contentsOf: Array(repeating: 2, count: 17))
         cardOwner.append(contentsOf: Array(repeating: 3, count: 3))
         
         cardOwner.shuffle()
-        playerCards = Array(repeating: [], count: 4)
+        self.playerCards = Array(repeating: [], count: 4)
         
         for i in 0..<cardOwner.count {
-            playerCards[cardOwner[i]].append(deck[i])
+            self.playerCards[cardOwner[i]].append(deck[i])
         }
         
         for i in 0..<4 {
-            playerCards[i].sort()
+            self.playerCards[i].sort()
         }
     }
 }

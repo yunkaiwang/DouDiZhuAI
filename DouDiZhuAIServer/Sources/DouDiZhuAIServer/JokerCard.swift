@@ -7,8 +7,7 @@
 import Foundation
 
 class JokerCard: Card {
-    
-    private var type = JokerType.black
+    private var type: JokerType
     
     init(type: JokerType) {
         self.type = type

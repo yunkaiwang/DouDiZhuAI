@@ -147,7 +147,6 @@ class GameScene: SKScene {
     }
     
     func enterGameScene() {
-//        resetTable()
         joinGameButton.isHidden = true
         welcomeLabel.isHidden = false
         player2Status.isHidden = false
@@ -237,6 +236,9 @@ class GameScene: SKScene {
     
     func resetTable() {
         hidePlayButtons()
+        welcomeLabel.isHidden = true
+        addAIPlayerButton.isHidden = true
+        
         gameOverMsg.isHidden = true
         startGameButton.isHidden = true
         landlordLabel.isHidden = true

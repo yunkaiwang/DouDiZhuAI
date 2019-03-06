@@ -19,6 +19,7 @@ public enum MessageType: String, Codable {
     case startGame = "startGame" // start game
     case startGameFailed = "startGameFailed" // start game failed
     
+    case gameStarted = "gameStarted" // game has been started
     
     case gameEnd = "gameEnd" // game has ended (one player win)
     case informDecision = "informDecision" // inform the client/server about the decision of whether be a landlord or not
