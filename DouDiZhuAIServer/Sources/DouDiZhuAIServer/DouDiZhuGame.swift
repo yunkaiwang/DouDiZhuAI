@@ -13,8 +13,8 @@ enum GameError: Error {
     case failedToSerializeMessageToJsonString(message: Message)
 }
 
-class Game {
-    static let shared = Game()
+class DouDiZhuGame {
+    static let shared = DouDiZhuGame()
     
     private var timer: Timer? = nil
     private var deck: Deck = Deck.shared
@@ -66,16 +66,7 @@ class Game {
         }
     }
     
-    private func handleJoin(player: Player, socket: WebSocket?) throws -> Bool {
-        if self.playerSocketInfo.count > 3 {
-            return false
-        }
-        
-        self.playerSocketInfo[player] = socket
-        return true
-    }
-    
-    func handleNewUserJoin(socket: WebSocket) throws {
+    public func handleNewUserJoin(socket: WebSocket) throws {
         let player = Player()
         
         if try self.handleJoin(player: player, socket: socket) {
@@ -94,7 +85,7 @@ class Game {
         }
     }
     
-    func handleAddAIPlayer(socket: WebSocket) throws {
+    public func handleAddAIPlayer(socket: WebSocket) throws {
         let AIPlayer = Player()
         if try self.handleJoin(player: AIPlayer, socket: nil) {
             let player = playerForSocket(socket)
@@ -110,58 +101,14 @@ class Game {
         }
     }
     
-    
-    private func didPlayerWin() -> Bool {
-        
-        return false
-    }
-    
-    private func startGame() throws {
-        self.activePlayer = randomPlayer()
-        self.chooseLandlord()
-        
-        let message = Message.playerTurn(player: self.activePlayer!)
-        try notifyPlayers(message: message)
-    }
-    
-    private func randomPlayer() -> Player {
-        let randomIdx = Int(arc4random() % UInt32(self.players.count))
-        return players[randomIdx]
-    }
-    
-    private func nextActivePlayer() -> Player? {
-        return self.players.filter({ $0 != self.activePlayer }).first
-    }
-    
-    private func notifyPlayer(message: Message, socket: WebSocket) throws {
-        let jsonEncoder = JSONEncoder()
-        let jsonData = try jsonEncoder.encode(message)
-        
-        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            throw GameError.failedToSerializeMessageToJsonString(message: message)
+    public func handleStartGame(socket: WebSocket) throws {
+        if self.playerSocketInfo.count < 3 {
+            try notifyPlayer(message: Message.startGameFailed(), socket: socket)
         }
-        
-        socket.sendStringMessage(string: jsonString, final: true, completion: {
-            print("did send message: \(message.type)")
-        })
+        self.newGame()
     }
     
-    private func notifyPlayers(message: Message) throws {
-        let jsonEncoder = JSONEncoder()
-        let jsonData = try jsonEncoder.encode(message)
-        
-        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            throw GameError.failedToSerializeMessageToJsonString(message: message)
-        }
-        
-        self.playerSocketInfo.values.forEach({
-            $0?.sendStringMessage(string: jsonString, final: true, completion: {
-                print("did send message: \(message.type)")
-            })
-        })
-    }
-    
-    func newGame() {
+    private func newGame() {
         deck.newGame()
         self.landlord = nil
         self.pillagingLandlord = false
@@ -175,7 +122,7 @@ class Game {
         }
     }
     
-    func isGameOver()->Bool {
+    private func isGameOver()->Bool {
         for i in 0..<self.players.count {
             if self.players[i].getNumCard() == 0 {
                 return true
@@ -184,7 +131,7 @@ class Game {
         return false
     }
     
-    func getWinner()->String? {
+    private func getWinner()->String? {
         if !isGameOver() || landlord == nil {
             return nil
         } else {
@@ -196,7 +143,7 @@ class Game {
         }
     }
     
-    func setLandlordAndStartGame(landlordNum: PlayerNum) {
+    private func setLandlordAndStartGame(landlordNum: PlayerNum) {
         var landlord: Player, currentPlayerNum: Int
         switch landlordNum {
         case .one:
@@ -220,7 +167,7 @@ class Game {
         
     }
     
-    func chooseLandlord() {
+    private func chooseLandlord() {
 //        self.currentPlayerNum = Int.random(in: 0...2)
 //
 //
@@ -251,7 +198,7 @@ class Game {
 //        }
     }
     
-    func letPlayerDecideLandlord(playerNum: Int) {
+    private func letPlayerDecideLandlord(playerNum: Int) {
 //        if playerNum == 0 {
 //
 //            self.waitForPlayerChoise()
@@ -286,7 +233,7 @@ class Game {
 //        }
     }
     
-    func playerChooseToBeLandlord() {
+    private func playerChooseToBeLandlord() {
         
 //        if !self.pillagingLandlord {
 //            player1.decideToBeLandlord(decision: true)
@@ -348,7 +295,7 @@ class Game {
 //        }
     }
     
-    func playerChooseToBeFarmer() {
+    private func playerChooseToBeFarmer() {
         
         
 //        if !self.pillagingLandlord {
@@ -433,6 +380,64 @@ class Game {
 //                }
 //            }
 //        }
+    }
+    
+    private func didPlayerWin() -> Bool {
+        return false
+    }
+    
+    private func startGame() throws {
+        self.activePlayer = randomPlayer()
+        self.chooseLandlord()
+        
+        let message = Message.playerTurn(player: self.activePlayer!)
+        try notifyPlayers(message: message)
+    }
+    
+    private func randomPlayer() -> Player {
+        let randomIdx = Int(arc4random() % UInt32(self.players.count))
+        return players[randomIdx]
+    }
+    
+    private func nextActivePlayer() -> Player? {
+        return self.players.filter({ $0 != self.activePlayer }).first
+    }
+    
+    private func notifyPlayer(message: Message, socket: WebSocket) throws {
+        let jsonEncoder = JSONEncoder()
+        let jsonData = try jsonEncoder.encode(message)
+        
+        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+            throw GameError.failedToSerializeMessageToJsonString(message: message)
+        }
+        
+        socket.sendStringMessage(string: jsonString, final: true, completion: {
+            print("did send message: \(message.type)")
+        })
+    }
+    
+    private func notifyPlayers(message: Message) throws {
+        let jsonEncoder = JSONEncoder()
+        let jsonData = try jsonEncoder.encode(message)
+        
+        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+            throw GameError.failedToSerializeMessageToJsonString(message: message)
+        }
+        
+        self.playerSocketInfo.values.forEach({
+            $0?.sendStringMessage(string: jsonString, final: true, completion: {
+                print("did send message: \(message.type)")
+            })
+        })
+    }
+    
+    private func handleJoin(player: Player, socket: WebSocket?) throws -> Bool {
+        if self.playerSocketInfo.count > 3 {
+            return false
+        }
+        
+        self.playerSocketInfo[player] = socket
+        return true
     }
 }
 

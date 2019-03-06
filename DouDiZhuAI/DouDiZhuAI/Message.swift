@@ -40,4 +40,8 @@ public class Message: Codable {
     public static func addAIPlayer() -> Message {
         return Message(type: .addAIPlayer)
     }
+    
+    public static func startGame() -> Message {
+        return Message(type: .startGame)
+    }
 }

@@ -18,11 +18,11 @@ class GameHandler: WebSocketSessionHandler {
         socket.readStringMessage { (string, op, fin) in
             
             guard let string = string else {
-                if let player = Game.shared.playerForSocket(socket) {
+                if let player = DouDiZhuGame.shared.playerForSocket(socket) {
                     print("socket closed for \(player.id)")
                     
                     do {
-                        try Game.shared.handlePlayerLeft(player: player)
+                        try DouDiZhuGame.shared.handlePlayerLeft(player: player)
                     } catch let error {
                         print("error: \(error)")
                     }
@@ -40,9 +40,11 @@ class GameHandler: WebSocketSessionHandler {
                 let message: Message = try decoder.decode(Message.self, from: data)
                 switch message.type {
                 case .joinGame:
-                    try Game.shared.handleNewUserJoin(socket: socket)
+                    try DouDiZhuGame.shared.handleNewUserJoin(socket: socket)
                 case .addAIPlayer:
-                    try Game.shared.handleAddAIPlayer(socket: socket)
+                    try DouDiZhuGame.shared.handleAddAIPlayer(socket: socket)
+                case .startGame:
+                    try DouDiZhuGame.shared.handleStartGame(socket: socket)
                 case .makePlay:
                     
                     

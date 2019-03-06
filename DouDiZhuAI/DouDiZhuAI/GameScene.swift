@@ -407,7 +407,7 @@ class GameScene: SKScene {
     }
     
     @objc func startGame() {
-        
+        DouDiZhuGame.sharedInstace.startGame()
     }
     
     @objc func beLandlordButtonClicked() {

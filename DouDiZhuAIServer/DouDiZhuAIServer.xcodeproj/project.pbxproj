@@ -10,7 +10,7 @@
 		3F1B81D9222D8591001680B2 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D7222D858E001680B2 /* Player.swift */; };
 		3F1B81DC222D85F5001680B2 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81DA222D85F4001680B2 /* Message.swift */; };
 		3F1B81DF222D8625001680B2 /* MessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81DD222D861B001680B2 /* MessageType.swift */; };
-		3F1B81E2222D89D0001680B2 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81E0222D89CE001680B2 /* Game.swift */; };
+		3F1B81E2222D89D0001680B2 /* DouDiZhuGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81E0222D89CE001680B2 /* DouDiZhuGame.swift */; };
 		3F1B81E5222D8AD7001680B2 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81E3222D8ACF001680B2 /* Deck.swift */; };
 		3F1B81E8222D8B1D001680B2 /* Suit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81E6222D8B19001680B2 /* Suit.swift */; };
 		3F1B81EB222D8B4B001680B2 /* SuitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81E9222D8B3E001680B2 /* SuitType.swift */; };
@@ -636,7 +636,7 @@
 		3F1B81D7222D858E001680B2 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		3F1B81DA222D85F4001680B2 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		3F1B81DD222D861B001680B2 /* MessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageType.swift; sourceTree = "<group>"; };
-		3F1B81E0222D89CE001680B2 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		3F1B81E0222D89CE001680B2 /* DouDiZhuGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuGame.swift; sourceTree = "<group>"; };
 		3F1B81E3222D8ACF001680B2 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		3F1B81E6222D8B19001680B2 /* Suit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suit.swift; sourceTree = "<group>"; };
 		3F1B81E9222D8B3E001680B2 /* SuitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitType.swift; sourceTree = "<group>"; };
@@ -1645,7 +1645,7 @@
 			children = (
 				OBJ_9 /* main.swift */,
 				3F1B8209222E0D7A001680B2 /* GameHandler.swift */,
-				3F1B81E0222D89CE001680B2 /* Game.swift */,
+				3F1B81E0222D89CE001680B2 /* DouDiZhuGame.swift */,
 				3F1B8207222E0741001680B2 /* ComputerPlayer.swift */,
 				3F1B8205222D9037001680B2 /* PlayerNum.swift */,
 				3F1B8202222D8D44001680B2 /* utilities.swift */,
@@ -2405,7 +2405,7 @@
 				3F1B81F2222D8C2A001680B2 /* JokerCard.swift in Sources */,
 				3F1B81DC222D85F5001680B2 /* Message.swift in Sources */,
 				3F1B8204222D8D46001680B2 /* utilities.swift in Sources */,
-				3F1B81E2222D89D0001680B2 /* Game.swift in Sources */,
+				3F1B81E2222D89D0001680B2 /* DouDiZhuGame.swift in Sources */,
 				3F1B81D9222D8591001680B2 /* Player.swift in Sources */,
 				OBJ_619 /* main.swift in Sources */,
 				3F1B8208222E0741001680B2 /* ComputerPlayer.swift in Sources */,

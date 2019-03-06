@@ -17,7 +17,6 @@ public enum MessageType: String, Codable {
     case addAIPlayerFailed = "addAIPlayerFailed" // add AI player failed
     
     case startGame = "startGame" // start game
-    case startGameSucceded = "startGameSucceded" // start game succeded
     case startGameFailed = "startGameFailed" // start game failed
     
     

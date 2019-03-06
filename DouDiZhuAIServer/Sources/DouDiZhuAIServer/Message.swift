@@ -12,6 +12,10 @@ public class Message: Codable {
     public let existingPlayers: [String]
     public let error: String?
     
+    private convenience init(type: MessageType) {
+        self.init(type: type, playerID: nil, players: [], error: nil)
+    }
+    
     private convenience init(type: MessageType, playerID: String?) {
         self.init(type: type, playerID: playerID, players: [], error: nil)
     }
@@ -49,5 +53,9 @@ public class Message: Codable {
     
     public static func newUserJoined(player: Player) -> Message {
         return Message(type: .newUserJoined, playerID: player.id)
+    }
+    
+    public static func startGameFailed() -> Message {
+        return Message(type: .startGameFailed)
     }
 }

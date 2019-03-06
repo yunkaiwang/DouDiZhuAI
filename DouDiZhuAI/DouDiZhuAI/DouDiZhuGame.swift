@@ -164,6 +164,10 @@ class DouDiZhuGame {
         self.client.joinGame()
     }
     
+    public func startGame() {
+        self.client.startGame()
+    }
+    
     private func setExistingPlayer(playerIDs: [String]){
         for playerID in playerIDs {
             self.addNewPlayer(playerID: playerID)
@@ -229,6 +233,9 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             return
         case .joinGameFailed:
             DouDiZhuGame.gameScene?.showAlert(withTitle: "Join failed", message: "Failed to join the game, please try again")
+            return
+        case .startGameFailed:
+            DouDiZhuGame.gameScene?.showAlert(withTitle: "Start failed", message: "Failed to start the game, please try again")
             return
         case .gameEnd:
             if let winningPlayer = message.playerID {
