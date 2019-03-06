@@ -12,4 +12,8 @@ class NullCard: Card {
     init() {
         super.init(identifier: "NULL")
     }
+    
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
+    }
 }

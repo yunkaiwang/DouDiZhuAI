@@ -40,6 +40,10 @@ class DouDiZhuClient: WebSocketDelegate {
         self.writeMessageToSocket(Message.joinGame())
     }
     
+    func addAIPlayer() {
+        self.writeMessageToSocket(Message.addAIPlayer())
+    }
+    
     // MARK: - Private
     
     private func writeMessageToSocket(_ message: Message) {

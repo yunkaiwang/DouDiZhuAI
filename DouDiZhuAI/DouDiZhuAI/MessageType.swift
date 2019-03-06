@@ -13,8 +13,9 @@ public enum MessageType: String, Codable {
     case joinGameSucceded = "joinGameSucceded" // new player join the game successfully
     case joinGameFailed = "joinGameFailed" // new player failed to join the game
     
+    case newUserJoined = "newUserJoined" // new player joined the game
+    
     case addAIPlayer = "addAIPlayer" // add AI player
-    case addAIPlayerSucceded = "addAIPlayerSucceded" // add AI player succeded
     case addAIPlayerFailed = "addAIPlayerFailed" // add AI player failed
     
     case startGame = "startGame" // start game

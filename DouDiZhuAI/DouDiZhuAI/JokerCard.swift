@@ -24,6 +24,10 @@ class JokerCard: Card {
         super.init(identifier: identifier)
     }
     
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
+    }
+    
     func isRedJoker()->Bool {
         return self.type == JokerType.red
     }

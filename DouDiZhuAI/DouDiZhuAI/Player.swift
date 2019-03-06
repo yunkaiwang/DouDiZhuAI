@@ -15,16 +15,12 @@ public enum PlayerError: Error {
 class Player {
     public let id: String
     private var cards: [Card]
-//    private var playerNum: PlayerNum
-    internal var beLandlord: Bool
-    internal var pillageLandlord: Bool
+    private var playerNum: PlayerNum
     
-    init(id: String) {
+    init(id: String, num: PlayerNum) {
         self.id = id
         self.cards = []
-//        self.playerNum = num
-        self.beLandlord = false
-        self.pillageLandlord = false
+        self.playerNum = num
     }
     
     func getNumCard()->Int {
@@ -35,31 +31,18 @@ class Player {
         return self.cards
     }
     
+    func getPlayerNum()->PlayerNum{
+        return self.playerNum
+    }
+    
     func startNewGame(cards: [Card]) {
         self.cards = cards
-        self.beLandlord = false
-        self.pillageLandlord = false
     }
     
     func addLandlordCard(newCards: [Card]) {
         self.cards += newCards
         self.cards.sort()
     }
-    
-    func pass() {
-    }
-    
-    func wantToBeLandlord()->Bool {
-        return self.beLandlord
-    }
-    
-    func wantToPillageLandlord()->Bool {
-        return self.pillageLandlord
-    }
-    
-//    func getPlayerNum()->PlayerNum {
-//        return self.playerNum
-//    }
     
     func makePlay(cards: [Card]) {
         for selected_card in cards {
@@ -72,27 +55,3 @@ class Player {
         }
     }
 }
-
-//public class Player2: Hashable, Codable {
-//    public let id: String
-//    
-//    public init() {
-//        self.id = NSUUID().uuidString
-//    }
-//    
-//    public init(json: [String: Any]) throws {
-//        guard let id = json["id"] as? String else {
-//            throw PlayerError.creationFailed
-//        }
-//        
-//        self.id = id
-//    }
-//    
-//    public var hashValue: Int {
-//        return self.id.hashValue
-//    }
-//    
-//    public static func == (lhs: Player2, rhs: Player2) -> Bool {
-//        return lhs.id == rhs.id
-//    }
-//}

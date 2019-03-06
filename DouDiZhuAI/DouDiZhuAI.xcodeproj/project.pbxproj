@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3F1B81C0222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */; };
-		3F1B81C1222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3F1B81CE222C9A74001680B2 /* DouDiZhuClientDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81CD222C9A74001680B2 /* DouDiZhuClientDelegate.swift */; };
 		3F1B81D2222D7B2A001680B2 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D1222D7B2A001680B2 /* GameState.swift */; };
-		3F1B81D4222D7D2C001680B2 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D3222D7D2C001680B2 /* Game.swift */; };
+		3F1B81D4222D7D2C001680B2 /* DouDiZhuGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D3222D7D2C001680B2 /* DouDiZhuGame.swift */; };
 		3F1B81D6222D835C001680B2 /* MessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B81D5222D835C001680B2 /* MessageType.swift */; };
 		3F1B820C222E1640001680B2 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B820B222E1640001680B2 /* Message.swift */; };
+		3F1B8214222F5E6C001680B2 /* SuitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8213222F5E6C001680B2 /* SuitType.swift */; };
+		3F1B8216222F5FDC001680B2 /* PlayerNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8215222F5FDC001680B2 /* PlayerNum.swift */; };
 		3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51D921FBF26D002AC4A0 /* Play.swift */; };
 		3F6A51DC21FE55F1002AC4A0 /* CardNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */; };
 		3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */; };
@@ -24,40 +24,18 @@
 		3F79391721EAE019003A590F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391521EAE019003A590F /* Main.storyboard */; };
 		3F79391C21EAE01B003A590F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F79391A21EAE01B003A590F /* LaunchScreen.storyboard */; };
 		3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392721EBBEDF003A590F /* GameSceneViewController.swift */; };
-		3F79392A21EC1363003A590F /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392921EC1363003A590F /* Deck.swift */; };
 		3F79392C21EC13B4003A590F /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392B21EC13B4003A590F /* Card.swift */; };
 		3F79392E21EC1832003A590F /* JokerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392D21EC1832003A590F /* JokerType.swift */; };
 		3F79393021EC1958003A590F /* NumCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392F21EC1958003A590F /* NumCard.swift */; };
 		3F79393221EC196F003A590F /* JokerCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393121EC196F003A590F /* JokerCard.swift */; };
 		3F79393421EC1A3A003A590F /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393321EC1A3A003A590F /* utilities.swift */; };
 		3F79393621EC1F17003A590F /* FTButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393521EC1F17003A590F /* FTButtonNode.swift */; };
-		3F79393A21EC3089003A590F /* DouDiZhuGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393921EC3089003A590F /* DouDiZhuGame.swift */; };
 		3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394321ED818A003A590F /* CardButtonNode.swift */; };
 		3F79394621F02814003A590F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F79394521F02814003A590F /* Assets.xcassets */; };
 		3F79394821F2C061003A590F /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394721F2C061003A590F /* Player.swift */; };
-		3F79394A21F2C0BE003A590F /* ComputerPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394921F2C0BE003A590F /* ComputerPlayer.swift */; };
-		3F79394C21F2C586003A590F /* HumanPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394B21F2C586003A590F /* HumanPlayer.swift */; };
 		3F79394E21FA5003003A590F /* extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394D21FA5003003A590F /* extension.swift */; };
-		3F79395021FA5108003A590F /* PlayerNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394F21FA5108003A590F /* PlayerNum.swift */; };
 		E970AD61EB1B46D0C64D5804 /* Pods_DouDiZhuAI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		3F1B81BE222C920C001680B2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3F1B819C222C8F06001680B2;
-			remoteInfo = DouDiZhuSharedLibrary;
-		};
-		3F1B81C2222C921A001680B2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 3F1B819B222C8F06001680B2;
-			remoteInfo = DouDiZhuSharedLibrary;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		3F1B814D22153192001680B2 /* Embed Frameworks */ = {
@@ -66,7 +44,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3F1B81C1222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,12 +53,13 @@
 /* Begin PBXFileReference section */
 		2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DouDiZhuAI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = DouDiZhuAI.xcodeproj; sourceTree = "<group>"; };
-		3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DouDiZhuSharedLibrary.xcodeproj; path = ../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary.xcodeproj; sourceTree = "<group>"; };
 		3F1B81CD222C9A74001680B2 /* DouDiZhuClientDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuClientDelegate.swift; sourceTree = "<group>"; };
 		3F1B81D1222D7B2A001680B2 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
-		3F1B81D3222D7D2C001680B2 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		3F1B81D3222D7D2C001680B2 /* DouDiZhuGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuGame.swift; sourceTree = "<group>"; };
 		3F1B81D5222D835C001680B2 /* MessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageType.swift; sourceTree = "<group>"; };
 		3F1B820B222E1640001680B2 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		3F1B8213222F5E6C001680B2 /* SuitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitType.swift; sourceTree = "<group>"; };
+		3F1B8215222F5FDC001680B2 /* PlayerNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNum.swift; sourceTree = "<group>"; };
 		3F6A51D921FBF26D002AC4A0 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Play.swift; path = ../../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary/Play.swift; sourceTree = "<group>"; };
 		3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNum.swift; sourceTree = "<group>"; };
 		3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suit.swift; sourceTree = "<group>"; };
@@ -94,21 +72,16 @@
 		3F79391B21EAE01B003A590F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F79391D21EAE01B003A590F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F79392721EBBEDF003A590F /* GameSceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneViewController.swift; sourceTree = "<group>"; };
-		3F79392921EC1363003A590F /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		3F79392B21EC13B4003A590F /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		3F79392D21EC1832003A590F /* JokerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JokerType.swift; sourceTree = "<group>"; };
 		3F79392F21EC1958003A590F /* NumCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumCard.swift; sourceTree = "<group>"; };
 		3F79393121EC196F003A590F /* JokerCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JokerCard.swift; sourceTree = "<group>"; };
-		3F79393321EC1A3A003A590F /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
+		3F79393321EC1A3A003A590F /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = utilities.swift; path = ../../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary/utilities.swift; sourceTree = "<group>"; };
 		3F79393521EC1F17003A590F /* FTButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTButtonNode.swift; sourceTree = "<group>"; };
-		3F79393921EC3089003A590F /* DouDiZhuGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuGame.swift; sourceTree = "<group>"; };
 		3F79394321ED818A003A590F /* CardButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardButtonNode.swift; sourceTree = "<group>"; };
 		3F79394521F02814003A590F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3F79394721F2C061003A590F /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
-		3F79394921F2C0BE003A590F /* ComputerPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputerPlayer.swift; sourceTree = "<group>"; };
-		3F79394B21F2C586003A590F /* HumanPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumanPlayer.swift; sourceTree = "<group>"; };
 		3F79394D21FA5003003A590F /* extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extension.swift; sourceTree = "<group>"; };
-		3F79394F21FA5108003A590F /* PlayerNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNum.swift; sourceTree = "<group>"; };
 		4586AC69F28375089889FFEB /* Pods-DouDiZhuAI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DouDiZhuAI.release.xcconfig"; path = "Target Support Files/Pods-DouDiZhuAI/Pods-DouDiZhuAI.release.xcconfig"; sourceTree = "<group>"; };
 		742E9561ACCBB6F91A553257 /* Pods-DouDiZhuAI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DouDiZhuAI.debug.xcconfig"; path = "Target Support Files/Pods-DouDiZhuAI/Pods-DouDiZhuAI.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,7 +91,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F1B81C0222C921A001680B2 /* DouDiZhuSharedLibrary.framework in Frameworks */,
 				E970AD61EB1B46D0C64D5804 /* Pods_DouDiZhuAI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -141,18 +113,9 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3F1B81BB222C920B001680B2 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		3F7938FF21EAE019003A590F = {
 			isa = PBXGroup;
 			children = (
-				3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */,
 				3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */,
 				3F79390A21EAE019003A590F /* DouDiZhuAI */,
 				3F79390921EAE019003A590F /* Products */,
@@ -177,21 +140,18 @@
 				3F79394521F02814003A590F /* Assets.xcassets */,
 				3F79391121EAE019003A590F /* GameScene.swift */,
 				3F79394D21FA5003003A590F /* extension.swift */,
-				3F79394B21F2C586003A590F /* HumanPlayer.swift */,
 				3F79394721F2C061003A590F /* Player.swift */,
-				3F79394F21FA5108003A590F /* PlayerNum.swift */,
-				3F79394921F2C0BE003A590F /* ComputerPlayer.swift */,
-				3F79392921EC1363003A590F /* Deck.swift */,
 				3F79393321EC1A3A003A590F /* utilities.swift */,
 				3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */,
+				3F1B8213222F5E6C001680B2 /* SuitType.swift */,
+				3F1B8215222F5FDC001680B2 /* PlayerNum.swift */,
 				3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */,
 				3F79392B21EC13B4003A590F /* Card.swift */,
 				3F6A51DF22016735002AC4A0 /* NullCard.swift */,
 				3F79393121EC196F003A590F /* JokerCard.swift */,
 				3F79392F21EC1958003A590F /* NumCard.swift */,
 				3F79392D21EC1832003A590F /* JokerType.swift */,
-				3F79393921EC3089003A590F /* DouDiZhuGame.swift */,
-				3F1B81D3222D7D2C001680B2 /* Game.swift */,
+				3F1B81D3222D7D2C001680B2 /* DouDiZhuGame.swift */,
 				3F6A51D921FBF26D002AC4A0 /* Play.swift */,
 				3F79391521EAE019003A590F /* Main.storyboard */,
 				3F79393521EC1F17003A590F /* FTButtonNode.swift */,
@@ -233,7 +193,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F1B81C3222C921A001680B2 /* PBXTargetDependency */,
 			);
 			name = DouDiZhuAI;
 			productName = DouDiZhuAI;
@@ -271,10 +230,6 @@
 					ProductGroup = 3F1B81B8222C91DA001680B2 /* Products */;
 					ProjectRef = 3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */;
 				},
-				{
-					ProductGroup = 3F1B81BB222C920B001680B2 /* Products */;
-					ProjectRef = 3F1B81BA222C920B001680B2 /* DouDiZhuSharedLibrary.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -282,16 +237,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		3F1B81BF222C920C001680B2 /* DouDiZhuSharedLibrary.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = DouDiZhuSharedLibrary.framework;
-			remoteRef = 3F1B81BE222C920C001680B2 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3F79390621EAE019003A590F /* Resources */ = {
@@ -363,11 +308,9 @@
 				3F79393621EC1F17003A590F /* FTButtonNode.swift in Sources */,
 				3F79391221EAE019003A590F /* GameScene.swift in Sources */,
 				3F6A51DC21FE55F1002AC4A0 /* CardNum.swift in Sources */,
-				3F79394C21F2C586003A590F /* HumanPlayer.swift in Sources */,
-				3F79394A21F2C0BE003A590F /* ComputerPlayer.swift in Sources */,
+				3F1B8214222F5E6C001680B2 /* SuitType.swift in Sources */,
 				3F79392C21EC13B4003A590F /* Card.swift in Sources */,
 				3F1B81D6222D835C001680B2 /* MessageType.swift in Sources */,
-				3F79393A21EC3089003A590F /* DouDiZhuGame.swift in Sources */,
 				3F1B820C222E1640001680B2 /* Message.swift in Sources */,
 				3F79394821F2C061003A590F /* Player.swift in Sources */,
 				3F79393021EC1958003A590F /* NumCard.swift in Sources */,
@@ -375,13 +318,12 @@
 				3F79392821EBBEDF003A590F /* GameSceneViewController.swift in Sources */,
 				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
 				3F1B81CE222C9A74001680B2 /* DouDiZhuClientDelegate.swift in Sources */,
+				3F1B8216222F5FDC001680B2 /* PlayerNum.swift in Sources */,
 				3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */,
 				3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */,
-				3F1B81D4222D7D2C001680B2 /* Game.swift in Sources */,
+				3F1B81D4222D7D2C001680B2 /* DouDiZhuGame.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
-				3F79392A21EC1363003A590F /* Deck.swift in Sources */,
 				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,
-				3F79395021FA5108003A590F /* PlayerNum.swift in Sources */,
 				3F1B81D2222D7B2A001680B2 /* GameState.swift in Sources */,
 				3F79390C21EAE019003A590F /* AppDelegate.swift in Sources */,
 				3F79393221EC196F003A590F /* JokerCard.swift in Sources */,
@@ -389,14 +331,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		3F1B81C3222C921A001680B2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = DouDiZhuSharedLibrary;
-			targetProxy = 3F1B81C2222C921A001680B2 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		3F79391521EAE019003A590F /* Main.storyboard */ = {

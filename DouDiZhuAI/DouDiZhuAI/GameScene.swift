@@ -10,9 +10,14 @@ import SpriteKit
 import GameplayKit
 
 class GameScene: SKScene {
+    let welcomeLabel: SKLabelNode = SKLabelNode(text: "Welcome to Landlord game!")
+    
+    let addAIPlayerButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let startGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
+    
+    let joinGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let beLandlordButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
-    let notBeLandlordButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
+    let beFarmerButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let player1CurrentPlay = SKSpriteNode(color: .clear, size: CGSize(width: 200, height: 100))
     let player2CurrentPlay = SKSpriteNode(color: .clear, size: CGSize(width: 200, height: 100))
     let player3CurrentPlay = SKSpriteNode(color: .clear, size: CGSize(width: 200, height: 100))
@@ -29,6 +34,8 @@ class GameScene: SKScene {
     let player3Card = SKSpriteNode(imageNamed: "back")
     let player3CardCount = SKLabelNode(text: "17")
     let gameOverMsg = SKLabelNode(text: "")
+    let player2Status = SKLabelNode(text: "No Player Yet")
+    let player3Status = SKLabelNode(text: "No Player Yet")
     
     let LandlordCard1 = SKSpriteNode(imageNamed: "back_small")
     let LandlordCard2 = SKSpriteNode(imageNamed: "back_small")
@@ -38,84 +45,81 @@ class GameScene: SKScene {
     
     private var countDown: Int = 0
     private var timer: Timer? = nil
-    private var game: DouDiZhuGame? = nil
     public static var gameController: UIViewController?
     
     override init(size: CGSize) {
         super.init(size: size)
         self.countDown = 0
         self.timer = nil
-        self.game = DouDiZhuGame(scene: self)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func setLabelNodeAttr(node: SKLabelNode, name: String?, color: UIColor?, pos: CGPoint, size: CGFloat?, isHidden: Bool) {
+        node.name = name
+        node.fontColor = color
+        node.position = pos
+        node.fontSize = size ?? node.fontSize
+        node.isHidden = isHidden
+        self.addChild(node)
+    }
+    
+    private func setSpritNodeAttr(node: SKSpriteNode, name: String?, pos: CGPoint) {
+        node.name = name
+        node.position = pos
+        self.addChild(node)
+    }
+    
+    private func setButtonAttributes() {
+        self.setButtonNodeAttr(node: joinGameButton, title: "Join game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: self.frame.midY), size: CGSize(width: 100, height: 30), zPosition: nil, name: "joinGameBtn", selector: #selector(GameScene.joinGame), enable: true)
+        self.setButtonNodeAttr(node: beLandlordButton, title: "Be landlord!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beLandlordBtn", selector: #selector(GameScene.beLandlordButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: beFarmerButton, title: "Be a farmer", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX+100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beFarmerBtn", selector: #selector(GameScene.beFarmerButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: playButton, title: "Play", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "playBtn", selector: #selector(GameScene.playButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: hintButton, title: "Hint", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "hintBtn", selector: #selector(GameScene.hintButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: passButton, title: "Pass", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX + 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.passButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: addAIPlayerButton, title: "Add AI Player", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 220), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.addAIPlayer), enable: true)
+        self.setButtonNodeAttr(node: startGameButton, title: "Start Game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 150), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.startGame), enable: false)
+    }
+    
+    private func setButtonNodeAttr(node: FTButtonNode, title: NSString, font: String?, fontSize: CGFloat?, pos: CGPoint, size: CGSize, zPosition: CGFloat?, name: String, selector: Selector, enable: Bool?) {
+        node.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: selector)
+        node.setButtonLabel(title: title, font: font ?? "Arial", fontSize: fontSize ?? 12)
+        node.position = pos
+        node.size = size
+        node.isEnabled = enable ?? true
+        node.zPosition = zPosition ?? 1
+        node.name = name
+        self.addChild(node)
+    }
+    
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.white
-        player2CardCount.fontColor = UIColor.black
-        player3CardCount.fontColor = UIColor.black
         
-        gameOverMsg.position = CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 75)
-        gameOverMsg.fontColor = UIColor.black
-        gameOverMsg.fontSize = 50
-        self.addChild(gameOverMsg)
-        gameOverMsg.isHidden = true
+        setLabelNodeAttr(node: welcomeLabel, name: "welcomeLabel", color: UIColor.black, pos: CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 75), size: 50, isHidden: true)
+        setLabelNodeAttr(node: gameOverMsg, name: "gameOverMsg", color: UIColor.black, pos: CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 75), size: 50, isHidden: true)
+        setLabelNodeAttr(node: countDownLabel, name: "countDownLabel", color: UIColor.black, pos: CGPoint(x: 600, y: 150), size: nil, isHidden: true)
+        setLabelNodeAttr(node: landlordLabel, name: "landlordLabel", color: UIColor.black, pos: CGPoint(x: 600, y: 150), size: 30, isHidden: true)
+        setLabelNodeAttr(node: player2CardCount, name: "player2CardCount", color: UIColor.black, pos: CGPoint(x: self.frame.minX + 75, y: CGFloat(200)), size: nil, isHidden: true)
+        setLabelNodeAttr(node: player3CardCount, name: "player3CardCount", color: UIColor.black, pos: CGPoint(x: self.frame.maxX - 75, y: CGFloat(200)), size: nil, isHidden: true)
+        setLabelNodeAttr(node: player2Status, name: "player2Status", color: UIColor.black, pos: CGPoint(x: self.frame.minX + 75, y: CGFloat(320)), size: 20, isHidden: true)
+        setLabelNodeAttr(node: player3Status, name: "player3Status", color: UIColor.black, pos: CGPoint(x: self.frame.maxX - 75, y: CGFloat(320)), size: 20, isHidden: true)
         
-        countDownLabel.name = "countDownLabel"
-        countDownLabel.fontColor = UIColor.black
-        countDownLabel.position = CGPoint(x: 600, y: 150)
-        countDownLabel.isHidden = true
-        self.addChild(countDownLabel)
-        
-        landlordLabel.name = "landlordLabel"
-        landlordLabel.fontColor = UIColor.black
-        landlordLabel.fontSize = 30
-        landlordLabel.isHidden = true
-        self.addChild(landlordLabel)
-        
+        setSpritNodeAttr(node: player2Card, name: "player2Card", pos: CGPoint(x: self.frame.minX + 75, y: CGFloat(270)))
+        setSpritNodeAttr(node: player3Card, name: "player3Card", pos: CGPoint(x: self.frame.maxX - 75, y: CGFloat(270)))
+        setSpritNodeAttr(node: LandlordCard1, name: "LandlordCard1", pos: CGPoint(x: size.width / 2 - 50, y: CGFloat(340)))
+        setSpritNodeAttr(node: LandlordCard2, name: "LandlordCard2", pos: CGPoint(x: size.width / 2, y: CGFloat(340)))
+        setSpritNodeAttr(node: LandlordCard3, name: "LandlordCard3", pos: CGPoint(x: size.width / 2 + 50, y: CGFloat(340)))
         setButtonAttributes()
         
-        self.addChild(startGameButton)
-        self.addChild(beLandlordButton)
-        self.addChild(notBeLandlordButton)
-        self.addChild(playButton)
-        self.addChild(hintButton)
-        self.addChild(passButton)
         self.addChild(playerCardContainer)
-        
         self.addChild(player1CurrentPlay)
         self.addChild(player2CurrentPlay)
         self.addChild(player3CurrentPlay)
         
-        player2Card.name = "player2Card"
-        player2Card.position = CGPoint(x: self.frame.minX + 75, y: CGFloat(270))
-        player2CardCount.name = "player2CardCount"
-        player2CardCount.position = CGPoint(x: self.frame.minX + 75, y: CGFloat(200))
-        player3Card.name = "player3Card"
-        player3Card.position = CGPoint(x: self.frame.maxX - 75, y: CGFloat(270))
-        player3CardCount.name = "player3CardCount"
-        player3CardCount.position = CGPoint(x: self.frame.maxX - 75, y: CGFloat(200))
-        
-        self.addChild(player2Card)
-        self.addChild(player2CardCount)
-        self.addChild(player3Card)
-        self.addChild(player3CardCount)
-        
-        LandlordCard1.name = "LandlordCard1"
-        LandlordCard1.position = CGPoint(x: size.width / 2 - 50, y: CGFloat(340))
-        LandlordCard2.name = "LandlordCard2"
-        LandlordCard2.position = CGPoint(x: size.width / 2, y: CGFloat(340))
-        LandlordCard3.name = "LandlordCard3"
-        LandlordCard3.position = CGPoint(x: size.width / 2 + 50, y: CGFloat(340))
-        
-        self.addChild(LandlordCard1)
-        self.addChild(LandlordCard2)
-        self.addChild(LandlordCard3)
-        
         alert.delegate = self
-        startGameButton.isHidden = false
+        joinGameButton.isHidden = false
         cleanTable()
     }
     
@@ -132,62 +136,38 @@ class GameScene: SKScene {
         LandlordCard2.isHidden = true
         LandlordCard3.isHidden = true
         
+        addAIPlayerButton.isHidden = true
+        startGameButton.isHidden = true
         hideBeLandlordActionButtons()
         hidePlayButtons()
     }
     
-    func setButtonAttributes() {
-        startGameButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.joinGame))
-        startGameButton.setButtonLabel(title: "Start game!", font: "Arial", fontSize: 12)
-        startGameButton.position = CGPoint(x: self.frame.midX,y: self.frame.midY)
-        startGameButton.size = CGSize(width: 100, height: 20)
-        startGameButton.zPosition = 1
-        startGameButton.name = "startGameBtn"
-        
-        beLandlordButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.beLandlordButtonClicked))
-        beLandlordButton.setButtonLabel(title: "Be landlord!", font: "Arial", fontSize: 12)
-        beLandlordButton.position = CGPoint(x: self.frame.midX - 100,y: 130)
-        beLandlordButton.size = CGSize(width: 150, height: 30)
-        beLandlordButton.zPosition = 1
-        beLandlordButton.name = "beLandlordBtn"
-        
-        notBeLandlordButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.notBeLandlordButtonClicked))
-        notBeLandlordButton.setButtonLabel(title: "Be a farmer", font: "Arial", fontSize: 12)
-        notBeLandlordButton.position = CGPoint(x: self.frame.midX+100,y: 130)
-        notBeLandlordButton.size = CGSize(width: 150, height: 30)
-        notBeLandlordButton.zPosition = 1
-        notBeLandlordButton.name = "notBeLandlordBtn"
-
-        playButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.playButtonClicked))
-        playButton.setButtonLabel(title: "Play", font: "Arial", fontSize: 12)
-        playButton.position = CGPoint(x: self.frame.midX - 150,y: 130)
-        playButton.size = CGSize(width: 100, height: 30)
-        playButton.zPosition = 1
-        playButton.name = "playBtn"
-
-        hintButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.hintButtonClicked))
-        hintButton.setButtonLabel(title: "Hint", font: "Arial", fontSize: 12)
-        hintButton.position = CGPoint(x: self.frame.midX,y: 130)
-        hintButton.size = CGSize(width: 100, height: 30)
-        hintButton.zPosition = 1
-        hintButton.name = "hintBtn"
-
-        passButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(GameScene.passButtonClicked))
-        passButton.setButtonLabel(title: "Pass", font: "Arial", fontSize: 12)
-        passButton.position = CGPoint(x: self.frame.midX + 150,y: 130)
-        passButton.size = CGSize(width: 100, height: 30)
-        passButton.zPosition = 1
-        passButton.name = "passBtn"
-    }
-    
     @objc func joinGame() {
-        Game.sharedInstace.start()
+        DouDiZhuGame.sharedInstace.start()
     }
     
     func enterGameScene() {
-        resetTable()
-        game!.newGame()
-        game!.startGame()
+//        resetTable()
+        joinGameButton.isHidden = true
+        welcomeLabel.isHidden = false
+        player2Status.isHidden = false
+        player3Status.isHidden = false
+        addAIPlayerButton.isHidden = false
+        startGameButton.isHidden = false
+    }
+    
+    public func newUserAdded(playerNum: PlayerNum) {
+        switch playerNum {
+        case .three:
+            player3Status.text = "READY!"
+            return
+        case .two:
+            player2Status.text = "READY!"
+            return
+        default:
+            print("New user should never get assigned with player number other than 2 or 3, this should never happen")
+            return
+        }
     }
     
     func displayPlayerCards(cards: [CardButtonNode]) {
@@ -211,12 +191,12 @@ class GameScene: SKScene {
     
     func hideBeLandlordActionButtons() {
         beLandlordButton.isHidden = true
-        notBeLandlordButton.isHidden = true
+        beFarmerButton.isHidden = true
     }
     
     func showBeLandlordActionButtons() {
         beLandlordButton.isHidden = false
-        notBeLandlordButton.isHidden = false
+        beFarmerButton.isHidden = false
     }
     
     func hidePlayButtons() {
@@ -282,30 +262,9 @@ class GameScene: SKScene {
         self.clearCurrentPlay()
     }
     
-    @objc func timePassed() {
-        countDown -= 1
-        countDownLabel.text = String(countDown)
-        if countDown < 0 {
-            self.game?.timeout()
-            self.userMadeChoice()
-        }
-    }
-    
     func userMadeChoice() {
         timer!.invalidate()
         countDownLabel.isHidden = true
-    }
-    
-    @objc func beLandlordButtonClicked() {
-        self.userMadeChoice()
-        self.hideBeLandlordActionButtons()
-        self.game!.playerChooseToBeLandlord()
-    }
-    
-    @objc func notBeLandlordButtonClicked() {
-        self.userMadeChoice()
-        self.hideBeLandlordActionButtons()
-        self.game!.playerChooseToBeFarmer()
     }
     
     func refreshScene() {
@@ -375,10 +334,10 @@ class GameScene: SKScene {
             position = CGPoint(x: 150, y: 100)
         case .two:
             position = CGPoint(x: self.frame.minX + 75, y: 320)
-            player2CardCount.text = String(game!.getPlayer2CardCount())
+//            player2CardCount.text = String(game!.getPlayer2CardCount())
         default:
             position = CGPoint(x: self.frame.maxX - 75, y: 320)
-            player3CardCount.text = String(game!.getPlayer3CardCount())
+//            player3CardCount.text = String(game!.getPlayer3CardCount())
         }
         self.landlordLabel.position = position
         self.landlordLabel.isHidden = false
@@ -401,20 +360,9 @@ class GameScene: SKScene {
         }
     }
     
-    @objc func playButtonClicked() {
-        self.game!.playButtonClicked()
-    }
     
-    @objc func hintButtonClicked() {
-        self.game!.hintButtonClicked()
-    }
-    
-    @objc func passButtonClicked() {
-        self.game!.passButtonClicked()
-    }
-    
-    func gameOver() {
-        gameOverMsg.text = self.game!.getWinner()! + " wins!"
+    func gameOver(winner: String) {
+        gameOverMsg.text = winner + " wins!"
         gameOverMsg.isHidden = false
         startGameButton.isHidden = false
     }
@@ -423,5 +371,54 @@ class GameScene: SKScene {
         alert.title = title
         alert.message = message
         alert.show()
+    }
+    
+    public func disableAddAIButton() {
+        addAIPlayerButton.isEnabled = false
+    }
+    
+    public func enableStartGameButton() {
+        startGameButton.isEnabled = true
+    }
+    
+    @objc func timePassed() {
+        countDown -= 1
+        countDownLabel.text = String(countDown)
+        if countDown < 0 {
+            DouDiZhuGame.sharedInstace.timeOut()
+            self.userMadeChoice()
+        }
+    }
+    
+    @objc func playButtonClicked() {
+        DouDiZhuGame.sharedInstace.playButtonClicked()
+    }
+    
+    @objc func hintButtonClicked() {
+        DouDiZhuGame.sharedInstace.hintButtonClicked()
+    }
+    
+    @objc func passButtonClicked() {
+        DouDiZhuGame.sharedInstace.passButtonClicked()
+    }
+    
+    @objc func addAIPlayer() {
+        DouDiZhuGame.sharedInstace.addAIPlayer()
+    }
+    
+    @objc func startGame() {
+        
+    }
+    
+    @objc func beLandlordButtonClicked() {
+        self.userMadeChoice()
+        self.hideBeLandlordActionButtons()
+        //        self.game!.playerChooseToBeLandlord()
+    }
+    
+    @objc func beFarmerButtonClicked() {
+        self.userMadeChoice()
+        self.hideBeLandlordActionButtons()
+        //        self.game!.playerChooseToBeFarmer()
     }
 }

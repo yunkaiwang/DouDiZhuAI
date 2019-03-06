@@ -11,19 +11,33 @@ import Foundation
 public class Message: Codable {
     public let type: MessageType
     public let playerID: String?
+    public let existingPlayers: [String]
     public let error: String?
     
-    private convenience init(type: MessageType, playerID: String?) {
-        self.init(type: type, playerID: playerID, error: nil)
+    private convenience init(type: MessageType) {
+        self.init(type: type, playerID: nil, players: [], error: nil)
     }
     
-    private init(type: MessageType, playerID: String?, error: String?) {
+    private convenience init(type: MessageType, playerID: String?) {
+        self.init(type: type, playerID: playerID, players: [], error: nil)
+    }
+    
+    private convenience init(type: MessageType, playerID: String?, players: [String]) {
+        self.init(type: type, playerID: playerID, players: players, error: nil)
+    }
+    
+    private init(type: MessageType, playerID: String?, players: [String], error: String?) {
         self.type = type
         self.playerID = playerID
         self.error = error
+        self.existingPlayers = players
     }
     
     public static func joinGame() -> Message {
-        return Message(type: .joinGame, playerID: nil)
+        return Message(type: .joinGame)
+    }
+    
+    public static func addAIPlayer() -> Message {
+        return Message(type: .addAIPlayer)
     }
 }

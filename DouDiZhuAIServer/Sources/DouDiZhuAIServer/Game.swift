@@ -19,6 +19,7 @@ class Game {
     private var timer: Timer? = nil
     private var deck: Deck = Deck.shared
     private var playerSocketInfo: [Player: WebSocket?] = [:]
+    private var playerAddedAIPlayers: [Player: [Player]] = [:]
     private var activePlayer: Player?
     private var landlord: Player?
     private var currentPlayerNum:Int
@@ -56,9 +57,12 @@ class Game {
     func handlePlayerLeft(player: Player) throws {
         if self.playerSocketInfo[player] != nil {
             self.playerSocketInfo.removeValue(forKey: player)
+            for AIPlayer in playerAddedAIPlayers[player]! {
+                self.playerSocketInfo.removeValue(forKey: AIPlayer)
+            }
             
-            let message = Message.gameEnd(player: player)
-            try notifyPlayers(message: message)
+//            let message = Message.gameEnd(player: player)
+//            try notifyPlayers(message: message)
         }
     }
     
@@ -73,9 +77,18 @@ class Game {
     
     func handleNewUserJoin(socket: WebSocket) throws {
         let player = Player()
-        print("received new user join request and user id is", player.id)
+        
         if try self.handleJoin(player: player, socket: socket) {
-            try notifyPlayer(message: Message.joinGameSucceeded(player: player), socket: socket)
+            var playerIDs: [String] = []
+            for p in self.players {
+                if p.id != player.id {
+                    playerIDs.append(p.id)
+                }
+            }
+            
+            playerAddedAIPlayers[player] = []
+            try notifyPlayer(message: Message.joinGameSucceeded(player: player, players: playerIDs), socket: socket)
+            try notifyPlayers(message: Message.newUserJoined(player: player))
         } else {
             try notifyPlayer(message: Message.joinGameFailed(), socket: socket)
         }
@@ -84,7 +97,14 @@ class Game {
     func handleAddAIPlayer(socket: WebSocket) throws {
         let AIPlayer = Player()
         if try self.handleJoin(player: AIPlayer, socket: nil) {
-            try notifyPlayer(message: Message.addAIPlayerSucceded(), socket: socket)
+            let player = playerForSocket(socket)
+            if player == nil {
+                print("Cannot find the player, this should never happen")
+                return
+            }
+            
+            playerAddedAIPlayers[player!]!.append(AIPlayer)
+            try notifyPlayers(message: Message.newUserJoined(player: AIPlayer))
         } else {
             try notifyPlayer(message: Message.addAIPlayerFailed(), socket: socket)
         }
@@ -99,7 +119,6 @@ class Game {
     private func startGame() throws {
         self.activePlayer = randomPlayer()
         self.chooseLandlord()
-        
         
         let message = Message.playerTurn(player: self.activePlayer!)
         try notifyPlayers(message: message)

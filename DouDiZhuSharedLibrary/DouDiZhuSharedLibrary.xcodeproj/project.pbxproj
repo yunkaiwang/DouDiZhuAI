@@ -8,14 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		3F1B81A1222C8F06001680B2 /* DouDiZhuSharedLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F1B819F222C8F06001680B2 /* DouDiZhuSharedLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3F1B820E222E40F5001680B2 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B820D222E40F5001680B2 /* Play.swift */; };
+		3F1B8210222EE25E001680B2 /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B820F222EE25D001680B2 /* utilities.swift */; };
+		3F1B8212222EE392001680B2 /* Plat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8211222EE392001680B2 /* Plat.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3F1B819C222C8F06001680B2 /* DouDiZhuSharedLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DouDiZhuSharedLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F1B819F222C8F06001680B2 /* DouDiZhuSharedLibrary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DouDiZhuSharedLibrary.h; sourceTree = "<group>"; };
 		3F1B81A0222C8F06001680B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3F1B820D222E40F5001680B2 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
+		3F1B820F222EE25D001680B2 /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
+		3F1B8211222EE392001680B2 /* Plat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plat.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,7 +50,8 @@
 		3F1B819E222C8F06001680B2 /* DouDiZhuSharedLibrary */ = {
 			isa = PBXGroup;
 			children = (
-				3F1B820D222E40F5001680B2 /* Play.swift */,
+				3F1B8211222EE392001680B2 /* Plat.swift */,
+				3F1B820F222EE25D001680B2 /* utilities.swift */,
 				3F1B819F222C8F06001680B2 /* DouDiZhuSharedLibrary.h */,
 				3F1B81A0222C8F06001680B2 /* Info.plist */,
 			);
@@ -134,7 +137,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F1B820E222E40F5001680B2 /* Play.swift in Sources */,
+				3F1B8212222EE392001680B2 /* Plat.swift in Sources */,
+				3F1B8210222EE25E001680B2 /* utilities.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

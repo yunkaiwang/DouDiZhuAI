@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Card: Comparable {
+class Card: Comparable, Codable {
     private var identifier: String = ""
     
     init(identifier:String) {
