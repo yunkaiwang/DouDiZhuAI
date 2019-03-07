@@ -12,4 +12,17 @@ enum PlayerNum: Int {
     case one = 1
     case two
     case three
+    
+    func getNext() -> PlayerNum {
+        switch self {
+        case .none:
+            return .none
+        case .one:
+            return .two
+        case .two:
+            return .three
+        default:
+            return .one
+        }
+    }
 }

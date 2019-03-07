@@ -23,6 +23,10 @@ public enum MessageType: String, Codable {
     
     case gameStarted = "gameStarted" // game has been started
     
+    case playerDecisionTurn = "playerDecisionTurn" // player make the decision of whether be landlord or not
+    case playerWantToBeLandlord = "playerWantToBeLandlord" // player wants to be landlord
+    case playerWantToBeFarmer = "playerWantToBeFarmer" // player wants to be farmer
+    
     case gameEnd = "gameEnd" // game has ended (one player win)
     case informDecision = "informDecision" // inform the client/server about the decision of whether be a landlord or not
     case notifyLandlord = "notifyLandord" // notify the landlord

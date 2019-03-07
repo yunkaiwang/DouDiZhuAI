@@ -45,8 +45,15 @@ class GameHandler: WebSocketSessionHandler {
                     try DouDiZhuGame.shared.handleAddAIPlayer(socket)
                 case .startGame:
                     try DouDiZhuGame.shared.handleStartGame(socket)
-                case .makePlay:
+                case .playerWantToBeFarmer, .playerWantToBeLandlord:
+                    guard let playerID = message.playerID else {
+                        print("No player ID is provided within the message, this should never happen")
+                        return
+                    }
+
+                    try DouDiZhuGame.shared.playerMadeDecision(playerID: playerID, decision: (message.type == .playerWantToBeLandlord ? true : false))
                     
+                case .makePlay:
                     
                     break
                 default:

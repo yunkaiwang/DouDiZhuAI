@@ -12,7 +12,7 @@ public enum PlayerError: Error {
     case creationFailed
 }
 
-class Player {
+public class Player {
     public let id: String
     private var cards: [Card]
     private var playerNum: PlayerNum

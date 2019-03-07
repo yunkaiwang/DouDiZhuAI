@@ -72,8 +72,8 @@ class DouDiZhuGame {
         //        }
     }
     
-    public func waitForPlayerChoise() {
-        DouDiZhuGame.gameScene?.resetTimer(interval: 30)
+    public func playerDecided(beLandlord: Bool) {
+        self.client.informDecision(beLandlord: beLandlord, playerID: self.player?.id ?? "")
     }
     
     public func playButtonClicked() {
@@ -250,6 +250,20 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             }
             self.player?.startNewGame(cards: message.cards)
             self.createPlayerCards()
+            return
+        case .playerDecisionTurn:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            if playerID != self.player?.id {
+                DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
+            } else {
+                DouDiZhuGame.gameScene?.showBeLandlordActionButtons()
+                DouDiZhuGame.gameScene?.showCountDownLabel(PlayerNum.one)
+            }
+            
             return
         case .gameEnd:
             if let winningPlayer = message.playerID {

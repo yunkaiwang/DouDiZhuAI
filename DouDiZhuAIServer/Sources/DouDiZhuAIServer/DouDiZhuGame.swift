@@ -117,6 +117,30 @@ class DouDiZhuGame {
         try self.newGame()
     }
     
+    public func playerMadeDecision(playerID: String, decision: Bool) throws {
+        try notifyPlayers(message: Message.informDecision(beLandlord: decision, playerID: playerID))
+        
+        try notifyPlayers(message: Message.playerDecisionTurn(player: findPlayerWithNum(findPlayerWithID(playerID)?.getPlayerNum().getNext() ?? PlayerNum.none)))
+    }
+    
+    private func findPlayerWithID(_ id: String) -> Player? {
+        for player in self.players {
+            if player.id == id {
+                return player
+            }
+        }
+        return nil
+    }
+    
+    private func findPlayerWithNum(_ num: PlayerNum) -> Player? {
+        for player in self.players {
+            if player.getPlayerNum() == num {
+                return player
+            }
+        }
+        return nil
+    }
+    
     private func newGame() throws {
         deck.newGame()
 
@@ -128,6 +152,8 @@ class DouDiZhuGame {
             player.startNewGame(cards: deck.getPlayerCard(playerNum: player.getPlayerNum()))
             try self.notifyPlayer(message: Message.startGame(player: player, cards: deck.getPlayerCard(playerNum: player.getPlayerNum())), socket: player.getSocket())
         }
+        
+        try electLandlord()
     }
     
     private func isGameOver()->Bool {
@@ -172,6 +198,15 @@ class DouDiZhuGame {
     
     private func runGame() {
         
+    }
+    
+    private func electLandlord() throws {
+        self.state = .choosingLandlord
+        
+        let rand = Int.random(in: 0...2)
+        self.activePlayer = rand == 0 ? self.players[0] : (rand == 1 ? self.players[1] : self.players[2])
+        
+        try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
     }
     
     private func chooseLandlord() {
@@ -454,19 +489,6 @@ class DouDiZhuGame {
                 self.players.remove(at: i)
                 return
             }
-        }
-    }
-    
-    private func getNextPlayerNum(_ playerNum: PlayerNum) -> PlayerNum {
-        switch playerNum {
-        case .none:
-            return .one
-        case .one:
-            return .two
-        case .two:
-            return .three
-        default:
-            return .one
         }
     }
 }

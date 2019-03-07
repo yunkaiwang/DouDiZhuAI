@@ -48,6 +48,10 @@ class DouDiZhuClient: WebSocketDelegate {
         self.writeMessageToSocket(Message.startGame())
     }
     
+    func informDecision(beLandlord: Bool, playerID: String) {
+        self.writeMessageToSocket(Message.informDecision(beLandlord: beLandlord, playerID: playerID))
+    }
+    
     // MARK: - Private
     
     private func writeMessageToSocket(_ message: Message) {

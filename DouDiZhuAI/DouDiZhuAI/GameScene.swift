@@ -74,8 +74,8 @@ class GameScene: SKScene {
     
     private func setButtonAttributes() {
         self.setButtonNodeAttr(node: joinGameButton, title: "Join game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: self.frame.midY), size: CGSize(width: 100, height: 30), zPosition: nil, name: "joinGameBtn", selector: #selector(GameScene.joinGame), enable: true)
-        self.setButtonNodeAttr(node: beLandlordButton, title: "Be landlord!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beLandlordBtn", selector: #selector(GameScene.beLandlordButtonClicked), enable: false)
-        self.setButtonNodeAttr(node: beFarmerButton, title: "Be a farmer", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX+100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beFarmerBtn", selector: #selector(GameScene.beFarmerButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: beLandlordButton, title: "Be landlord!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beLandlordBtn", selector: #selector(GameScene.beLandlordButtonClicked), enable: true)
+        self.setButtonNodeAttr(node: beFarmerButton, title: "Be a farmer", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX+100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beFarmerBtn", selector: #selector(GameScene.beFarmerButtonClicked), enable: true)
         self.setButtonNodeAttr(node: playButton, title: "Play", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "playBtn", selector: #selector(GameScene.playButtonClicked), enable: false)
         self.setButtonNodeAttr(node: hintButton, title: "Hint", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "hintBtn", selector: #selector(GameScene.hintButtonClicked), enable: false)
         self.setButtonNodeAttr(node: passButton, title: "Pass", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX + 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.passButtonClicked), enable: false)
@@ -175,13 +175,6 @@ class GameScene: SKScene {
         }
     }
     
-    func resetTimer(interval: Int) {
-        self.countDown = interval
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(GameScene.timePassed), userInfo: nil, repeats: true)
-        countDownLabel.isHidden = false
-        countDownLabel.text = String(countDown)
-    }
-    
     func revealLandloardCard(cards: [Card]) {
         LandlordCard1.texture = SKTexture(imageNamed: cards[0].getIdentifier())
         LandlordCard2.texture = SKTexture(imageNamed: cards[1].getIdentifier())
@@ -274,21 +267,6 @@ class GameScene: SKScene {
         self.view?.layoutIfNeeded()
     }
     
-    func startNewGameSinceNoPlayerChooseToBeLandlord() {
-        
-    }
-    
-    func getPlayerPlayDisplayPosition(playerNum: PlayerNum)->CGPoint {
-        switch playerNum {
-        case .one:
-            return CGPoint(x: self.frame.midX, y: 180)
-        case .two:
-            return CGPoint(x: self.frame.minX + 150, y: 250)
-        default:
-            return CGPoint(x: self.frame.maxX - 150, y: 250)
-        }
-    }
-    
     func displayPlayerDecision(playerNum: PlayerNum, decision: String) {
         var playerContainer: SKSpriteNode;
         switch playerNum {
@@ -345,31 +323,24 @@ class GameScene: SKScene {
         self.landlordLabel.isHidden = false
     }
     
-    func clearCurrentPlay() {
-        player1CurrentPlay.removeAllChildren()
-        player2CurrentPlay.removeAllChildren()
-        player3CurrentPlay.removeAllChildren()
-    }
-    
-    func clearCurrentPlayerPlay(currentPlayerNum: Int) {
-        switch currentPlayerNum {
-        case 0:
+    public func clearCurrentPlayerPlay(playerNum: PlayerNum) {
+        switch playerNum {
+        case .one:
             player1CurrentPlay.removeAllChildren()
-        case 1:
+        case .two:
             player2CurrentPlay.removeAllChildren()
         default:
             player3CurrentPlay.removeAllChildren()
         }
     }
     
-    
-    func gameOver(winner: String) {
+    public func gameOver(winner: String) {
         gameOverMsg.text = winner + " wins!"
         gameOverMsg.isHidden = false
         startGameButton.isHidden = false
     }
     
-    func showAlert(withTitle title: String, message: String) {
+    public func showAlert(withTitle title: String, message: String) {
         alert.title = title
         alert.message = message
         alert.show()
@@ -382,6 +353,23 @@ class GameScene: SKScene {
     public func enableStartGameButton() {
         startGameButton.isEnabled = true
     }
+    
+    public func showCountDownLabel(_ playerNum: PlayerNum) {
+        var position: CGPoint
+        switch playerNum {
+        case .one:
+            position = CGPoint(x: 150, y: 100)
+        case .two:
+            position = CGPoint(x: self.frame.minX + 75, y: 350)
+        default:
+            position = CGPoint(x: self.frame.maxX - 75, y: 350)
+        }
+        countDownLabel.position = position
+        
+        self.resetTimer(interval: 30)
+    }
+    
+    /* Mark - objc function */
     
     @objc func timePassed() {
         countDown -= 1
@@ -412,15 +400,42 @@ class GameScene: SKScene {
         DouDiZhuGame.sharedInstace.startGame()
     }
     
-    @objc func beLandlordButtonClicked() {
+    @objc private func beLandlordButtonClicked() {
         self.userMadeChoice()
         self.hideBeLandlordActionButtons()
-        //        self.game!.playerChooseToBeLandlord()
+        DouDiZhuGame.sharedInstace.playerDecided(beLandlord: true)
     }
     
-    @objc func beFarmerButtonClicked() {
+    @objc private func beFarmerButtonClicked() {
         self.userMadeChoice()
         self.hideBeLandlordActionButtons()
-        //        self.game!.playerChooseToBeFarmer()
+        DouDiZhuGame.sharedInstace.playerDecided(beLandlord: false)
+    }
+    
+    /* Mark -- private */
+    
+    private func getPlayerPlayDisplayPosition(playerNum: PlayerNum)->CGPoint {
+        switch playerNum {
+        case .one:
+            return CGPoint(x: self.frame.midX, y: 180)
+        case .two:
+            return CGPoint(x: self.frame.minX + 150, y: 250)
+        default:
+            return CGPoint(x: self.frame.maxX - 150, y: 250)
+        }
+    }
+    
+    private func clearCurrentPlay() {
+        player1CurrentPlay.removeAllChildren()
+        player2CurrentPlay.removeAllChildren()
+        player3CurrentPlay.removeAllChildren()
+    }
+    
+    private func resetTimer(interval: Int) {
+        self.timer?.invalidate()
+        self.countDown = interval
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(GameScene.timePassed), userInfo: nil, repeats: true)
+        countDownLabel.isHidden = false
+        countDownLabel.text = String(countDown)
     }
 }
