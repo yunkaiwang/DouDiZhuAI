@@ -54,13 +54,17 @@ class GameHandler: WebSocketSessionHandler {
                     try DouDiZhuGame.shared.playerMadeDecision(playerID: playerID, decision: (message.type == .playerWantToBeLandlord ? true : false))
                     
                 case .makePlay:
+                    guard let playerID = message.playerID else {
+                        print("No player ID is provided within the message, this should never happen")
+                        return
+                    }
                     
-                    break
+                    try DouDiZhuGame.shared.playerMakePlay(playerID, cards: message.cards)
                 default:
                     break
                 }
             } catch {
-                print("Failed to decode JSON from Received Socket Message")
+                DouDiZhuGame.shared.handleError(nil)
             }
             
             // Done working on this message? Loop back around and read the next message.

@@ -11,6 +11,7 @@ import Foundation
 
 enum GameError: Error {
     case failedToSerializeMessageToJsonString(message: Message)
+    case unknowError
 }
 
 class DouDiZhuGame {
@@ -22,6 +23,8 @@ class DouDiZhuGame {
     private var activePlayer: Player? = nil
     private var landlord: Player? = nil
     private var currentPlay: Play = .none
+    private var lastPlayedPlayer: Player? = nil
+    private var lastPlayedCard: [Card] = []
     private (set) var state: GameState = .created
     private var players: [Player] = []
     
@@ -148,6 +151,32 @@ class DouDiZhuGame {
         }
     }
     
+    public func playerMakePlay(_ id: String, cards: [Card]) throws {
+        if !isCurrentPlayValid(cards: cards) {
+            try notifyPlayers(message: Message.unknonError())
+            self.abortGame()
+        }
+        let player: Player = findPlayerWithID(id)!
+        self.currentPlay = checkPlay(cards: cards)
+        self.lastPlayedCard = cards
+        self.lastPlayedPlayer = player
+        try player.makePlay(cards: cards)
+        try self.notifyPlayers(message: Message.informPlay(player: player, cards: cards))
+        self.activePlayer = self.findPlayerWithNum(player.getPlayerNum().getNext())
+        try self.runGame()
+    }
+    
+    // May add more code to handle different type of error later on
+    public func handleError(_ error: Error?) {
+        self.abortGame()
+    }
+    
+    // TO DO
+    // abort the game sine an unknow error has occured, or when no one chooses to be the landlord
+    private func abortGame() {
+        
+    }
+    
     private func findPlayerWithID(_ id: String) -> Player? {
         for player in self.players {
             if player.id == id {
@@ -205,24 +234,16 @@ class DouDiZhuGame {
         }
     }
     
-    private func setLandlordAndStartGame(_ landlordNum: PlayerNum) {
-        var landlord: Player
-        switch landlordNum {
-        case .one:
-            landlord = self.players[0]
-        case .two:
-            landlord = self.players[1]
-        default:
-            landlord = self.players[2]
+    private func runGame() throws {
+        self.state = .inProgress
+        if !isGameOver() {
+            self.gameEnded()
         }
-        self.landlord = landlord
-        self.landlord?.addLandlordCard(newCards: deck.getLandlordCard())
-        
-        self.runGame()
+        try notifyPlayers(message: Message.playerTurn(player: self.activePlayer))
     }
     
-    private func runGame() {
-        self.state = .inProgress
+    private func gameEnded() {
+        print("game has ended")
     }
     
     private func electLandlord() throws {
@@ -262,7 +283,7 @@ class DouDiZhuGame {
             }
             self.activePlayer = findPlayerWithNum(self.activePlayer!.getPlayerNum().getNext())
         }
-        self.startNewGameSinceNoOneChooseToBeLandlord()
+        try self.startNewGameSinceNoOneChooseToBeLandlord()
     }
     
     private func notifyPlayer(message: Message, socket: WebSocket?) throws {
@@ -309,12 +330,73 @@ class DouDiZhuGame {
         let landlordCards = Deck.shared.getLandlordCard()
         landlord.addLandlordCard(newCards: landlordCards)
         try notifyPlayers(message: Message.informLandlord(playerID: landlord.id, landlordCards: landlordCards))
-        self.runGame()
+        try self.runGame()
     }
     
     // TO DO
-    private func startNewGameSinceNoOneChooseToBeLandlord() {
-        print("has to restart game since nobody choose to be the landlord")
+    private func startNewGameSinceNoOneChooseToBeLandlord() throws {
+        try self.newGame()
+    }
+    
+    private func isCurrentPlayValid(cards: [Card]) -> Bool {
+        let cardPlay = checkPlay(cards: cards)
+        
+        if self.activePlayer == self.lastPlayedPlayer || self.lastPlayedPlayer == nil {
+            return cardPlay != .none && cardPlay != .invalid
+        } else if cardPlay == .rocket || (cardPlay == .bomb && self.currentPlay != . bomb && self.currentPlay != .rocket) {
+            return true
+        } else if cardPlay == .none || cardPlay == .invalid || (self.currentPlay != .none && self.currentPlay != cardPlay) {
+            return false
+        } else if (self.currentPlay == .none) {
+            return true
+        }
+        
+        switch currentPlay {
+        case .solo, .pair, .trio, .bomb:
+            return cards[0] > self.lastPlayedCard[0]
+        case .soloChain, .pairChain, .airplane:
+            return cards.max()! > self.lastPlayedCard.max()!
+        case .trioPlusPair, .trioPlusSolo, .airplanePlusPair, .airplanePlusSolo:
+            let cards_parsed = parseCards(cards: cards)
+            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
+            
+            var cardTrio: Card = NullCard.shared
+            var lastTrio: Card = NullCard.shared
+            for card in lastPlayedCard_parsed.numCards {
+                if lastPlayedCard_parsed.card_count[card.getNum()]! == 3 {
+                    lastTrio = card
+                    break
+                }
+            }
+            for card in cards_parsed.numCards {
+                if cards_parsed.card_count[card.getNum()]! == 3 {
+                    cardTrio = card
+                    break
+                }
+            }
+            return cardTrio > lastTrio
+        case .spaceShuttle, .spaceShuttlePlusFourPair, .spaceShuttlePlusFourSolo, .bombPlusDualSolo, .bombPlusDualPair:
+            let cards_parsed = parseCards(cards: cards)
+            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
+            
+            var cardBomb: Card = NullCard.shared
+            var lastBomb: Card = NullCard.shared
+            for card in lastPlayedCard_parsed.numCards {
+                if lastPlayedCard_parsed.card_count[card.getNum()]! == 4 {
+                    cardBomb = card
+                    break
+                }
+            }
+            for card in cards_parsed.numCards {
+                if cards_parsed.card_count[card.getNum()]! == 4 {
+                    lastBomb = card
+                    break
+                }
+            }
+            return cardBomb > lastBomb
+        default:
+            return false
+        }
     }
 }
 

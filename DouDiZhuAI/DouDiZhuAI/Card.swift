@@ -21,7 +21,7 @@ public class Card: Comparable, Codable {
     
     public static func identifierToCard(id: String) -> Card {
         if id.isEmpty {
-            return NullCard()
+            return NullCard.shared
         } else if id.contains("joker") {
             return JokerCard(type: JokerType.fromString(s: id))
         } else {

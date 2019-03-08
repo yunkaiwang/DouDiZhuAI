@@ -52,6 +52,10 @@ class DouDiZhuClient: WebSocketDelegate {
         self.writeMessageToSocket(Message.informDecision(beLandlord: beLandlord, playerID: playerID))
     }
     
+    func makePlay(cards: [Card], playerID: String) {
+        self.writeMessageToSocket(Message.makePlay(playerID: playerID, cards: cards))
+    }
+    
     // MARK: - Private
     
     private func writeMessageToSocket(_ message: Message) {

@@ -44,7 +44,7 @@ public class Player {
         self.cards.sort()
     }
     
-    func makePlay(cards: [Card]) {
+    public func makePlay(cards: [Card]) {
         for selected_card in cards {
             for i in 0..<self.cards.count {
                 if self.cards[i].getIdentifier() == selected_card.getIdentifier() {

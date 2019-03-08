@@ -194,25 +194,25 @@ class GameScene: SKScene {
         passButton.isHidden = true
     }
     
-    func showPlayButtons() {
+    public func showPlayButtons() {
         playButton.isHidden = false
         hintButton.isHidden = false
         passButton.isHidden = false
     }
     
-    func disablePlayButton() {
+    public func disablePlayButton() {
         playButton.isEnabled = false
     }
     
-    func enablePlayButton() {
+    public func enablePlayButton() {
         playButton.isEnabled = true
     }
     
-    func disablePassButton() {
+    public func disablePassButton() {
         passButton.isEnabled = false
     }
     
-    func enablePassButton() {
+    public func enablePassButton() {
         passButton.isEnabled = true
     }
     
@@ -275,7 +275,7 @@ class GameScene: SKScene {
         playerContainer.addChild(labelNode)
     }
     
-    func displayPlayerPlay(playerNum: PlayerNum, cards: [Card]) {
+    public func displayPlayerPlay(playerNum: PlayerNum, cards: [Card]) {
         let playerContainer: SKSpriteNode = findPlayerContainer(playerNum)
         
         playerContainer.removeAllChildren()
@@ -295,13 +295,23 @@ class GameScene: SKScene {
             position = CGPoint(x: 150, y: 100)
         case .two:
             position = CGPoint(x: self.frame.minX + 75, y: 320)
-            player2CardCount.text = String(20)
         default:
             position = CGPoint(x: self.frame.maxX - 75, y: 320)
-            player3CardCount.text = String(20)
         }
         self.landlordLabel.position = position
         self.landlordLabel.isHidden = false
+        self.updatePlayerCardCount(num: landlordNum, count: 20)
+    }
+    
+    public func updatePlayerCardCount(num: PlayerNum, count: Int) {
+        switch num {
+        case .two:
+            player2CardCount.text = String(count)
+        case .three:
+            player3CardCount.text = String(count)
+        default:
+            return
+        }
     }
     
     public func revealLandloardCard(cards: [Card]) {

@@ -20,29 +20,25 @@ public class Player: Hashable {
         self.socket = socket
     }
     
-    func getCards()->[Card] {
-        return self.cards
-    }
-    
-    func startNewGame(cards: [Card]) {
+    public func startNewGame(cards: [Card]) {
         self.state = .undecided
         self.cards = cards
     }
     
-    func addLandlordCard(newCards: [Card]) {
+    public func addLandlordCard(newCards: [Card]) {
         self.cards += newCards
         self.cards.sort()
     }
     
-    func getPlayerNum() -> PlayerNum {
+    public func getPlayerNum() -> PlayerNum {
         return self.playerNum
     }
     
-    func setPlayerNum(playerNum: PlayerNum) {
+    public func setPlayerNum(playerNum: PlayerNum) {
         self.playerNum = playerNum
     }
     
-    func getSocket() -> WebSocket? {
+    public func getSocket() -> WebSocket? {
         return self.socket
     }
     
@@ -79,6 +75,23 @@ public class Player: Hashable {
     
     public static func == (lhs: Player, rhs: Player) -> Bool {
         return lhs.id == rhs.id
+    }
+    
+    public func makePlay(cards: [Card]) throws {
+        for selected_card in cards {
+            var found: Bool = false
+            for i in 0..<self.cards.count {
+                if self.cards[i].getIdentifier() == selected_card.getIdentifier() {
+                    self.cards.remove(at: i)
+                    found = true
+                    break
+                }
+            }
+            
+            if !found {
+                throw GameError.unknowError
+            }
+        }
     }
 }
 

@@ -175,7 +175,7 @@ func suggestTrioPlusPlay(playerCards: [Card], play: Play, lastPlayedCards: [Card
         }
     }
     
-    let suggestAddonCard = suggestSPTPlay(playerCards:leftCards, lastPlayedCards: [NullCard()], play: play == Play.trioPlusSolo ? Play.solo : Play.pair)
+    let suggestAddonCard = suggestSPTPlay(playerCards:leftCards, lastPlayedCards: [NullCard.shared], play: play == Play.trioPlusSolo ? Play.solo : Play.pair)
     if suggestAddonCard.count == 0 {
         return []
     }
@@ -965,7 +965,7 @@ func suggestSpaceShuttlePlay(playerCards: [Card], currentPlay: Play, lastPlayedC
 }
 
 func suggestNewPlay(playerCards: [Card])->[Card] {
-    let lastPlayedCards: [Card] = [NullCard()]
+    let lastPlayedCards: [Card] = [NullCard.shared]
     var maxPlay: [Card] = []
     
     var curPlay: [Card] = []
@@ -1043,7 +1043,7 @@ func suggestPlay(playerCards: [Card], currentPlay: Play, lastPlayedCards: [Card]
     }
     
     if suggestedCards.count == 0 {
-        return findBomb(playerCards: playerCards, lastBomb: [NullCard()])
+        return findBomb(playerCards: playerCards, lastBomb: [NullCard.shared])
     } else {
         return suggestedCards
     }

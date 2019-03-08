@@ -34,4 +34,6 @@ public enum MessageType: String, Codable {
     case makePlay = "makePlay" // player makes a play
     case playerTurn = "playerTurn" // notify the player it's their turn to play
     case gameEnd = "gameEnd" // game has ended (one player win)
+    
+    case unknownError = "unknownError" // game has met an unknown error
 }

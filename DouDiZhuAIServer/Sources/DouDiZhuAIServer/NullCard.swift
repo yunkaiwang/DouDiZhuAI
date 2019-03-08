@@ -7,7 +7,9 @@
 import Foundation
 
 class NullCard: Card {
-    init() {
+    public static let shared = NullCard()
+    
+    private init() {
         super.init(identifier: "NULL")
     }
     
@@ -15,3 +17,4 @@ class NullCard: Card {
         fatalError("init(from:) has not been implemented")
     }
 }
+

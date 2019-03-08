@@ -84,4 +84,16 @@ public class Message: Codable {
     public static func playerPillageTurn(player: Player?) -> Message {
         return Message(.playerPillageTurn, playerID: player?.id ?? "")
     }
+    
+    public static func playerTurn(player: Player?) -> Message {
+        return Message(.playerTurn, playerID: player?.id ?? "")
+    }
+    
+    public static func unknonError() -> Message {
+        return Message(.unknownError)
+    }
+    
+    public static func informPlay(player: Player?, cards: [Card]) -> Message {
+        return Message(.makePlay, playerID: player?.id ?? "", cards: cards)
+    }
 }

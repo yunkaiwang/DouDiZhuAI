@@ -54,4 +54,8 @@ public class Message: Codable {
     public static func informDecision(beLandlord: Bool, playerID: String) -> Message {
         return Message((beLandlord ? .playerWantToBeLandlord : .playerWantToBeFarmer), playerID: playerID)
     }
+    
+    public static func makePlay(playerID: String, cards: [Card]) -> Message {
+        return Message(.makePlay, playerID: playerID, cards: cards)
+    }
 }

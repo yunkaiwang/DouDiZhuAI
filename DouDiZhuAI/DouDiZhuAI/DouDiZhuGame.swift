@@ -21,9 +21,14 @@ class DouDiZhuGame {
     private (set) var state: GameState = .disconnected
     private (set) var player: Player?
     private (set) var userSelectedCards:[Card] = []
+    private (set) var lastPlayedPlayerID: String = ""
     private (set) var playerCardButtons:[CardButtonNode] = []
     private (set) var currentPlay: Play = .none
+    private (set) var lastPlayedCard: [Card] = []
     private (set) var otherPlayers: [String:PlayerNum] = [:]
+    private (set) var player2CardCount: Int = 17
+    private (set) var player3CardCount: Int = 17
+    
     
     public func start() {
         self.client.delegate = self
@@ -53,11 +58,11 @@ class DouDiZhuGame {
             self.userSelectedCards.append(card)
         }
         
-        //        if currentPlayerNum == 0 {
-        //            if isCurrentPlayValid(cards: self.userSelectedCards) {
-        //                self.gameScene.enablePlayButton()
-        //            }
-        //        }
+        if isCurrentPlayValid(cards: self.userSelectedCards) {
+            DouDiZhuGame.gameScene?.enablePlayButton()
+        } else {
+            DouDiZhuGame.gameScene?.disablePlayButton()
+        }
     }
     
     public func playerDecided(beLandlord: Bool) {
@@ -69,16 +74,7 @@ class DouDiZhuGame {
             return
         }
         
-        let res = checkPlay(cards: self.userSelectedCards)
-        if res == Play.invalid || res == Play.none {
-            return
-        } else if res != Play.bomb && res != Play.rocket && currentPlay != Play.none && res != currentPlay {
-            return
-        }
-        if currentPlay == Play.none {
-            currentPlay = res
-        }
-        
+        self.player?.makePlay(cards: self.userSelectedCards)
         DouDiZhuGame.gameScene?.displayPlayerPlay(playerNum: self.player!.getPlayerNum(), cards: self.userSelectedCards)
         
         for selected_card in self.userSelectedCards {
@@ -91,11 +87,13 @@ class DouDiZhuGame {
             }
         }
         
-        self.userSelectedCards = []
-        
         for i in 0..<self.playerCardButtons.count {
             playerCardButtons[i].position = CGPoint(x: 200 - (self.playerCardButtons.count - 17) * 13 + 25 * i, y: 50)
         }
+        
+        self.client.makePlay(cards: self.userSelectedCards, playerID: self.player?.id ?? "")
+        self.userSelectedCards = []
+        self.state = .waiting
     }
     
     public func hintButtonClicked() {
@@ -109,7 +107,7 @@ class DouDiZhuGame {
         
         self.userSelectedCards = []
         
-        let suggested_cards: [Card] = suggestPlay(playerCards: [], currentPlay: Play.none, lastPlayedCards: [NullCard()])
+        let suggested_cards: [Card] = suggestPlay(playerCards: [], currentPlay: Play.none, lastPlayedCards: [NullCard.shared])
         
         if suggested_cards.count == 0 {
             self.passButtonClicked()
@@ -160,6 +158,67 @@ class DouDiZhuGame {
         if self.otherPlayers.count == 2 {
             DouDiZhuGame.gameScene?.enableStartGameButton()
             DouDiZhuGame.gameScene?.disableAddAIButton()
+        }
+    }
+    
+    private func isCurrentPlayValid(cards: [Card]) -> Bool {
+        let cardPlay = checkPlay(cards: cards)
+        
+        if self.player?.id == self.lastPlayedPlayerID || self.lastPlayedPlayerID == "" {
+            return cardPlay != .none && cardPlay != .invalid
+        } else if cardPlay == .rocket || (cardPlay == .bomb && self.currentPlay != . bomb && self.currentPlay != .rocket) {
+            return true
+        } else if cardPlay == .none || cardPlay == .invalid || (self.currentPlay != .none && self.currentPlay != cardPlay) {
+            return false
+        } else if (self.currentPlay == .none) {
+            return true
+        }
+        
+        switch currentPlay {
+        case .solo, .pair, .trio, .bomb:
+            return cards[0] > self.lastPlayedCard[0]
+        case .soloChain, .pairChain, .airplane:
+            return cards.max()! > self.lastPlayedCard.max()!
+        case .trioPlusPair, .trioPlusSolo, .airplanePlusPair, .airplanePlusSolo:
+            let cards_parsed = parseCards(cards: cards)
+            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
+            
+            var cardTrio: Card = NullCard.shared
+            var lastTrio: Card = NullCard.shared
+            for card in lastPlayedCard_parsed.numCards {
+                if lastPlayedCard_parsed.card_count[card.getNum()]! == 3 {
+                    lastTrio = card
+                    break
+                }
+            }
+            for card in cards_parsed.numCards {
+                if cards_parsed.card_count[card.getNum()]! == 3 {
+                    cardTrio = card
+                    break
+                }
+            }
+            return cardTrio > lastTrio
+        case .spaceShuttle, .spaceShuttlePlusFourPair, .spaceShuttlePlusFourSolo, .bombPlusDualSolo, .bombPlusDualPair:
+            let cards_parsed = parseCards(cards: cards)
+            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
+            
+            var cardBomb: Card = NullCard.shared
+            var lastBomb: Card = NullCard.shared
+            for card in lastPlayedCard_parsed.numCards {
+                if lastPlayedCard_parsed.card_count[card.getNum()]! == 4 {
+                    cardBomb = card
+                    break
+                }
+            }
+            for card in cards_parsed.numCards {
+                if cards_parsed.card_count[card.getNum()]! == 4 {
+                    lastBomb = card
+                    break
+                }
+            }
+            return cardBomb > lastBomb
+        default:
+            return false
         }
     }
     
@@ -286,12 +345,45 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             if playerID == self.player?.id {
                 self.player?.addLandlordCard(newCards: message.cards)
                 self.createPlayerCards()
+            } else {
+                if (self.otherPlayers[playerID]! == .two) {
+                    player2CardCount = 20
+                } else {
+                    player3CardCount = 20
+                }
             }
             self.updateLandlordCardCount(num: (playerID == self.player?.id ? PlayerNum.one : self.otherPlayers[playerID] ?? PlayerNum.one))
             self.state = .inProgress
-        case .gameEnd:
-            return
         case .playerTurn:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            self.state = .active
+            DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
+            
+            if playerID == self.player?.id {
+                DouDiZhuGame.gameScene?.showPlayButtons()
+            }
+        case .makePlay:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            self.lastPlayedPlayerID = playerID
+            if playerID != self.player?.id {
+                DouDiZhuGame.gameScene?.displayPlayerPlay(playerNum: self.otherPlayers[playerID] ?? PlayerNum.one, cards: message.cards)
+                if (self.otherPlayers[playerID]! == .two) {
+                    player2CardCount -= message.cards.count
+                    DouDiZhuGame.gameScene?.updatePlayerCardCount(num: .two, count: player2CardCount)
+                } else {
+                    player3CardCount -= message.cards.count
+                    DouDiZhuGame.gameScene?.updatePlayerCardCount(num: .three, count: player3CardCount)
+                }
+            }
+        case .gameEnd:
             return
         default: break
         }
