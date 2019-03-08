@@ -26,8 +26,6 @@ public enum MessageType: String, Codable {
     case playerWantToBeFarmer = "playerWantToBeFarmer" // player wants to be farmer
     
     case playerPillageTurn = "playerPillageTurn" // player make the decision of whether pillage the landlord or not
-    case playerWantToPillageLandlord = "playerWantToPillageLandlord"
-    case playerWillNotPillageLandlord = "playerWillNotPillageLandlord"
     
     case informLandlord = "informLandlord" // inform the players about the landlord of the game
     

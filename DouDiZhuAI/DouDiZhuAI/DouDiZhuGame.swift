@@ -38,18 +38,6 @@ class DouDiZhuGame {
         return self.state != GameState.disconnected
     }
     
-    public func letPlayerDecideLandlord() {
-        //        if playerNum == 0 {
-        //            if self.pillagingLandlord {
-        //                self.gameScene.setBeLandlordButtonText(pillage: true)
-        //            } else {
-        //                self.gameScene.setBeLandlordButtonText(pillage: false)
-        //            }
-        //            self.gameScene.showBeLandlordActionButtons()
-        //            self.waitForPlayerChoise()
-        //        }
-    }
-    
     public func cardIsClicked(card: Card) {
         var isSelected: Bool = true
         
@@ -187,12 +175,10 @@ class DouDiZhuGame {
     
     private func getMessageToDisplay(type: MessageType) -> String {
         switch type {
-        case .playerWantToBeFarmer, .playerWillNotPillageLandlord:
+        case .playerWantToBeFarmer:
             return "Be a farmer"
         case .playerWantToBeLandlord:
-            return "Be the landlord"
-        case .playerWantToPillageLandlord:
-            return "Pillage the landlord"
+            return self.state == .pillagingLandlord ? "Pillage the landlord" : "Be the landlord"
         default:
             return ""
         }
@@ -261,17 +247,23 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 print("The given player id doesn't match current player id, this should never happen")
                 return
             }
+            self.state = .choosingLandlord
             self.player?.startNewGame(cards: message.cards)
             self.createPlayerCards()
-        case .playerDecisionTurn:
+        case .playerDecisionTurn, .playerPillageTurn:
             guard let playerID = message.playerID else {
                 print("No player ID is provided within the message, this should never happen")
                 return
             }
             
+            if message.type == .playerPillageTurn {
+                self.state = .pillagingLandlord
+            }
+            
             if playerID != self.player?.id {
                 DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
             } else {
+                DouDiZhuGame.gameScene?.setBeLandlordButtonText(pillage: message.type == .playerPillageTurn)
                 DouDiZhuGame.gameScene?.showBeLandlordActionButtons()
                 DouDiZhuGame.gameScene?.showCountDownLabel(PlayerNum.one)
             }
@@ -296,23 +288,11 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 self.createPlayerCards()
             }
             self.updateLandlordCardCount(num: (playerID == self.player?.id ? PlayerNum.one : self.otherPlayers[playerID] ?? PlayerNum.one))
+            self.state = .inProgress
         case .gameEnd:
-            if let winningPlayer = message.playerID {
-                self.state = (winningPlayer == self.player?.id) ? .playerWon : .playerLost
-            } else {
-                self.state = .draw
-            }
+            return
         case .playerTurn:
-            guard let activePlayer = message.playerID else {
-                print("No player ID is provided within the message, this should never happen")
-                return
-            }
-            
-            if activePlayer == self.player?.id {
-                self.state = .active
-            } else {
-                self.state = .waiting
-            }
+            return
         default: break
         }
     }

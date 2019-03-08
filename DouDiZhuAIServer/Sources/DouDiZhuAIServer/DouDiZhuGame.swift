@@ -119,14 +119,32 @@ class DouDiZhuGame {
     
     public func playerMadeDecision(playerID: String, decision: Bool) throws {
         try notifyPlayers(message: Message.informDecision(beLandlord: decision, playerID: playerID))
-        
         let player: Player? = findPlayerWithID(playerID)
         player?.makeDecision(decision: decision)
-        let nextPlayer: Player? = findPlayerWithNum(player?.getPlayerNum().getNext() ?? PlayerNum.none)
-        if !(nextPlayer?.hasMadeDecision() ?? false) {
-             try notifyPlayers(message: Message.playerDecisionTurn(player: nextPlayer))
+        self.activePlayer = findPlayerWithNum(player?.getPlayerNum().getNext() ?? PlayerNum.none)
+        
+        if self.state == .choosingLandlord {
+            if !(self.activePlayer?.hasMadeDecision() ?? false) {
+                try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
+            } else {
+                try self.pillageLandlord()
+            }
         } else {
-            try self.pillageLandlord(prioritizedPlayerNum: nextPlayer?.getPlayerNum() ?? PlayerNum.none)
+            if !(self.activePlayer!.hasMadePillageDecision()) {
+                if !(self.activePlayer!.wantToBeLandlord()) {
+                    self.activePlayer?.makeDecision(decision: false)
+                    self.activePlayer = findPlayerWithNum(self.activePlayer!.getPlayerNum().getNext())
+                    if !(self.activePlayer!.hasMadePillageDecision()) {
+                        try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+                    } else {
+                        try decideLandlord()
+                    }
+                } else {
+                    try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+                }
+            } else {
+                try decideLandlord()
+            }
         }
     }
     
@@ -216,7 +234,7 @@ class DouDiZhuGame {
         try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
     }
     
-    private func pillageLandlord(prioritizedPlayerNum: PlayerNum) throws {
+    private func pillageLandlord() throws {
         self.state = .pillagingLandlord
         
         var willingPlayers: [Player] = []
@@ -225,13 +243,26 @@ class DouDiZhuGame {
                 willingPlayers.append(player)
             }
         }
-        if willingPlayers.count == 0 {
-            self.startNewGameSinceNoOneChooseToBeLandlord()
-        } else if willingPlayers.count == 1 {
-            try self.notifyLandlord(willingPlayers[0])
+        
+        if willingPlayers.count < 2 {
+            try decideLandlord()
         } else {
-            
+            if !self.activePlayer!.wantToBeLandlord() {
+                self.activePlayer = findPlayerWithNum(self.activePlayer?.getPlayerNum().getNext() ?? PlayerNum.none)
+            }
+            try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
         }
+    }
+    
+    private func decideLandlord() throws {
+        for _ in 0..<3 {
+            if self.activePlayer!.wantToBeLandlord() {
+                try self.notifyLandlord(self.activePlayer!)
+                return
+            }
+            self.activePlayer = findPlayerWithNum(self.activePlayer!.getPlayerNum().getNext())
+        }
+        self.startNewGameSinceNoOneChooseToBeLandlord()
     }
     
     private func notifyPlayer(message: Message, socket: WebSocket?) throws {

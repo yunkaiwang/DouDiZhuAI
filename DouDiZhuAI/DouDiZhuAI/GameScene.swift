@@ -252,6 +252,7 @@ class GameScene: SKScene {
         player3CardCount.isHidden = false
         
         self.clearCurrentPlay()
+        self.setBeLandlordButtonText(pillage: false)
     }
     
     func userMadeChoice() {

@@ -80,4 +80,8 @@ public class Message: Codable {
     public static func informLandlord(playerID: String, landlordCards: [Card]) -> Message {
         return Message(.informLandlord, playerID: playerID, cards: landlordCards)
     }
+    
+    public static func playerPillageTurn(player: Player?) -> Message {
+        return Message(.playerPillageTurn, playerID: player?.id ?? "")
+    }
 }
