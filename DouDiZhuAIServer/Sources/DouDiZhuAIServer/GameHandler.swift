@@ -59,7 +59,11 @@ class GameHandler: WebSocketSessionHandler {
                         return
                     }
                     
-                    try DouDiZhuGame.shared.playerMakePlay(playerID, cards: message.cards)
+                    var convertedCards: [Card] = []
+                    for card in message.cards {
+                        convertedCards.append(Card.identifierToCard(id: card.getIdentifier()))
+                    }
+                    try DouDiZhuGame.shared.playerMakePlay(playerID, cards: convertedCards)
                 default:
                     break
                 }

@@ -29,7 +29,6 @@ class DouDiZhuGame {
     private (set) var player2CardCount: Int = 17
     private (set) var player3CardCount: Int = 17
     
-    
     public func start() {
         self.client.delegate = self
         self.client.connect()
@@ -58,10 +57,8 @@ class DouDiZhuGame {
             self.userSelectedCards.append(card)
         }
         
-        if isCurrentPlayValid(cards: self.userSelectedCards) {
-            DouDiZhuGame.gameScene?.enablePlayButton()
-        } else {
-            DouDiZhuGame.gameScene?.disablePlayButton()
+        if self.state == .active {
+            checkCurrentPlay()
         }
     }
     
@@ -223,7 +220,13 @@ class DouDiZhuGame {
     }
     
     private func createPlayerCards() {
+        for card in self.playerCardButtons {
+            card.removeFromParent()
+        }
+        self.playerCardButtons = []
+        
         let playerCards: [Card] = self.player?.getCards() ?? []
+        
         for i in 0..<playerCards.count {
             let newCard = CardButtonNode(normalTexture: SKTexture(imageNamed: playerCards[i].getIdentifier()), card: playerCards[i], game: self)
             newCard.position = CGPoint(x: 200 - (playerCards.count - 17) * 13 + 25 * i, y: 50)
@@ -245,6 +248,14 @@ class DouDiZhuGame {
     
     private func updateLandlordCardCount(num: PlayerNum) {
         DouDiZhuGame.gameScene?.updateLandlord(landlordNum: num)
+    }
+    
+    private func checkCurrentPlay() {
+        if isCurrentPlayValid(cards: self.userSelectedCards) {
+            DouDiZhuGame.gameScene?.enablePlayButton()
+        } else {
+            DouDiZhuGame.gameScene?.disablePlayButton()
+        }
     }
     
     private init() { /* singleton */ }
@@ -364,6 +375,7 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
             
             if playerID == self.player?.id {
+                self.checkCurrentPlay()
                 DouDiZhuGame.gameScene?.showPlayButtons()
             }
         case .makePlay:
@@ -372,7 +384,10 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 return
             }
             
-            self.lastPlayedPlayerID = playerID
+            if message.cards.count != 0 {
+                self.lastPlayedPlayerID = playerID
+                self.lastPlayedCard = message.cards
+            }
             if playerID != self.player?.id {
                 DouDiZhuGame.gameScene?.displayPlayerPlay(playerNum: self.otherPlayers[playerID] ?? PlayerNum.one, cards: message.cards)
                 if (self.otherPlayers[playerID]! == .two) {

@@ -252,6 +252,7 @@ class GameScene: SKScene {
         player3CardCount.isHidden = false
         
         self.clearCurrentPlay()
+        self.playerCardContainer.removeAllChildren()
         self.setBeLandlordButtonText(pillage: false)
     }
     
@@ -280,10 +281,17 @@ class GameScene: SKScene {
         
         playerContainer.removeAllChildren()
         let position = self.getPlayerPlayDisplayPosition(playerNum: playerNum)
-        for i in 0..<cards.count {
-            let card: SKSpriteNode = SKSpriteNode(imageNamed: cards[i].getIdentifier() + "_small")
-            card.position = CGPoint(x: position.x + CGFloat((i - cards.count / 2) * 15), y:position.y)
-            playerContainer.addChild(card)
+        
+        if cards.count != 0 {
+            for i in 0..<cards.count {
+                let card: SKSpriteNode = SKSpriteNode(imageNamed: cards[i].getIdentifier() + "_small")
+                card.position = CGPoint(x: position.x + CGFloat((i - cards.count / 2) * 15), y:position.y)
+                playerContainer.addChild(card)
+            }
+        } else {
+            let passNote = SKLabelNode(text: "pass")
+            passNote.position = position
+            playerContainer.addChild(passNote)
         }
     }
     
@@ -292,7 +300,7 @@ class GameScene: SKScene {
         var position: CGPoint
         switch landlordNum {
         case .one:
-            position = CGPoint(x: 150, y: 100)
+            position = CGPoint(x: 100, y: 100)
         case .two:
             position = CGPoint(x: self.frame.minX + 75, y: 320)
         default:
