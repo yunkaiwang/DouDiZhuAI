@@ -58,12 +58,18 @@ class GameScene: SKScene {
     }
     
     private func setLabelNodeAttr(node: SKLabelNode, name: String?, color: UIColor?, pos: CGPoint, size: CGFloat?, isHidden: Bool) {
+        setLabelNodeAttr(node: node, name: name, color: color, pos: pos, size: size, isHidden: isHidden, addNode: true)
+    }
+    
+    private func setLabelNodeAttr(node: SKLabelNode, name: String?, color: UIColor?, pos: CGPoint, size: CGFloat?, isHidden: Bool, addNode: Bool) {
         node.name = name
         node.fontColor = color
         node.position = pos
         node.fontSize = size ?? node.fontSize
         node.isHidden = isHidden
-        self.addChild(node)
+        if addNode {
+            self.addChild(node)
+        }
     }
     
     private func setSpritNodeAttr(node: SKSpriteNode, name: String?, pos: CGPoint) {
@@ -142,10 +148,6 @@ class GameScene: SKScene {
         hidePlayButtons()
     }
     
-    @objc func joinGame() {
-        DouDiZhuGame.sharedInstace.start()
-    }
-    
     func enterGameScene() {
         joinGameButton.isHidden = true
         welcomeLabel.isHidden = false
@@ -170,15 +172,10 @@ class GameScene: SKScene {
     }
     
     func displayPlayerCards(cards: [CardButtonNode]) {
+        self.playerCardContainer.removeAllChildren()
         for i in 0..<cards.count {
             self.playerCardContainer.addChild(cards[i])
         }
-    }
-    
-    func revealLandloardCard(cards: [Card]) {
-        LandlordCard1.texture = SKTexture(imageNamed: cards[0].getIdentifier())
-        LandlordCard2.texture = SKTexture(imageNamed: cards[1].getIdentifier())
-        LandlordCard3.texture = SKTexture(imageNamed: cards[2].getIdentifier())
     }
     
     func hideBeLandlordActionButtons() {
@@ -227,7 +224,7 @@ class GameScene: SKScene {
         }
     }
     
-    func resetTable() {
+    public func resetTable() {
         hidePlayButtons()
         welcomeLabel.isHidden = true
         addAIPlayerButton.isHidden = true
@@ -268,35 +265,17 @@ class GameScene: SKScene {
     }
     
     func displayPlayerDecision(playerNum: PlayerNum, decision: String) {
-        var playerContainer: SKSpriteNode;
-        switch playerNum {
-        case .one:
-            playerContainer = player1CurrentPlay
-        case .two:
-            playerContainer = player2CurrentPlay
-        default:
-            playerContainer = player3CurrentPlay
-        }
-        
+        let playerContainer: SKSpriteNode = findPlayerContainer(playerNum)
         playerContainer.removeAllChildren()
-        let display: SKLabelNode = SKLabelNode(text: decision)
-        display.name = "display"
-        display.fontColor = UIColor.black
-        display.fontSize = 15
-        display.position = self.getPlayerPlayDisplayPosition(playerNum: playerNum)
-        playerContainer.addChild(display)
+        
+        let labelNode: SKLabelNode = SKLabelNode(text: decision)
+        setLabelNodeAttr(node: labelNode, name: "display", color: UIColor.black, pos: self.getPlayerPlayDisplayPosition(playerNum: playerNum), size: 15, isHidden: false, addNode: false)
+        
+        playerContainer.addChild(labelNode)
     }
     
     func displayPlayerPlay(playerNum: PlayerNum, cards: [Card]) {
-        var playerContainer: SKSpriteNode;
-        switch playerNum {
-        case .one:
-            playerContainer = player1CurrentPlay
-        case .two:
-            playerContainer = player2CurrentPlay
-        default:
-            playerContainer = player3CurrentPlay
-        }
+        let playerContainer: SKSpriteNode = findPlayerContainer(playerNum)
         
         playerContainer.removeAllChildren()
         let position = self.getPlayerPlayDisplayPosition(playerNum: playerNum)
@@ -307,20 +286,27 @@ class GameScene: SKScene {
         }
     }
     
-    func updateLandlord(landlordNum: PlayerNum) {
+    public func updateLandlord(landlordNum: PlayerNum) {
+        self.hideStatusTag()
         var position: CGPoint
         switch landlordNum {
         case .one:
             position = CGPoint(x: 150, y: 100)
         case .two:
             position = CGPoint(x: self.frame.minX + 75, y: 320)
-//            player2CardCount.text = String(game!.getPlayer2CardCount())
+            player2CardCount.text = String(20)
         default:
             position = CGPoint(x: self.frame.maxX - 75, y: 320)
-//            player3CardCount.text = String(game!.getPlayer3CardCount())
+            player3CardCount.text = String(20)
         }
         self.landlordLabel.position = position
         self.landlordLabel.isHidden = false
+    }
+    
+    public func revealLandloardCard(cards: [Card]) {
+        LandlordCard1.texture = SKTexture(imageNamed: cards[0].getIdentifier())
+        LandlordCard2.texture = SKTexture(imageNamed: cards[1].getIdentifier())
+        LandlordCard3.texture = SKTexture(imageNamed: cards[2].getIdentifier())
     }
     
     public func clearCurrentPlayerPlay(playerNum: PlayerNum) {
@@ -369,7 +355,18 @@ class GameScene: SKScene {
         self.resetTimer(interval: 30)
     }
     
+   
+    
+    public func revealStatusTag() {
+        player2Status.isHidden = false
+        player3Status.isHidden = false
+    }
+    
     /* Mark - objc function */
+    
+    @objc func joinGame() {
+        DouDiZhuGame.sharedInstace.start()
+    }
     
     @objc func timePassed() {
         countDown -= 1
@@ -437,5 +434,21 @@ class GameScene: SKScene {
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(GameScene.timePassed), userInfo: nil, repeats: true)
         countDownLabel.isHidden = false
         countDownLabel.text = String(countDown)
+    }
+    
+    private func findPlayerContainer(_ playerNum: PlayerNum) -> SKSpriteNode {
+        switch playerNum {
+        case .one:
+            return player1CurrentPlay
+        case .two:
+            return player2CurrentPlay
+        default:
+            return player3CurrentPlay
+        }
+    }
+    
+    private func hideStatusTag() {
+        player2Status.isHidden = true
+        player3Status.isHidden = true
     }
 }

@@ -13,6 +13,7 @@ public class Player: Hashable {
     private var beLandlord: Bool = false
     private var playerNum: PlayerNum = .none
     private var socket: WebSocket? = nil
+    private var state: DecisionState = .undecided
     
     public init(_ socket: WebSocket?) {
         self.id = NSUUID().uuidString
@@ -24,6 +25,7 @@ public class Player: Hashable {
     }
     
     func startNewGame(cards: [Card]) {
+        self.state = .undecided
         self.cards = cards
     }
     
@@ -46,6 +48,23 @@ public class Player: Hashable {
     
     public func getNumCard()->Int {
         return self.cards.count
+    }
+    
+    public func makeDecision(decision: Bool) {
+        switch self.state {
+        case .undecided:
+            self.state = decision ? .beLandlord : .beFarmer
+        default:
+            self.state = decision ? .pillaged : .beFarmer
+        }
+    }
+    
+    public func hasMadeDecision() -> Bool {
+        return self.state != .undecided
+    }
+    
+    public func wantToBeLandlord() -> Bool {
+        return self.state == .beLandlord || self.state == .pillaged
     }
     
     public func pass() { }

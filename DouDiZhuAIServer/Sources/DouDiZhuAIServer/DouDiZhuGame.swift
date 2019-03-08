@@ -120,7 +120,14 @@ class DouDiZhuGame {
     public func playerMadeDecision(playerID: String, decision: Bool) throws {
         try notifyPlayers(message: Message.informDecision(beLandlord: decision, playerID: playerID))
         
-        try notifyPlayers(message: Message.playerDecisionTurn(player: findPlayerWithNum(findPlayerWithID(playerID)?.getPlayerNum().getNext() ?? PlayerNum.none)))
+        let player: Player? = findPlayerWithID(playerID)
+        player?.makeDecision(decision: decision)
+        let nextPlayer: Player? = findPlayerWithNum(player?.getPlayerNum().getNext() ?? PlayerNum.none)
+        if !(nextPlayer?.hasMadeDecision() ?? false) {
+             try notifyPlayers(message: Message.playerDecisionTurn(player: nextPlayer))
+        } else {
+            try self.pillageLandlord(prioritizedPlayerNum: nextPlayer?.getPlayerNum() ?? PlayerNum.none)
+        }
     }
     
     private func findPlayerWithID(_ id: String) -> Player? {
@@ -197,7 +204,7 @@ class DouDiZhuGame {
     }
     
     private func runGame() {
-        
+        self.state = .inProgress
     }
     
     private func electLandlord() throws {
@@ -209,240 +216,22 @@ class DouDiZhuGame {
         try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
     }
     
-    private func chooseLandlord() {
-//        self.currentPlayerNum = Int.random(in: 0...2)
-//
-//
-//        if currentPlayerNum == 0 {
-//            letPlayerDecideLandlord(playerNum: 0)
-//        } else if currentPlayerNum == 1 {
-//            letPlayerDecideLandlord(playerNum: 1)
-//            self.beLandlordDecision[1] = true
-//            let decision = player2.wantToBeLandlord()
-//            if decision {
-//                self.pillagingLandlord = true
-//                self.pillageLandlordDecision[2] = true
-//            } else {
-//                self.beLandlordDecision[2] = true
-//            }
-//            letPlayerDecideLandlord(playerNum: 2)
-//            if !decision && player3.wantToBeLandlord() {
-//                self.pillagingLandlord = true
-//            }
-//            letPlayerDecideLandlord(playerNum: 0)
-//        } else {
-//            letPlayerDecideLandlord(playerNum: 2)
-//            self.beLandlordDecision[2] = true
-//            if player3.wantToBeLandlord() {
-//                self.pillagingLandlord = true
-//            }
-//            letPlayerDecideLandlord(playerNum: 0)
-//        }
-    }
-    
-    private func letPlayerDecideLandlord(playerNum: Int) {
-//        if playerNum == 0 {
-//
-//            self.waitForPlayerChoise()
-//        } else if playerNum == 1 {
-//            var decision: Bool
-//            var text: String
-//            if self.pillagingLandlord {
-//                player2.chooseToPillageLandlord()
-//                decision = player2.wantToPillageLandlord()
-//                text = "Pillage landlord"
-//            } else {
-//                player2.chooseToBeLandlord()
-//                decision = player2.wantToBeLandlord()
-//                text = "Be landlord"
-//            }
-//
-//
-//        } else {
-//            var decision: Bool
-//            var text: String
-//            if self.pillagingLandlord {
-//                player3.chooseToPillageLandlord()
-//                decision = player3.wantToPillageLandlord()
-//                text = "Pillage landlord"
-//            } else {
-//                player3.chooseToBeLandlord()
-//                decision = player3.wantToBeLandlord()
-//                text = "Be landlord"
-//            }
-//
-//
-//        }
-    }
-    
-    private func playerChooseToBeLandlord() {
+    private func pillageLandlord(prioritizedPlayerNum: PlayerNum) throws {
+        self.state = .pillagingLandlord
         
-//        if !self.pillagingLandlord {
-//            player1.decideToBeLandlord(decision: true)
-//            self.pillagingLandlord = true
-//            self.beLandlordDecision[0] = true
-//            if self.beLandlordDecision[1] && self.beLandlordDecision[2] {
-//                // since it's not pillaging landlord, so any of the two previous player must decide to not be the landlord as if they have decided, so current player can be safely picked as landlord
-//                self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
-//            } else {
-//                if self.beLandlordDecision[2] { // player 3 has decided but it's not in the pillaging process so player 3 must have decided to not be the landlord
-//                    self.letPlayerDecideLandlord(playerNum: 1)
-//                    let decision = player2.wantToPillageLandlord()
-//                    if !decision {
-//                        self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
-//                    } else {
-//                        self.letPlayerDecideLandlord(playerNum: 1) // if player 2 wants to pillage landlord, then player 1 has to choose if he wants to pillage again
-//                    }
-//                } else { // player 3 has not decided as well, so only player 1 has made the choice
-//                    self.letPlayerDecideLandlord(playerNum: 1)
-//                    self.letPlayerDecideLandlord(playerNum: 2)
-//
-//                    let player2_decision = player2.wantToPillageLandlord()
-//                    let player3_decision = player3.wantToPillageLandlord()
-//                    if !player2_decision && !player3_decision { // both two players don't want to pillage the landlord
-//                        self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
-//                    } else { // at least one of the player wants to pillage the landlord, so we need to let player 1 decide again if he wants to pillage the landlord
-//                        self.letPlayerDecideLandlord(playerNum: 0)
-//                    }
-//                }
-//            }
-//        } else {
-//            player1.decideToPillageLandlord(decision: true)
-//            self.pillageLandlordDecision[0] = true
-//
-//            if self.pillageLandlordDecision[1] && self.pillageLandlordDecision[2] {
-//                self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
-//            } else if !self.pillageLandlordDecision[1] && self.pillageLandlordDecision[2] { // player 2 had not decided to pillage or not, player 3 did, if we are in this case, then player 2 must be the player who first wants to be the landlord
-//                letPlayerDecideLandlord(playerNum: 1)
-//                let decision = player2.wantToPillageLandlord()
-//
-//                if decision {
-//                    self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                } else if player3.wantToPillageLandlord() {
-//                    self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                } else {
-//                    self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
-//                }
-//            } else { // if we are here, then it means that both player2 and player 3 must have not decided yet, and the only possibility when we are in this case is that player 3 is the first one who decided to be the landlord
-//                letPlayerDecideLandlord(playerNum: 1)
-//                letPlayerDecideLandlord(playerNum: 2)
-//                let decision = player3.wantToPillageLandlord()
-//
-//                if decision {
-//                    self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                } else {
-//                    self.setLandlordAndStartGame(landlordNum: player1.getPlayerNum())
-//                }
-//            }
-//        }
-    }
-    
-    private func playerChooseToBeFarmer() {
-        
-        
-//        if !self.pillagingLandlord {
-//            player1.decideToBeLandlord(decision: false)
-//            self.beLandlordDecision[0] = true
-//            if self.beLandlordDecision[1] && self.beLandlordDecision[2] {
-//                // since it's not pillaging landlord, so any of the two previous player must decide to not be the landlord as if they have decided, so new game has to be started
-//                
-//                
-//            } else {
-//                if self.beLandlordDecision[2] {
-//                    self.letPlayerDecideLandlord(playerNum: 1)
-//                    let decision = player2.wantToBeLandlord()
-//                    if !decision {
-//                        
-//                        
-//                    } else {
-//                        self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                    }
-//                } else { // player 3 has not decided as well, so only player 1 has made the choice
-//                    self.letPlayerDecideLandlord(playerNum: 1)
-//                    let player2_decision = player2.wantToBeLandlord()
-//                    var player3_decision: Bool
-//                    if player2_decision {
-//                        self.pillagingLandlord = true
-//                        self.beLandlordDecision[1] = true
-//                        player3.chooseToPillageLandlord()
-//                        player3_decision = player3.wantToPillageLandlord()
-//                        if !player3_decision {
-//                            self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                        } else {
-//                            player2.chooseToPillageLandlord()
-//                            let player2_decision = player2.wantToPillageLandlord()
-//                            if player2_decision {
-//                                self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                            } else {
-//                                self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                            }
-//                        }
-//                    } else {
-//                        player3.chooseToBeLandlord()
-//                        player3_decision = player3.wantToBeLandlord()
-//                        if !player3_decision {
-//                            
-//                            
-//                        } else {
-//                            self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            player1.decideToPillageLandlord(decision: false)
-//            self.pillageLandlordDecision[0] = true
-//            
-//            if self.pillageLandlordDecision[2] && !self.pillageLandlordDecision[1] {
-//                let player3_decision = player3.wantToPillageLandlord()
-//                if !player3_decision {
-//                    self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                } else {
-//                    letPlayerDecideLandlord(playerNum: 1)
-//                    let player2_decision = player2.wantToPillageLandlord()
-//                    if player2_decision {
-//                        self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                    } else {
-//                        self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                    }
-//                }
-//            } else {
-//                letPlayerDecideLandlord(playerNum: 1)
-//                let player2_decision = player2.wantToPillageLandlord()
-//                if !player2_decision {
-//                    self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                } else {
-//                    letPlayerDecideLandlord(playerNum: 2)
-//                    let player3_decision = player3.wantToPillageLandlord()
-//                    if player3_decision {
-//                        self.setLandlordAndStartGame(landlordNum: player3.getPlayerNum())
-//                    } else {
-//                        self.setLandlordAndStartGame(landlordNum: player2.getPlayerNum())
-//                    }
-//                }
-//            }
-//        }
-    }
-    
-    private func didPlayerWin() -> Bool {
-        return false
-    }
-    
-    private func startGame() throws {
-        self.activePlayer = randomPlayer()
-        self.chooseLandlord()
-        
-        let message = Message.playerTurn(player: self.activePlayer!)
-        try notifyPlayers(message: message)
-    }
-    
-    private func randomPlayer() -> Player {
-        let randomIdx = Int(arc4random() % UInt32(self.players.count))
-        return players[randomIdx]
-    }
-    
-    private func nextActivePlayer() -> Player? {
-        return self.players.filter({ $0 != self.activePlayer }).first
+        var willingPlayers: [Player] = []
+        for player in self.players {
+            if player.wantToBeLandlord() {
+                willingPlayers.append(player)
+            }
+        }
+        if willingPlayers.count == 0 {
+            self.startNewGameSinceNoOneChooseToBeLandlord()
+        } else if willingPlayers.count == 1 {
+            try self.notifyLandlord(willingPlayers[0])
+        } else {
+            
+        }
     }
     
     private func notifyPlayer(message: Message, socket: WebSocket?) throws {
@@ -459,17 +248,8 @@ class DouDiZhuGame {
     }
     
     private func notifyPlayers(message: Message) throws {
-        let jsonEncoder = JSONEncoder()
-        let jsonData = try jsonEncoder.encode(message)
-        
-        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            throw GameError.failedToSerializeMessageToJsonString(message: message)
-        }
-        
-        self.players.forEach({
-            $0.getSocket()?.sendStringMessage(string: jsonString, final: true, completion: {
-                print("did send message: \(message.type)")
-            })
+        try self.players.forEach({
+            try self.notifyPlayer(message: message, socket: $0.getSocket())
         })
     }
     
@@ -490,6 +270,20 @@ class DouDiZhuGame {
                 return
             }
         }
+    }
+    
+    private func notifyLandlord(_ landlord: Player) throws {
+        self.landlord = landlord
+        self.activePlayer = landlord
+        let landlordCards = Deck.shared.getLandlordCard()
+        landlord.addLandlordCard(newCards: landlordCards)
+        try notifyPlayers(message: Message.informLandlord(playerID: landlord.id, landlordCards: landlordCards))
+        self.runGame()
+    }
+    
+    // TO DO
+    private func startNewGameSinceNoOneChooseToBeLandlord() {
+        print("has to restart game since nobody choose to be the landlord")
     }
 }
 

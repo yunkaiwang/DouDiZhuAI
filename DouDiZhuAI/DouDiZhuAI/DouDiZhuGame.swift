@@ -182,8 +182,24 @@ class DouDiZhuGame {
             newCard.position = CGPoint(x: 200 - (playerCards.count - 17) * 13 + 25 * i, y: 50)
             self.playerCardButtons.append(newCard)
         }
-        DouDiZhuGame.gameScene?.resetTable()
         DouDiZhuGame.gameScene?.displayPlayerCards(cards: self.playerCardButtons)
+    }
+    
+    private func getMessageToDisplay(type: MessageType) -> String {
+        switch type {
+        case .playerWantToBeFarmer, .playerWillNotPillageLandlord:
+            return "Be a farmer"
+        case .playerWantToBeLandlord:
+            return "Be the landlord"
+        case .playerWantToPillageLandlord:
+            return "Pillage the landlord"
+        default:
+            return ""
+        }
+    }
+    
+    private func updateLandlordCardCount(num: PlayerNum) {
+        DouDiZhuGame.gameScene?.updateLandlord(landlordNum: num)
     }
     
     private init() { /* singleton */ }
@@ -230,27 +246,23 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             return
         case .addAIPlayerFailed:
             DouDiZhuGame.gameScene?.showAlert(withTitle: "Add AI player failed", message: "Failed to add AI player to the game, please try again!")
-            
-            return
         case .joinGameFailed:
             DouDiZhuGame.gameScene?.showAlert(withTitle: "Join failed", message: "Failed to join the game, please try again")
-            return
         case .startGameFailed:
             DouDiZhuGame.gameScene?.showAlert(withTitle: "Start failed", message: "Failed to start the game, please try again")
-            return
         case .gameStarted:
             guard let playerID = message.playerID else {
                 print("No player ID is provided within the message, this should never happen")
                 return
             }
             
+            DouDiZhuGame.gameScene?.resetTable()
             if playerID != self.player?.id {
                 print("The given player id doesn't match current player id, this should never happen")
                 return
             }
             self.player?.startNewGame(cards: message.cards)
             self.createPlayerCards()
-            return
         case .playerDecisionTurn:
             guard let playerID = message.playerID else {
                 print("No player ID is provided within the message, this should never happen")
@@ -264,14 +276,32 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 DouDiZhuGame.gameScene?.showCountDownLabel(PlayerNum.one)
             }
             
-            return
+        case .playerWantToBeLandlord, .playerWantToBeFarmer:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            let playerNum = (playerID == self.player?.id) ? PlayerNum.one : (self.otherPlayers[playerID] ?? PlayerNum.one)
+            DouDiZhuGame.gameScene?.displayPlayerDecision(playerNum: playerNum, decision: self.getMessageToDisplay(type: message.type))
+        case .informLandlord:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            DouDiZhuGame.gameScene?.revealLandloardCard(cards: message.cards)
+            if playerID == self.player?.id {
+                self.player?.addLandlordCard(newCards: message.cards)
+                self.createPlayerCards()
+            }
+            self.updateLandlordCardCount(num: (playerID == self.player?.id ? PlayerNum.one : self.otherPlayers[playerID] ?? PlayerNum.one))
         case .gameEnd:
             if let winningPlayer = message.playerID {
                 self.state = (winningPlayer == self.player?.id) ? .playerWon : .playerLost
             } else {
                 self.state = .draw
             }
-            return
         case .playerTurn:
             guard let activePlayer = message.playerID else {
                 print("No player ID is provided within the message, this should never happen")
@@ -283,7 +313,6 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             } else {
                 self.state = .waiting
             }
-            return
         default: break
         }
     }

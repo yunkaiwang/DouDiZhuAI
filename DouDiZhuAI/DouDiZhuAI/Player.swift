@@ -36,11 +36,11 @@ public class Player {
     }
     
     func startNewGame(cards: [Card]) {
-        self.cards = cards
+        self.cards = self.convertCards(cards: cards)
     }
     
     func addLandlordCard(newCards: [Card]) {
-        self.cards += newCards
+        self.cards += self.convertCards(cards: newCards)
         self.cards.sort()
     }
     
@@ -53,5 +53,13 @@ public class Player {
                 }
             }
         }
+    }
+    
+    private func convertCards(cards: [Card]) -> [Card] {
+        var convertedCards: [Card] = []
+        for card in cards {
+            convertedCards.append(Card.identifierToCard(id: card.getIdentifier()))
+        }
+        return convertedCards
     }
 }
