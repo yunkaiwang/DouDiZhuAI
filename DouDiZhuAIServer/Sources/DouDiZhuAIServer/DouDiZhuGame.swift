@@ -236,10 +236,11 @@ class DouDiZhuGame {
     
     private func runGame() throws {
         self.state = .inProgress
-        if !isGameOver() {
+        if isGameOver() {
             self.gameEnded()
+        } else {
+            try notifyPlayers(message: Message.playerTurn(player: self.activePlayer))
         }
-        try notifyPlayers(message: Message.playerTurn(player: self.activePlayer))
     }
     
     private func gameEnded() {

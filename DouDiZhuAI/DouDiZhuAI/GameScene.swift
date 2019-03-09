@@ -83,7 +83,7 @@ class GameScene: SKScene {
         self.setButtonNodeAttr(node: beLandlordButton, title: "Be landlord!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beLandlordBtn", selector: #selector(GameScene.beLandlordButtonClicked), enable: true)
         self.setButtonNodeAttr(node: beFarmerButton, title: "Be a farmer", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX+100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beFarmerBtn", selector: #selector(GameScene.beFarmerButtonClicked), enable: true)
         self.setButtonNodeAttr(node: playButton, title: "Play", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "playBtn", selector: #selector(GameScene.playButtonClicked), enable: false)
-        self.setButtonNodeAttr(node: hintButton, title: "Hint", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "hintBtn", selector: #selector(GameScene.hintButtonClicked), enable: false)
+        self.setButtonNodeAttr(node: hintButton, title: "Hint", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "hintBtn", selector: #selector(GameScene.hintButtonClicked), enable: true)
         self.setButtonNodeAttr(node: passButton, title: "Pass", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX + 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.passButtonClicked), enable: false)
         self.setButtonNodeAttr(node: addAIPlayerButton, title: "Add AI Player", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 220), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.addAIPlayer), enable: true)
         self.setButtonNodeAttr(node: startGameButton, title: "Start Game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 150), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.startGame), enable: false)
@@ -290,6 +290,9 @@ class GameScene: SKScene {
             }
         } else {
             let passNote = SKLabelNode(text: "pass")
+            passNote.fontColor = UIColor.black
+            passNote.fontSize = 20
+            passNote.isHidden = false
             passNote.position = position
             playerContainer.addChild(passNote)
         }
@@ -326,6 +329,12 @@ class GameScene: SKScene {
         LandlordCard1.texture = SKTexture(imageNamed: cards[0].getIdentifier())
         LandlordCard2.texture = SKTexture(imageNamed: cards[1].getIdentifier())
         LandlordCard3.texture = SKTexture(imageNamed: cards[2].getIdentifier())
+    }
+    
+    public func clearPlayerContains() {
+        player1CurrentPlay.removeAllChildren()
+        player2CurrentPlay.removeAllChildren()
+        player3CurrentPlay.removeAllChildren()
     }
     
     public func clearCurrentPlayerPlay(playerNum: PlayerNum) {
@@ -373,8 +382,6 @@ class GameScene: SKScene {
         
         self.resetTimer(interval: 30)
     }
-    
-   
     
     public func revealStatusTag() {
         player2Status.isHidden = false
@@ -435,9 +442,9 @@ class GameScene: SKScene {
         case .one:
             return CGPoint(x: self.frame.midX, y: 180)
         case .two:
-            return CGPoint(x: self.frame.minX + 150, y: 250)
+            return CGPoint(x: self.frame.minX + 250, y: 250)
         default:
-            return CGPoint(x: self.frame.maxX - 150, y: 250)
+            return CGPoint(x: self.frame.maxX - 250, y: 250)
         }
     }
     
