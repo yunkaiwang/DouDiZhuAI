@@ -48,17 +48,13 @@ public class Message: Codable {
     public static func addAIPlayerFailed() -> Message {
         return Message(.addAIPlayerFailed)
     }
-
-    public static func playerTurn(player: Player) -> Message {
-        return Message(.playerTurn, playerID: player.id)
-    }
-
-    public static func gameEnd(player: Player) -> Message {
-        return Message(.gameEnd, playerID: player.id)
-    }
     
     public static func newUserJoined(player: Player) -> Message {
         return Message(.newUserJoined, playerID: player.id)
+    }
+    
+    public static func userLeft(player: Player) -> Message {
+        return Message(.userLeft, playerID: player.id)
     }
     
     public static func startGameFailed() -> Message {
@@ -89,11 +85,15 @@ public class Message: Codable {
         return Message(.playerTurn, playerID: player?.id ?? "")
     }
     
-    public static func unknonError() -> Message {
-        return Message(.unknownError)
+    public static func abortGame() -> Message {
+        return Message(.abortGame)
     }
     
     public static func informPlay(player: Player?, cards: [Card]) -> Message {
         return Message(.makePlay, playerID: player?.id ?? "", cards: cards)
+    }
+    
+    public static func gameEnded(player: Player?) -> Message {
+        return Message(.gameEnd, playerID: player?.id ?? "")
     }
 }

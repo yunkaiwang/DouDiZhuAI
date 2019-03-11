@@ -16,6 +16,7 @@ class GameScene: SKScene {
     let startGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     
     let joinGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
+    let leaveGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let beLandlordButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let beFarmerButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let player1CurrentPlay = SKSpriteNode(color: .clear, size: CGSize(width: 200, height: 100))
@@ -80,6 +81,7 @@ class GameScene: SKScene {
     
     private func setButtonAttributes() {
         self.setButtonNodeAttr(node: joinGameButton, title: "Join game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: self.frame.midY), size: CGSize(width: 100, height: 30), zPosition: nil, name: "joinGameBtn", selector: #selector(GameScene.joinGame), enable: true)
+        self.setButtonNodeAttr(node: leaveGameButton, title: "Leave game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: 185), size: CGSize(width: 100, height: 30), zPosition: nil, name: "leaveGameBtn", selector: #selector(GameScene.leaveGame), enable: true)
         self.setButtonNodeAttr(node: beLandlordButton, title: "Be landlord!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beLandlordBtn", selector: #selector(GameScene.beLandlordButtonClicked), enable: true)
         self.setButtonNodeAttr(node: beFarmerButton, title: "Be a farmer", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX+100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beFarmerBtn", selector: #selector(GameScene.beFarmerButtonClicked), enable: true)
         self.setButtonNodeAttr(node: playButton, title: "Play", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "playBtn", selector: #selector(GameScene.playButtonClicked), enable: false)
@@ -104,7 +106,7 @@ class GameScene: SKScene {
         backgroundColor = SKColor.white
         
         setLabelNodeAttr(node: welcomeLabel, name: "welcomeLabel", color: UIColor.black, pos: CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 75), size: 50, isHidden: true)
-        setLabelNodeAttr(node: gameOverMsg, name: "gameOverMsg", color: UIColor.black, pos: CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 75), size: 50, isHidden: true)
+        setLabelNodeAttr(node: gameOverMsg, name: "gameOverMsg", color: UIColor.black, pos: CGPoint(x:self.frame.midX - 25, y: self.frame.midY + 50), size: 50, isHidden: true)
         setLabelNodeAttr(node: countDownLabel, name: "countDownLabel", color: UIColor.black, pos: CGPoint(x: 600, y: 150), size: nil, isHidden: true)
         setLabelNodeAttr(node: landlordLabel, name: "landlordLabel", color: UIColor.black, pos: CGPoint(x: 600, y: 150), size: 30, isHidden: true)
         setLabelNodeAttr(node: player2CardCount, name: "player2CardCount", color: UIColor.black, pos: CGPoint(x: self.frame.minX + 75, y: CGFloat(200)), size: nil, isHidden: true)
@@ -130,6 +132,7 @@ class GameScene: SKScene {
     }
     
     func cleanTable() {
+        self.clearCurrentPlay()
         playerCardContainer.removeAllChildren()
         playerCardContainer.isHidden = true
         
@@ -142,17 +145,27 @@ class GameScene: SKScene {
         LandlordCard2.isHidden = true
         LandlordCard3.isHidden = true
         
+        leaveGameButton.isHidden = true
         addAIPlayerButton.isHidden = true
         startGameButton.isHidden = true
+        
+        player2Status.isHidden = true
+        player3Status.isHidden = true
+        welcomeLabel.isHidden = true
+        
+        gameOverMsg.isHidden = true
+        landlordLabel.isHidden = true
+        
         hideBeLandlordActionButtons()
         hidePlayButtons()
     }
     
-    func enterGameScene() {
+    public func enterGameScene() {
         joinGameButton.isHidden = true
         welcomeLabel.isHidden = false
         player2Status.isHidden = false
         player3Status.isHidden = false
+        leaveGameButton.isHidden = false
         addAIPlayerButton.isHidden = false
         startGameButton.isHidden = false
     }
@@ -166,29 +179,41 @@ class GameScene: SKScene {
             player2Status.text = "READY!"
             return
         default:
-            print("New user should never get assigned with player number other than 2 or 3, this should never happen")
             return
         }
     }
     
-    func displayPlayerCards(cards: [CardButtonNode]) {
+    public func userLeft(playerNum: PlayerNum) {
+        switch playerNum {
+        case .three:
+            player3Status.text = "No Player Yet"
+            return
+        case .two:
+            player2Status.text = "No Player Yet"
+            return
+        default:
+            return
+        }
+    }
+    
+    public func displayPlayerCards(cards: [CardButtonNode]) {
         self.playerCardContainer.removeAllChildren()
         for i in 0..<cards.count {
             self.playerCardContainer.addChild(cards[i])
         }
     }
     
-    func hideBeLandlordActionButtons() {
+    public func hideBeLandlordActionButtons() {
         beLandlordButton.isHidden = true
         beFarmerButton.isHidden = true
     }
     
-    func showBeLandlordActionButtons() {
+    public func showBeLandlordActionButtons() {
         beLandlordButton.isHidden = false
         beFarmerButton.isHidden = false
     }
     
-    func hidePlayButtons() {
+    public func hidePlayButtons() {
         playButton.isHidden = true
         hintButton.isHidden = true
         passButton.isHidden = true
@@ -216,7 +241,7 @@ class GameScene: SKScene {
         passButton.isEnabled = true
     }
     
-    func setBeLandlordButtonText(pillage: Bool) {
+    public func setBeLandlordButtonText(pillage: Bool) {
         if pillage {
             beLandlordButton.setButtonLabel(title: "Pillage landlord!", font: "Arial", fontSize: 12)
         } else {
@@ -228,6 +253,7 @@ class GameScene: SKScene {
         hidePlayButtons()
         welcomeLabel.isHidden = true
         addAIPlayerButton.isHidden = true
+        leaveGameButton.isHidden = true
         
         gameOverMsg.isHidden = true
         startGameButton.isHidden = true
@@ -298,6 +324,11 @@ class GameScene: SKScene {
         }
     }
     
+    public func resetPlayerStatus() {
+        player2Status.text = "No Player Yet"
+        player3Status.text = "No Player Yet"
+    }
+    
     public func updateLandlord(landlordNum: PlayerNum) {
         self.hideStatusTag()
         var position: CGPoint
@@ -348,10 +379,17 @@ class GameScene: SKScene {
         }
     }
     
-    public func gameOver(winner: String) {
-        gameOverMsg.text = winner + " wins!"
+    public func gameOver(msg: String) {
+        gameOverMsg.text = msg
         gameOverMsg.isHidden = false
-        startGameButton.isHidden = false
+        gameOverMsg.zPosition = 1
+        timer?.invalidate()
+        countDownLabel.isHidden = true
+    }
+    
+    public func resetJoinGameButtonEvent() {
+        joinGameButton.isHidden =  false
+        joinGameButton.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: #selector(self.reJoinGame))
     }
     
     public func showAlert(withTitle title: String, message: String) {
@@ -380,7 +418,8 @@ class GameScene: SKScene {
         }
         countDownLabel.position = position
         
-        self.resetTimer(interval: 30)
+//        self.resetTimer(interval: 30)
+        self.resetTimer(interval: 5)
     }
     
     public func revealStatusTag() {
@@ -394,12 +433,23 @@ class GameScene: SKScene {
         DouDiZhuGame.sharedInstace.start()
     }
     
+    @objc func reJoinGame() {
+        cleanTable()
+        DouDiZhuGame.sharedInstace.joinGame()
+    }
+    
+    @objc func leaveGame() {
+        DouDiZhuGame.sharedInstace.leaveGame()
+        cleanTable()
+        joinGameButton.isHidden = false
+    }
+    
     @objc func timePassed() {
         countDown -= 1
         countDownLabel.text = String(countDown)
-        if countDown < 0 {
-            DouDiZhuGame.sharedInstace.timeOut()
+        if countDown < 1 {
             self.userMadeChoice()
+            DouDiZhuGame.sharedInstace.timeOut()
         }
     }
     
@@ -442,9 +492,9 @@ class GameScene: SKScene {
         case .one:
             return CGPoint(x: self.frame.midX, y: 180)
         case .two:
-            return CGPoint(x: self.frame.minX + 250, y: 250)
+            return CGPoint(x: self.frame.minX + 250, y: 230)
         default:
-            return CGPoint(x: self.frame.maxX - 250, y: 250)
+            return CGPoint(x: self.frame.maxX - 250, y: 230)
         }
     }
     

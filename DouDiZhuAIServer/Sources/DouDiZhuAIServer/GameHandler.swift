@@ -23,6 +23,13 @@ class GameHandler: WebSocketSessionHandler {
                     
                     do {
                         try DouDiZhuGame.shared.handlePlayerLeft(player)
+                    } catch is GameError {
+                        do {
+                            try DouDiZhuGame.shared.handleError()
+                        } catch {
+                            print("Unknow error happened, server will exit...")
+                            exit(1)
+                        }
                     } catch let error {
                         print("error: \(error)")
                     }
@@ -67,8 +74,16 @@ class GameHandler: WebSocketSessionHandler {
                 default:
                     break
                 }
+            } catch is GameError {
+                do {
+                    try DouDiZhuGame.shared.handleError()
+                } catch {
+                    print("Unknow error happened, server will exit...")
+                    exit(1)
+                }
             } catch {
-                DouDiZhuGame.shared.handleError(nil)
+                print("Unknow error happened, server will exit...")
+                exit(1)
             }
             
             // Done working on this message? Loop back around and read the next message.

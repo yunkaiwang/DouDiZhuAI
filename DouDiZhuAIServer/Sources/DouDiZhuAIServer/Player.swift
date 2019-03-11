@@ -30,6 +30,10 @@ public class Player: Hashable {
         self.cards.sort()
     }
     
+    public func getCards()->[Card] {
+        return self.cards
+    }
+    
     public func getPlayerNum() -> PlayerNum {
         return self.playerNum
     }
@@ -89,7 +93,7 @@ public class Player: Hashable {
             }
             
             if !found {
-                throw GameError.unknowError
+                throw GameError.cardNotFoundError
             }
         }
     }

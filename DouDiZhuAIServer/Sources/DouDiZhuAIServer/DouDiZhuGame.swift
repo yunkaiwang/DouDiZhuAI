@@ -11,13 +11,16 @@ import Foundation
 
 enum GameError: Error {
     case failedToSerializeMessageToJsonString(message: Message)
-    case unknowError
+    case cardNotFoundError
+    case invalidPlay
+    case playerLeftWhileGameInProgress
 }
 
 class DouDiZhuGame {
     static let shared = DouDiZhuGame()
     
     private var timer: Timer? = nil
+    private var countDown: int = 0
     private var deck: Deck = Deck.shared
     private var playerAddedAIPlayers: [Player: [Player]] = [:]
     private var activePlayer: Player? = nil
@@ -52,10 +55,7 @@ class DouDiZhuGame {
         return playerNums
     }
     
-    
-    private init() { } // singleton
-    
-    func playerForSocket(_ aSocket: WebSocket) -> Player? {
+    public func playerForSocket(_ aSocket: WebSocket) -> Player? {
         var aPlayer: Player? = nil
         
         self.players.forEach { player in
@@ -67,15 +67,18 @@ class DouDiZhuGame {
         return aPlayer
     }
     
-    func handlePlayerLeft(_ player: Player) throws {
-        self.removePlayer(player)
-        for AIPlayer in playerAddedAIPlayers[player]! {
-            self.removePlayer(AIPlayer)
+    public func handlePlayerLeft(_ player: Player) throws {
+        if self.state != .created {
+            throw GameError.playerLeftWhileGameInProgress
+        } else {
+            self.removePlayer(player)
+            try notifyPlayers(message: Message.userLeft(player: player))
+            for AIPlayer in playerAddedAIPlayers[player]! {
+                self.removePlayer(AIPlayer)
+                try notifyPlayers(message: Message.userLeft(player: AIPlayer))
+            }
+            self.playerAddedAIPlayers.removeValue(forKey: player)
         }
-        self.playerAddedAIPlayers.removeValue(forKey: player)
-        self.state = .created
-//            let message = Message.gameEnd(player: player)
-//            try notifyPlayers(message: message)
     }
     
     public func handleNewUserJoin(_ socket: WebSocket) throws {
@@ -116,6 +119,7 @@ class DouDiZhuGame {
     public func handleStartGame(_ socket: WebSocket) throws {
         if self.state != .created || self.players.count < 3 {
             try notifyPlayer(message: Message.startGameFailed(), socket: socket)
+            return
         }
         try self.newGame()
     }
@@ -152,29 +156,37 @@ class DouDiZhuGame {
     }
     
     public func playerMakePlay(_ id: String, cards: [Card]) throws {
+        if id != self.activePlayer?.id {
+            return
+        }
+        
         if !isCurrentPlayValid(cards: cards) {
-            try notifyPlayers(message: Message.unknonError())
-            self.abortGame()
+            throw GameError.invalidPlay
         }
         let player: Player = findPlayerWithID(id)!
         self.currentPlay = checkPlay(cards: cards)
-        self.lastPlayedCard = cards
-        self.lastPlayedPlayer = player
-        try player.makePlay(cards: cards)
+        
+        if cards.count != 0 {
+            self.lastPlayedCard = cards
+            self.lastPlayedPlayer = player
+            try player.makePlay(cards: cards)
+        }
+        
         try self.notifyPlayers(message: Message.informPlay(player: player, cards: cards))
         self.activePlayer = self.findPlayerWithNum(player.getPlayerNum().getNext())
         try self.runGame()
     }
     
-    // May add more code to handle different type of error later on
-    public func handleError(_ error: Error?) {
-        self.abortGame()
+    // May add more code to handle different type of error later on (to do)
+    public func handleError() throws {
+        try self.abortGame()
     }
     
     // TO DO
     // abort the game sine an unknow error has occured, or when no one chooses to be the landlord
-    private func abortGame() {
-        
+    private func abortGame() throws {
+        try self.notifyPlayers(message: Message.abortGame())
+        self.clearGameStateForNewGame()
     }
     
     private func findPlayerWithID(_ id: String) -> Player? {
@@ -222,29 +234,49 @@ class DouDiZhuGame {
         return false
     }
     
-    private func getWinner()->String? {
+    private func getWinner()->Player? {
         if self.state != .inProgress {
             return nil
         } else {
-            if landlord?.getNumCard() == 0 {
-                return "Landlord"
-            } else {
-                return "Farmer"
+            for i in 0..<self.players.count {
+                if self.players[i].getNumCard() == 0 {
+                    return self.players[i]
+                }
             }
+            return nil
         }
     }
     
     private func runGame() throws {
         self.state = .inProgress
         if isGameOver() {
-            self.gameEnded()
+            try self.gameEnded()
         } else {
             try notifyPlayers(message: Message.playerTurn(player: self.activePlayer))
         }
     }
     
-    private func gameEnded() {
-        print("game has ended")
+    private func gameEnded() throws {
+        if !isGameOver() {
+            return
+        }
+        let winner: Player? = self.getWinner()
+        try notifyPlayers(message: Message.gameEnded(player: winner))
+        
+        self.clearGameStateForNewGame()
+    }
+    
+    private func clearGameStateForNewGame() {
+        self.timer?.invalidate()
+        self.timer = nil
+        self.playerAddedAIPlayers = [:]
+        self.activePlayer = nil
+        self.landlord = nil
+        self.currentPlay = .none
+        self.lastPlayedCard = []
+        self.lastPlayedPlayer = nil
+        self.state = .created
+        self.players = []
     }
     
     private func electLandlord() throws {
@@ -255,6 +287,8 @@ class DouDiZhuGame {
         
         try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
     }
+    
+    private init() { } // singleton
     
     private func pillageLandlord() throws {
         self.state = .pillagingLandlord
@@ -273,6 +307,41 @@ class DouDiZhuGame {
                 self.activePlayer = findPlayerWithNum(self.activePlayer?.getPlayerNum().getNext() ?? PlayerNum.none)
             }
             try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+        }
+    }
+    
+    private func resetTimer() {
+        timer?.invalidate()
+        countDown = 30
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.timePassed), userInfo: nil, repeats: true)
+    }
+    
+    @objc private func timePassed() {
+        countDown -= 1
+        if countDown < 1 {
+            self.timer?.invalidate()
+            self.timeout()
+        }
+    }
+    
+    private func timeout() {
+        do {
+            guard let playerID = self.activePlayer?.id else {
+                try self.abortGame()
+            }
+            if state == .choosingLandlord || state == .pillagingLandlord {
+                try self.playerMadeDecision(playerID: playerID, decision: false)
+            } else {
+                if canPass() {
+                    try self.playerMakePlay(playerID, cards: [])
+                } else {
+                    try self.playerMakePlay(playerID, cards: suggestNewPlay(playerCards: self.activePlayer?.getCards() ?? []))
+                }
+            }
+            
+        } catch {
+            print("unknow error happened, exiting...")
+            exit(1)
         }
     }
     
@@ -307,7 +376,7 @@ class DouDiZhuGame {
     }
     
     private func handleJoin(_ player: Player) throws -> Bool {
-        if self.players.count > 3 {
+        if self.players.count >= 3 {
             return false
         }
         
@@ -334,22 +403,27 @@ class DouDiZhuGame {
         try self.runGame()
     }
     
-    // TO DO
     private func startNewGameSinceNoOneChooseToBeLandlord() throws {
         try self.newGame()
     }
     
+     private func canPass()-> Bool {
+        return self.activePlayer?.id != self.lastPlayedPlayer?.id && self.currentPlay != .none
+    }
+    
     private func isCurrentPlayValid(cards: [Card]) -> Bool {
+        if canPass() && cards.count == 0 {
+            return true
+        }
+        
         let cardPlay = checkPlay(cards: cards)
         
         if self.activePlayer == self.lastPlayedPlayer || self.lastPlayedPlayer == nil {
-            return cardPlay != .none && cardPlay != .invalid
+            return !(cardPlay == .none || cardPlay == .invalid)
         } else if cardPlay == .rocket || (cardPlay == .bomb && self.currentPlay != . bomb && self.currentPlay != .rocket) {
             return true
         } else if cardPlay == .none || cardPlay == .invalid || (self.currentPlay != .none && self.currentPlay != cardPlay) {
             return false
-        } else if (self.currentPlay == .none) {
-            return true
         }
         
         switch currentPlay {

@@ -12,6 +12,7 @@ public enum MessageType: String, Codable {
     case joinGameFailed = "joinGameFailed" // new player failed to join the game
     
     case newUserJoined = "newUserJoined" // new player joined the game
+    case userLeft = "userLeft" // user left the game
     
     case addAIPlayer = "addAIPlayer" // add AI player
     case addAIPlayerFailed = "addAIPlayerFailed" // add AI player failed
@@ -34,5 +35,5 @@ public enum MessageType: String, Codable {
     
     case gameEnd = "gameEnd" // game has ended (one player win)
     
-    case unknownError = "unknownError" // game has met an unknown error
+    case abortGame = "abortGame" // game is aborted for some unknow reason
 }

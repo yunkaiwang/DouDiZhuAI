@@ -28,10 +28,16 @@ class DouDiZhuGame {
     private (set) var otherPlayers: [String:PlayerNum] = [:]
     private (set) var player2CardCount: Int = 17
     private (set) var player3CardCount: Int = 17
+    private (set) var landlordID: String = ""
+    private (set) var activePlayer: String = ""
     
     public func start() {
         self.client.delegate = self
         self.client.connect()
+    }
+    
+    public func leaveGame() {
+        self.client.disconnect()
     }
     
     public func stop() {
@@ -74,6 +80,14 @@ class DouDiZhuGame {
         self.client.makePlay(cards: self.userSelectedCards, playerID: self.player?.id ?? "")
     }
     
+    private func suggestPlayForPlayer() -> [Card] {
+        if lastPlayedCard.count == 0 || currentPlay == .none || self.player?.id == self.lastPlayedPlayerID {
+            return suggestPlay(playerCards: self.player?.getCards() ?? [], currentPlay: .none, lastPlayedCards: [NullCard.shared])
+        } else {
+            return suggestPlay(playerCards: self.player?.getCards() ?? [], currentPlay: currentPlay, lastPlayedCards: self.lastPlayedCard)
+        }
+    }
+    
     public func hintButtonClicked() {
         for selected_card in self.userSelectedCards {
             for i in 0..<self.playerCardButtons.count {
@@ -85,13 +99,7 @@ class DouDiZhuGame {
         
         self.userSelectedCards = []
         
-        var suggested_cards: [Card] = []
-        if lastPlayedCard.count == 0 || currentPlay == .none || self.player?.id == self.lastPlayedPlayerID {
-            suggested_cards = suggestPlay(playerCards: self.player?.getCards() ?? [], currentPlay: .none, lastPlayedCards: [NullCard.shared])
-        } else {
-            suggested_cards = suggestPlay(playerCards: self.player?.getCards() ?? [], currentPlay: currentPlay, lastPlayedCards: self.lastPlayedCard)
-        }
-        
+        let suggested_cards: [Card] = suggestPlayForPlayer()
         if suggested_cards.count == 0 {
             self.passButtonClicked()
         }
@@ -111,12 +119,21 @@ class DouDiZhuGame {
         if self.state != .active || !canPass() {
             return
         }
-        print("pass button is clicked")
         self.client.makePlay(cards: [], playerID: self.player?.id ?? "")
     }
     
     public func timeOut() {
+        if self.activePlayer != self.player?.id {
+            return
+        }
         
+        if self.state == .choosingLandlord || self.state == .pillagingLandlord {
+            DouDiZhuGame.gameScene?.hideBeLandlordActionButtons()
+            self.client.informDecision(beLandlord: false, playerID: self.player?.id ?? "")
+        } else {
+            DouDiZhuGame.gameScene?.hidePlayButtons()
+            self.client.makePlay(cards: canPass() ? [] : suggestPlayForPlayer(), playerID: self.player?.id ?? "")
+        }
     }
     
     public func addAIPlayer() {
@@ -127,18 +144,27 @@ class DouDiZhuGame {
         self.client.startGame()
     }
     
-    private func joinGame() {
+    public func joinGame() {
         self.client.joinGame()
     }
     
     private func setExistingPlayer(playerIDs: [String]){
+        DouDiZhuGame.gameScene?.resetPlayerStatus()
         for playerID in playerIDs {
             self.addNewPlayer(playerID: playerID)
         }
     }
     
+    private func nextAvailablePlayerNum() -> PlayerNum {
+        if otherPlayers.values.contains(.two) {
+            return .three
+        } else {
+            return .two
+        }
+    }
+    
     private func addNewPlayer(playerID: String) {
-        let nextPlayerNum: PlayerNum = self.otherPlayers.count == 0 ? PlayerNum.two : PlayerNum.three
+        let nextPlayerNum: PlayerNum = self.nextAvailablePlayerNum()
         otherPlayers[playerID] = nextPlayerNum
         DouDiZhuGame.gameScene?.newUserAdded(playerNum: nextPlayerNum)
         
@@ -146,6 +172,11 @@ class DouDiZhuGame {
             DouDiZhuGame.gameScene?.enableStartGameButton()
             DouDiZhuGame.gameScene?.disableAddAIButton()
         }
+    }
+    
+    private func removePlayer(playerID: String) {
+        DouDiZhuGame.gameScene?.userLeft(playerNum: otherPlayers[playerID] ?? .one)
+        otherPlayers.removeValue(forKey: playerID)
     }
     
     private func isCurrentPlayValid(cards: [Card]) -> Bool {
@@ -284,7 +315,7 @@ class DouDiZhuGame {
                 DouDiZhuGame.gameScene?.updatePlayerCardCount(num: .three, count: player3CardCount)
             }
         } else {
-            self.player?.makePlay(cards: self.userSelectedCards)
+            self.player?.makePlay(cards: convertedCards)
             
             for card in cards {
                 for i in 0..<self.playerCardButtons.count {
@@ -306,15 +337,26 @@ class DouDiZhuGame {
         }
     }
     
+    private func gameHasEnded(winner: String) {
+        DouDiZhuGame.gameScene?.gameOver(msg: (winner == self.landlordID ? "Landlord" : "Player") + " wins!")
+        DouDiZhuGame.gameScene?.resetJoinGameButtonEvent()
+    }
+    
+    private func abortGame() {
+        DouDiZhuGame.gameScene?.gameOver(msg: "Game aborted")
+        DouDiZhuGame.gameScene?.resetJoinGameButtonEvent()
+    }
+    
     private init() { /* singleton */ }
 }
 
 extension DouDiZhuGame: DouDiZhuClientDelegate {
     func clientDidDisconnect(error: Error?) {
-        self.state = .disconnected
-        if error != nil {
+        if self.state != .connected {
             DouDiZhuGame.gameScene?.showAlert(withTitle: "Connection failed", message: "Failed to connect to the server, please try again!")
         }
+        
+        self.state = .disconnected
     }
     
     func clientDidConnect() {
@@ -365,6 +407,7 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 print("The given player id doesn't match current player id, this should never happen")
                 return
             }
+            self.activePlayer = ""
             self.state = .choosingLandlord
             self.player?.startNewGame(cards: message.cards)
             self.createPlayerCards()
@@ -378,6 +421,7 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 self.state = .pillagingLandlord
             }
             
+            self.activePlayer = playerID
             if playerID != self.player?.id {
                 DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
             } else {
@@ -400,6 +444,7 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 return
             }
             
+            self.landlordID = playerID
             DouDiZhuGame.gameScene?.clearPlayerContains()
             DouDiZhuGame.gameScene?.revealLandloardCard(cards: message.cards)
             if playerID == self.player?.id {
@@ -420,11 +465,12 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 return
             }
             
-            self.state = .active
-            DouDiZhuGame.gameScene?.clearCurrentPlayerPlay(self.otherPlayers[playerID] ?? PlayerNum.one)
+            self.activePlayer = playerID
+            DouDiZhuGame.gameScene?.clearCurrentPlayerPlay(playerNum: self.otherPlayers[playerID] ?? PlayerNum.one)
             DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
             
             if playerID == self.player?.id {
+                self.state = .active
                 self.checkCurrentPlay()
                 self.checkIsAbleToPass()
                 DouDiZhuGame.gameScene?.showPlayButtons()
@@ -437,7 +483,21 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             
             self.playerMakePlay(playerID: playerID, cards: message.cards)
         case .gameEnd:
-            return
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            self.gameHasEnded(winner: playerID)
+        case .userLeft:
+            guard let playerID = message.playerID else {
+                print("No player ID is provided within the message, this should never happen")
+                return
+            }
+            
+            self.removePlayer(playerID: playerID)
+        case .abortGame:
+            self.abortGame()
         default: break
         }
     }
