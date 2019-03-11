@@ -15,6 +15,7 @@ public enum MessageType: String, Codable {
     case userLeft = "userLeft" // user left the game
     
     case addAIPlayer = "addAIPlayer" // add AI player
+    case removeAIPlayer = "removeAIPlayer" // remove AI player
     case addAIPlayerFailed = "addAIPlayerFailed" // add AI player failed
     
     case startGame = "startGame" // start game

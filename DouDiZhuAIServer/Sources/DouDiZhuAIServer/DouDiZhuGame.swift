@@ -14,13 +14,12 @@ enum GameError: Error {
     case cardNotFoundError
     case invalidPlay
     case playerLeftWhileGameInProgress
+    case unknowError
 }
 
 class DouDiZhuGame {
     static let shared = DouDiZhuGame()
     
-    private var timer: Timer? = nil
-    private var countDown: int = 0
     private var deck: Deck = Deck.shared
     private var playerAddedAIPlayers: [Player: [Player]] = [:]
     private var activePlayer: Player? = nil
@@ -73,9 +72,11 @@ class DouDiZhuGame {
         } else {
             self.removePlayer(player)
             try notifyPlayers(message: Message.userLeft(player: player))
-            for AIPlayer in playerAddedAIPlayers[player]! {
-                self.removePlayer(AIPlayer)
-                try notifyPlayers(message: Message.userLeft(player: AIPlayer))
+            if !(player is AIPlayer) {
+                for AIPlayer in playerAddedAIPlayers[player]! {
+                    self.removePlayer(AIPlayer)
+                    try notifyPlayers(message: Message.userLeft(player: AIPlayer))
+                }
             }
             self.playerAddedAIPlayers.removeValue(forKey: player)
         }
@@ -101,19 +102,25 @@ class DouDiZhuGame {
     }
     
     public func handleAddAIPlayer(_ socket: WebSocket) throws {
+        guard let player = playerForSocket(socket) else { return }
+        
         let aiPlayer = AIPlayer()
         if try self.handleJoin(aiPlayer) {
-            let player = playerForSocket(socket)
-            if player == nil {
-                print("Cannot find the player, this should never happen")
-                return
-            }
-            
-            playerAddedAIPlayers[player!]!.append(aiPlayer)
+            playerAddedAIPlayers[player]!.append(aiPlayer)
             try notifyPlayers(message: Message.newUserJoined(player: aiPlayer))
         } else {
             try notifyPlayer(message: Message.addAIPlayerFailed(), socket: socket)
         }
+    }
+    
+    public func handleRemoveAIPlayer(_ socket: WebSocket) throws {
+        guard let player = playerForSocket(socket) else { return }
+        if (playerAddedAIPlayers[player]?.count ?? 0) == 0 {
+            return
+        }
+        let aiPlayer = playerAddedAIPlayers[player]![0]
+        playerAddedAIPlayers[player]!.remove(at: 0)
+        try self.handlePlayerLeft(aiPlayer)
     }
     
     public func handleStartGame(_ socket: WebSocket) throws {
@@ -132,22 +139,39 @@ class DouDiZhuGame {
         
         if self.state == .choosingLandlord {
             if !(self.activePlayer?.hasMadeDecision() ?? false) {
-                try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
+                if self.activePlayer is AIPlayer {
+                    let decision = (self.activePlayer as! AIPlayer).makeBeLandlordDecision(false)
+                    try DouDiZhuGame.shared.playerMadeDecision(playerID: self.activePlayer!.id, decision: decision)
+                } else {
+                    try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
+                }
             } else {
                 try self.pillageLandlord()
             }
         } else {
+            guard self.activePlayer != nil else { throw GameError.unknowError }
+            
             if !(self.activePlayer!.hasMadePillageDecision()) {
                 if !(self.activePlayer!.wantToBeLandlord()) {
                     self.activePlayer?.makeDecision(decision: false)
                     self.activePlayer = findPlayerWithNum(self.activePlayer!.getPlayerNum().getNext())
                     if !(self.activePlayer!.hasMadePillageDecision()) {
-                        try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+                        if self.activePlayer is AIPlayer {
+                            let decision = (self.activePlayer as! AIPlayer).makeBeLandlordDecision(true)
+                            try DouDiZhuGame.shared.playerMadeDecision(playerID: self.activePlayer!.id, decision: decision)
+                        } else {
+                            try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+                        }
                     } else {
                         try decideLandlord()
                     }
                 } else {
-                    try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+                    if self.activePlayer is AIPlayer {
+                        let decision = (self.activePlayer as! AIPlayer).makeBeLandlordDecision(true)
+                        try DouDiZhuGame.shared.playerMadeDecision(playerID: self.activePlayer!.id, decision: decision)
+                    } else {
+                        try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
+                    }
                 }
             } else {
                 try decideLandlord()
@@ -161,12 +185,13 @@ class DouDiZhuGame {
         }
         
         if !isCurrentPlayValid(cards: cards) {
+            print("aborting since invalid play")
             throw GameError.invalidPlay
         }
         let player: Player = findPlayerWithID(id)!
-        self.currentPlay = checkPlay(cards: cards)
         
         if cards.count != 0 {
+            self.currentPlay = checkPlay(cards: cards)
             self.lastPlayedCard = cards
             self.lastPlayedPlayer = player
             try player.makePlay(cards: cards)
@@ -252,7 +277,14 @@ class DouDiZhuGame {
         if isGameOver() {
             try self.gameEnded()
         } else {
-            try notifyPlayers(message: Message.playerTurn(player: self.activePlayer))
+            if self.activePlayer is AIPlayer {
+                let cards = (self.activePlayer as! AIPlayer).makePlay(lastPlayedPlayer: lastPlayedPlayer?.id ?? "", lastPlayedCard: lastPlayedCard)
+            
+                try DouDiZhuGame.shared.playerMakePlay(self.activePlayer!.id, cards: cards)
+            } else {
+                try notifyPlayers(message: Message.playerTurn(player: self.activePlayer))
+            }
+            
         }
     }
     
@@ -267,8 +299,6 @@ class DouDiZhuGame {
     }
     
     private func clearGameStateForNewGame() {
-        self.timer?.invalidate()
-        self.timer = nil
         self.playerAddedAIPlayers = [:]
         self.activePlayer = nil
         self.landlord = nil
@@ -285,7 +315,12 @@ class DouDiZhuGame {
         let rand = Int.random(in: 0...2)
         self.activePlayer = rand == 0 ? self.players[0] : (rand == 1 ? self.players[1] : self.players[2])
         
-        try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
+        if self.activePlayer is AIPlayer {
+            let decision = (self.activePlayer as! AIPlayer).makeBeLandlordDecision(false)
+            try DouDiZhuGame.shared.playerMadeDecision(playerID: self.activePlayer!.id, decision: decision)
+        } else {
+            try notifyPlayers(message: Message.playerDecisionTurn(player: self.activePlayer))
+        }
     }
     
     private init() { } // singleton
@@ -306,42 +341,12 @@ class DouDiZhuGame {
             if !self.activePlayer!.wantToBeLandlord() {
                 self.activePlayer = findPlayerWithNum(self.activePlayer?.getPlayerNum().getNext() ?? PlayerNum.none)
             }
-            try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
-        }
-    }
-    
-    private func resetTimer() {
-        timer?.invalidate()
-        countDown = 30
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.timePassed), userInfo: nil, repeats: true)
-    }
-    
-    @objc private func timePassed() {
-        countDown -= 1
-        if countDown < 1 {
-            self.timer?.invalidate()
-            self.timeout()
-        }
-    }
-    
-    private func timeout() {
-        do {
-            guard let playerID = self.activePlayer?.id else {
-                try self.abortGame()
-            }
-            if state == .choosingLandlord || state == .pillagingLandlord {
-                try self.playerMadeDecision(playerID: playerID, decision: false)
+            if self.activePlayer is AIPlayer {
+                let decision = (self.activePlayer as! AIPlayer).makeBeLandlordDecision(true)
+                try DouDiZhuGame.shared.playerMadeDecision(playerID: self.activePlayer!.id, decision: decision)
             } else {
-                if canPass() {
-                    try self.playerMakePlay(playerID, cards: [])
-                } else {
-                    try self.playerMakePlay(playerID, cards: suggestNewPlay(playerCards: self.activePlayer?.getCards() ?? []))
-                }
+                try notifyPlayers(message: Message.playerPillageTurn(player: self.activePlayer))
             }
-            
-        } catch {
-            print("unknow error happened, exiting...")
-            exit(1)
         }
     }
     
@@ -371,7 +376,11 @@ class DouDiZhuGame {
     
     private func notifyPlayers(message: Message) throws {
         try self.players.forEach({
-            try self.notifyPlayer(message: message, socket: $0.getSocket())
+            if $0 is AIPlayer {
+                ($0 as! AIPlayer).receiveMessage(message)
+            } else {
+                try self.notifyPlayer(message: message, socket: $0.getSocket())
+            }
         })
     }
     
@@ -407,7 +416,7 @@ class DouDiZhuGame {
         try self.newGame()
     }
     
-     private func canPass()-> Bool {
+    private func canPass()-> Bool {
         return self.activePlayer?.id != self.lastPlayedPlayer?.id && self.currentPlay != .none
     }
     
@@ -419,13 +428,18 @@ class DouDiZhuGame {
         let cardPlay = checkPlay(cards: cards)
         
         if self.activePlayer == self.lastPlayedPlayer || self.lastPlayedPlayer == nil {
+            print("return 2")
             return !(cardPlay == .none || cardPlay == .invalid)
         } else if cardPlay == .rocket || (cardPlay == .bomb && self.currentPlay != . bomb && self.currentPlay != .rocket) {
+            
+            print("return 3")
             return true
         } else if cardPlay == .none || cardPlay == .invalid || (self.currentPlay != .none && self.currentPlay != cardPlay) {
+            print("return 4")
             return false
         }
         
+        print("return 5")
         switch currentPlay {
         case .solo, .pair, .trio, .bomb:
             return cards[0] > self.lastPlayedCard[0]

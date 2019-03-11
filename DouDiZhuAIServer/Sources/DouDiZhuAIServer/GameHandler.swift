@@ -50,6 +50,8 @@ class GameHandler: WebSocketSessionHandler {
                     try DouDiZhuGame.shared.handleNewUserJoin(socket)
                 case .addAIPlayer:
                     try DouDiZhuGame.shared.handleAddAIPlayer(socket)
+                case .removeAIPlayer:
+                    try DouDiZhuGame.shared.handleRemoveAIPlayer(socket)
                 case .startGame:
                     try DouDiZhuGame.shared.handleStartGame(socket)
                 case .playerWantToBeFarmer, .playerWantToBeLandlord:

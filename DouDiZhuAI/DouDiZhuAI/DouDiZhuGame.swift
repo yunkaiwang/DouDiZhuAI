@@ -30,6 +30,8 @@ class DouDiZhuGame {
     private (set) var player3CardCount: Int = 17
     private (set) var landlordID: String = ""
     private (set) var activePlayer: String = ""
+    private (set) var countDown: Int = 0
+    private (set) var timer: Timer? = nil
     
     public func start() {
         self.client.delegate = self
@@ -69,6 +71,7 @@ class DouDiZhuGame {
     }
     
     public func playerDecided(beLandlord: Bool) {
+        self.stopTimer()
         self.client.informDecision(beLandlord: beLandlord, playerID: self.player?.id ?? "")
     }
     
@@ -123,6 +126,7 @@ class DouDiZhuGame {
     }
     
     public func timeOut() {
+        self.stopTimer()
         if self.activePlayer != self.player?.id {
             return
         }
@@ -140,12 +144,33 @@ class DouDiZhuGame {
         self.client.addAIPlayer()
     }
     
+    public func removeAIPlayer() {
+        self.client.removeAIPlayer()
+    }
+    
     public func startGame() {
         self.client.startGame()
     }
     
     public func joinGame() {
+        self.cleanGameState()
         self.client.joinGame()
+    }
+    
+    private func cleanGameState() {
+        player = nil
+        userSelectedCards = []
+        lastPlayedPlayerID = ""
+        playerCardButtons = []
+        currentPlay = .none
+        lastPlayedCard = []
+        otherPlayers = [:]
+        player2CardCount = 17
+        player3CardCount = 17
+        landlordID = ""
+        activePlayer = ""
+        countDown = 0
+        self.stopTimer()
     }
     
     private func setExistingPlayer(playerIDs: [String]){
@@ -167,11 +192,7 @@ class DouDiZhuGame {
         let nextPlayerNum: PlayerNum = self.nextAvailablePlayerNum()
         otherPlayers[playerID] = nextPlayerNum
         DouDiZhuGame.gameScene?.newUserAdded(playerNum: nextPlayerNum)
-        
-        if self.otherPlayers.count == 2 {
-            DouDiZhuGame.gameScene?.enableStartGameButton()
-            DouDiZhuGame.gameScene?.disableAddAIButton()
-        }
+
     }
     
     private func removePlayer(playerID: String) {
@@ -292,6 +313,8 @@ class DouDiZhuGame {
     }
     
     private func playerMakePlay(playerID: String, cards: [Card]) {
+        self.stopTimer()
+        
         let playerNum: PlayerNum = playerID == self.player?.id ? PlayerNum.one : (self.otherPlayers[playerID] ?? PlayerNum.one)
         
         var convertedCards: [Card] = []
@@ -345,6 +368,29 @@ class DouDiZhuGame {
     private func abortGame() {
         DouDiZhuGame.gameScene?.gameOver(msg: "Game aborted")
         DouDiZhuGame.gameScene?.resetJoinGameButtonEvent()
+    }
+    
+    private func resetTimer() {
+        self.stopTimer()
+        countDown = 30
+        DouDiZhuGame.gameScene?.updateCountDown(countDown)
+        
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(DouDiZhuGame.timePassed), userInfo: nil, repeats: true)
+    }
+    
+    @objc private func timePassed() {
+        countDown -= 1
+        DouDiZhuGame.gameScene?.updateCountDown(countDown)
+        if countDown < 1 {
+            self.timeOut()
+        }
+    }
+    
+    private func stopTimer() {
+        DouDiZhuGame.gameScene?.hideCountDownLabel()
+        guard timer != nil else { return }
+        timer?.invalidate()
+        timer = nil
     }
     
     private init() { /* singleton */ }
@@ -421,13 +467,13 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 self.state = .pillagingLandlord
             }
             
+            self.resetTimer()
+            DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
+            
             self.activePlayer = playerID
-            if playerID != self.player?.id {
-                DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)
-            } else {
+            if playerID == self.player?.id {
                 DouDiZhuGame.gameScene?.setBeLandlordButtonText(pillage: message.type == .playerPillageTurn)
                 DouDiZhuGame.gameScene?.showBeLandlordActionButtons()
-                DouDiZhuGame.gameScene?.showCountDownLabel(PlayerNum.one)
             }
             
         case .playerWantToBeLandlord, .playerWantToBeFarmer:
@@ -465,6 +511,7 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
                 return
             }
             
+            self.resetTimer()
             self.activePlayer = playerID
             DouDiZhuGame.gameScene?.clearCurrentPlayerPlay(playerNum: self.otherPlayers[playerID] ?? PlayerNum.one)
             DouDiZhuGame.gameScene?.showCountDownLabel(self.otherPlayers[playerID] ?? PlayerNum.one)

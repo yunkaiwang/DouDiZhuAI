@@ -15,7 +15,6 @@ class GameSceneViewController: UIViewController {
 
         let scene = GameScene(size: UIScreen.main.bounds.size)
         let skView = self.view as! SKView
-        GameScene.gameController = self
         scene.scaleMode = .aspectFill
         DouDiZhuGame.gameScene = scene
         skView.presentScene(scene)

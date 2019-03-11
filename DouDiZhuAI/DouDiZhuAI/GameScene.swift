@@ -13,6 +13,7 @@ class GameScene: SKScene {
     let welcomeLabel: SKLabelNode = SKLabelNode(text: "Welcome to Landlord game!")
     
     let addAIPlayerButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
+    let removeAIPlayerButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     let startGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
     
     let joinGameButton: FTButtonNode = FTButtonNode(normalTexture: SKTexture(imageNamed: "btn"), selectedTexture: SKTexture(imageNamed: "selectedBtn"), disabledTexture: nil)
@@ -44,14 +45,8 @@ class GameScene: SKScene {
     let countDownLabel = SKLabelNode(text: "0")
     let landlordLabel = SKLabelNode(text: "L")
     
-    private var countDown: Int = 0
-    private var timer: Timer? = nil
-    public static var gameController: UIViewController?
-    
     override init(size: CGSize) {
         super.init(size: size)
-        self.countDown = 0
-        self.timer = nil
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -81,14 +76,15 @@ class GameScene: SKScene {
     
     private func setButtonAttributes() {
         self.setButtonNodeAttr(node: joinGameButton, title: "Join game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: self.frame.midY), size: CGSize(width: 100, height: 30), zPosition: nil, name: "joinGameBtn", selector: #selector(GameScene.joinGame), enable: true)
-        self.setButtonNodeAttr(node: leaveGameButton, title: "Leave game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: 185), size: CGSize(width: 100, height: 30), zPosition: nil, name: "leaveGameBtn", selector: #selector(GameScene.leaveGame), enable: true)
+        self.setButtonNodeAttr(node: leaveGameButton, title: "Leave game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25,y: 150), size: CGSize(width: 100, height: 30), zPosition: nil, name: "leaveGameBtn", selector: #selector(GameScene.leaveGame), enable: true)
         self.setButtonNodeAttr(node: beLandlordButton, title: "Be landlord!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beLandlordBtn", selector: #selector(GameScene.beLandlordButtonClicked), enable: true)
         self.setButtonNodeAttr(node: beFarmerButton, title: "Be a farmer", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX+100,y: 130), size: CGSize(width: 150, height: 30), zPosition: nil, name: "beFarmerBtn", selector: #selector(GameScene.beFarmerButtonClicked), enable: true)
         self.setButtonNodeAttr(node: playButton, title: "Play", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "playBtn", selector: #selector(GameScene.playButtonClicked), enable: false)
         self.setButtonNodeAttr(node: hintButton, title: "Hint", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "hintBtn", selector: #selector(GameScene.hintButtonClicked), enable: true)
         self.setButtonNodeAttr(node: passButton, title: "Pass", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX + 150,y: 130), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.passButtonClicked), enable: false)
-        self.setButtonNodeAttr(node: addAIPlayerButton, title: "Add AI Player", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 220), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.addAIPlayer), enable: true)
-        self.setButtonNodeAttr(node: startGameButton, title: "Start Game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 150), size: CGSize(width: 100, height: 30), zPosition: nil, name: "passBtn", selector: #selector(GameScene.startGame), enable: false)
+        self.setButtonNodeAttr(node: addAIPlayerButton, title: "Add AI Player", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 220), size: CGSize(width: 100, height: 30), zPosition: nil, name: "addAIBtn", selector: #selector(GameScene.addAIPlayer), enable: true)
+        self.setButtonNodeAttr(node: removeAIPlayerButton, title: "Remove AI Player", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 185), size: CGSize(width: 100, height: 30), zPosition: nil, name: "removeAIBtn", selector: #selector(GameScene.removeAIPlayer), enable: true)
+        self.setButtonNodeAttr(node: startGameButton, title: "Start Game!", font: nil, fontSize: nil, pos: CGPoint(x: self.frame.midX - 25 ,y: 115), size: CGSize(width: 100, height: 30), zPosition: nil, name: "startGameBtn", selector: #selector(GameScene.startGame), enable: true)
     }
     
     private func setButtonNodeAttr(node: FTButtonNode, title: NSString, font: String?, fontSize: CGFloat?, pos: CGPoint, size: CGSize, zPosition: CGFloat?, name: String, selector: Selector, enable: Bool?) {
@@ -147,6 +143,7 @@ class GameScene: SKScene {
         
         leaveGameButton.isHidden = true
         addAIPlayerButton.isHidden = true
+        removeAIPlayerButton.isHidden = true
         startGameButton.isHidden = true
         
         player2Status.isHidden = true
@@ -167,6 +164,7 @@ class GameScene: SKScene {
         player3Status.isHidden = false
         leaveGameButton.isHidden = false
         addAIPlayerButton.isHidden = false
+        removeAIPlayerButton.isHidden = false
         startGameButton.isHidden = false
     }
     
@@ -282,8 +280,7 @@ class GameScene: SKScene {
         self.setBeLandlordButtonText(pillage: false)
     }
     
-    func userMadeChoice() {
-        timer!.invalidate()
+    public func hideCountDownLabel() {
         countDownLabel.isHidden = true
     }
     
@@ -383,7 +380,6 @@ class GameScene: SKScene {
         gameOverMsg.text = msg
         gameOverMsg.isHidden = false
         gameOverMsg.zPosition = 1
-        timer?.invalidate()
         countDownLabel.isHidden = true
     }
     
@@ -398,14 +394,6 @@ class GameScene: SKScene {
         alert.show()
     }
     
-    public func disableAddAIButton() {
-        addAIPlayerButton.isEnabled = false
-    }
-    
-    public func enableStartGameButton() {
-        startGameButton.isEnabled = true
-    }
-    
     public func showCountDownLabel(_ playerNum: PlayerNum) {
         var position: CGPoint
         switch playerNum {
@@ -417,9 +405,11 @@ class GameScene: SKScene {
             position = CGPoint(x: self.frame.maxX - 75, y: 350)
         }
         countDownLabel.position = position
-        
-//        self.resetTimer(interval: 30)
-        self.resetTimer(interval: 5)
+        countDownLabel.isHidden = false
+    }
+    
+    public func updateCountDown(_ num: Int) {
+        countDownLabel.text = String(num)
     }
     
     public func revealStatusTag() {
@@ -444,15 +434,6 @@ class GameScene: SKScene {
         joinGameButton.isHidden = false
     }
     
-    @objc func timePassed() {
-        countDown -= 1
-        countDownLabel.text = String(countDown)
-        if countDown < 1 {
-            self.userMadeChoice()
-            DouDiZhuGame.sharedInstace.timeOut()
-        }
-    }
-    
     @objc func playButtonClicked() {
         DouDiZhuGame.sharedInstace.playButtonClicked()
     }
@@ -469,18 +450,20 @@ class GameScene: SKScene {
         DouDiZhuGame.sharedInstace.addAIPlayer()
     }
     
+    @objc func removeAIPlayer() {
+        DouDiZhuGame.sharedInstace.removeAIPlayer()
+    }
+    
     @objc func startGame() {
         DouDiZhuGame.sharedInstace.startGame()
     }
     
     @objc private func beLandlordButtonClicked() {
-        self.userMadeChoice()
         self.hideBeLandlordActionButtons()
         DouDiZhuGame.sharedInstace.playerDecided(beLandlord: true)
     }
     
     @objc private func beFarmerButtonClicked() {
-        self.userMadeChoice()
         self.hideBeLandlordActionButtons()
         DouDiZhuGame.sharedInstace.playerDecided(beLandlord: false)
     }
@@ -502,14 +485,6 @@ class GameScene: SKScene {
         player1CurrentPlay.removeAllChildren()
         player2CurrentPlay.removeAllChildren()
         player3CurrentPlay.removeAllChildren()
-    }
-    
-    private func resetTimer(interval: Int) {
-        self.timer?.invalidate()
-        self.countDown = interval
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(GameScene.timePassed), userInfo: nil, repeats: true)
-        countDownLabel.isHidden = false
-        countDownLabel.text = String(countDown)
     }
     
     private func findPlayerContainer(_ playerNum: PlayerNum) -> SKSpriteNode {

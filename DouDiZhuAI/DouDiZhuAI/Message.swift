@@ -47,6 +47,10 @@ public class Message: Codable {
         return Message(.addAIPlayer)
     }
     
+    public static func removeAIPlayer() -> Message {
+        return Message(.removeAIPlayer)
+    }
+    
     public static func startGame() -> Message {
         return Message(.startGame)
     }

@@ -17,9 +17,19 @@ class AIPlayer: Player {
         super.init(socket)
     }
     
-    func makeBeLandlordDecision() {
+    public func makeBeLandlordDecision(_ pillage: Bool)-> Bool {
+        return Int.random(in: 0...1) == 0
     }
     
-    func makePillageLandlordDecision() {
+    public func makePlay(lastPlayedPlayer: String, lastPlayedCard: [Card])->[Card] {
+        if self.id == lastPlayedPlayer || lastPlayedPlayer == "" || lastPlayedCard.count == 0 {
+            return suggestNewPlay(playerCards: self.getCards())
+        }
+        
+        return suggestPlay(playerCards: self.getCards(), currentPlay: checkPlay(cards: lastPlayedCard), lastPlayedCards: lastPlayedCard)
+    }
+    
+    public func receiveMessage(_ message: Message) {
+        print("AI player received a message", message.type)
     }
 }

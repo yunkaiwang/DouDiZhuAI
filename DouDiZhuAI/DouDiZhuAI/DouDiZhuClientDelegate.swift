@@ -44,6 +44,10 @@ class DouDiZhuClient: WebSocketDelegate {
         self.writeMessageToSocket(Message.addAIPlayer())
     }
     
+    func removeAIPlayer() {
+        self.writeMessageToSocket(Message.removeAIPlayer())
+    }
+    
     func startGame() {
         self.writeMessageToSocket(Message.startGame())
     }
