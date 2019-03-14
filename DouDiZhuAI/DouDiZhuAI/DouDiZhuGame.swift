@@ -366,6 +366,7 @@ class DouDiZhuGame {
     }
     
     private func abortGame() {
+        self.stopTimer()
         DouDiZhuGame.gameScene?.gameOver(msg: "Game aborted")
         DouDiZhuGame.gameScene?.resetJoinGameButtonEvent()
     }

@@ -24,12 +24,7 @@ class GameHandler: WebSocketSessionHandler {
                     do {
                         try DouDiZhuGame.shared.handlePlayerLeft(player)
                     } catch is GameError {
-                        do {
-                            try DouDiZhuGame.shared.handleError()
-                        } catch {
-                            print("Unknow error happened, server will exit...")
-                            exit(1)
-                        }
+                        DouDiZhuGame.shared.handleError()
                     } catch let error {
                         print("error: \(error)")
                     }
@@ -77,12 +72,7 @@ class GameHandler: WebSocketSessionHandler {
                     break
                 }
             } catch is GameError {
-                do {
-                    try DouDiZhuGame.shared.handleError()
-                } catch {
-                    print("Unknow error happened, server will exit...")
-                    exit(1)
-                }
+                DouDiZhuGame.shared.handleError()
             } catch {
                 print("Unknow error happened, server will exit...")
                 exit(1)

@@ -251,6 +251,7 @@ class GameScene: SKScene {
         hidePlayButtons()
         welcomeLabel.isHidden = true
         addAIPlayerButton.isHidden = true
+        removeAIPlayerButton.isHidden = true
         leaveGameButton.isHidden = true
         
         gameOverMsg.isHidden = true

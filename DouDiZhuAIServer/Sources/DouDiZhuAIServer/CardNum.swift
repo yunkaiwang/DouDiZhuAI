@@ -43,8 +43,7 @@ class CardNum: Comparable, Hashable, Codable {
     }
     
     static func == (lhs: CardNum, rhs: CardNum) -> Bool {
-        let l = lhs.getNum(), r = rhs.getNum()
-        return l == r
+        return lhs.getNum() == rhs.getNum()
     }
     
     static func == (lhs:CardNum, rhs: Int) -> Bool {
