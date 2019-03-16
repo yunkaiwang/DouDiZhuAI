@@ -11,6 +11,4 @@ enum DecisionState {
     case undecided
     case beLandlord
     case beFarmer
-    case pillage
-    case noPillage
 }

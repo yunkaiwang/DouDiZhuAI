@@ -54,7 +54,6 @@ class AIPlayer: Player {
             return
         case .newUserJoined:
             self.addNewPlayer(playerID)
-            return
         case .gameStarted:
             // may be start a new thread and start computing whether or not the AI should be the landlord or not
             self.removeCardsFromRemainingCards(self.getCards())

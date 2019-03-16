@@ -51,24 +51,15 @@ public class Player: Hashable {
     }
     
     public func makeDecision(decision: Bool) {
-        switch self.state {
-        case .undecided:
-            self.state = decision ? .beLandlord : .beFarmer
-        default:
-            self.state = decision ? .pillage : .noPillage
-        }
+        self.state = decision ? .beLandlord : .beFarmer
     }
     
     public func hasMadeDecision() -> Bool {
         return self.state != .undecided
     }
     
-    public func hasMadePillageDecision() -> Bool {
-        return self.state == .noPillage || self.state == .pillage
-    }
-    
     public func wantToBeLandlord() -> Bool {
-        return self.state == .beLandlord || self.state == .pillage
+        return self.state == .beLandlord
     }
     
     public func pass() { }
