@@ -29,6 +29,10 @@ class NumCard: Card {
         return self.suit
     }
     
+    public func getRank() -> Int {
+        return self.num.getRank()
+    }
+    
     static func < (lhs: NumCard, rhs: NumCard) -> Bool {
         if lhs.getNum() == rhs.getNum() {
             return lhs.getSuit() < rhs.getSuit()

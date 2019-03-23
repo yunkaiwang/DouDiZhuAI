@@ -24,10 +24,9 @@ class DouDiZhuGame {
     private var playerAddedAIPlayers: [Player: [Player]] = [:]
     private var activePlayer: Player? = nil
     private var landlord: Player? = nil
-    private var currentPlay: Play = .none
+    private var currentPlay: Play? = nil
     private var lastPlayedPlayer: Player? = nil
     private var firstPlayerCalledLandlord: String = ""
-    private var lastPlayedCard: [Card] = []
     private (set) var state: GameState = .created
     private var players: [Player] = []
     
@@ -222,16 +221,16 @@ class DouDiZhuGame {
         if id != self.activePlayer?.id {
             return
         }
-        
-        if !isCurrentPlayValid(cards: cards) {
+    
+        let play: Play = try Play(cards)
+        if !isCurrentPlayValid(play: play) {
             print("aborting since invalid play")
             throw GameError.invalidPlay
         }
         let player: Player = findPlayerWithID(id)!
         
         if cards.count != 0 {
-            self.currentPlay = checkPlay(cards: cards)
-            self.lastPlayedCard = cards
+            self.currentPlay = play
             self.lastPlayedPlayer = player
             try player.makePlay(cards: cards)
         }
@@ -281,7 +280,7 @@ class DouDiZhuGame {
 
         self.state = .started
         self.landlord = nil
-        self.currentPlay = Play.none
+        self.currentPlay = .none
         
         for player in self.players {
             player.startNewGame(cards: deck.getPlayerCard(playerNum: player.getPlayerNum()))
@@ -344,8 +343,7 @@ class DouDiZhuGame {
         self.playerAddedAIPlayers = [:]
         self.activePlayer = nil
         self.landlord = nil
-        self.currentPlay = .none
-        self.lastPlayedCard = []
+        self.currentPlay = nil
         self.lastPlayedPlayer = nil
         self.state = .created
         self.players = []
@@ -376,7 +374,7 @@ class DouDiZhuGame {
         }
         
         socket?.sendStringMessage(string: jsonString, final: true, completion: {
-//            print("did send message: \(message.type)")
+            print("did send message: \(message.type)")
         })
     }
     
@@ -423,75 +421,18 @@ class DouDiZhuGame {
     }
     
     private func canPass()-> Bool {
-        return self.activePlayer?.id != self.lastPlayedPlayer?.id && self.currentPlay != .none
+        return self.activePlayer?.id != self.lastPlayedPlayer?.id && self.currentPlay?.playType() != .none
     }
     
-    private func isCurrentPlayValid(cards: [Card]) -> Bool {
-        if canPass() && cards.count == 0 {
+    private func isCurrentPlayValid(play: Play) -> Bool {
+        if canPass() && play.playType() == .none {
             return true
         }
-        
-        let cardPlay = checkPlay(cards: cards)
-        
+
         if self.activePlayer == self.lastPlayedPlayer || self.lastPlayedPlayer == nil {
-            print("return 2")
-            return !(cardPlay == .none || cardPlay == .invalid)
-        } else if cardPlay == .rocket || (cardPlay == .bomb && self.currentPlay != . bomb && self.currentPlay != .rocket) {
-            
-            print("return 3")
-            return true
-        } else if cardPlay == .none || cardPlay == .invalid || (self.currentPlay != .none && self.currentPlay != cardPlay) {
-            print("return 4")
-            return false
+            return play.playType() != .none
         }
-        
-        print("return 5")
-        switch currentPlay {
-        case .solo, .pair, .trio, .bomb:
-            return cards[0] > self.lastPlayedCard[0]
-        case .soloChain, .pairChain, .airplane:
-            return cards.max()! > self.lastPlayedCard.max()!
-        case .trioPlusPair, .trioPlusSolo, .airplanePlusPair, .airplanePlusSolo:
-            let cards_parsed = parseCards(cards: cards)
-            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
-            
-            var cardTrio: Card = NullCard.shared
-            var lastTrio: Card = NullCard.shared
-            for card in lastPlayedCard_parsed.numCards {
-                if lastPlayedCard_parsed.card_count[card.getNum()]! == 3 {
-                    lastTrio = card
-                    break
-                }
-            }
-            for card in cards_parsed.numCards {
-                if cards_parsed.card_count[card.getNum()]! == 3 {
-                    cardTrio = card
-                    break
-                }
-            }
-            return cardTrio > lastTrio
-        case .spaceShuttle, .spaceShuttlePlusFourPair, .spaceShuttlePlusFourSolo, .bombPlusDualSolo, .bombPlusDualPair:
-            let cards_parsed = parseCards(cards: cards)
-            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
-            
-            var cardBomb: Card = NullCard.shared
-            var lastBomb: Card = NullCard.shared
-            for card in lastPlayedCard_parsed.numCards {
-                if lastPlayedCard_parsed.card_count[card.getNum()]! == 4 {
-                    cardBomb = card
-                    break
-                }
-            }
-            for card in cards_parsed.numCards {
-                if cards_parsed.card_count[card.getNum()]! == 4 {
-                    lastBomb = card
-                    break
-                }
-            }
-            return cardBomb > lastBomb
-        default:
-            return false
-        }
+        return (self.currentPlay ?? Play()) < play
     }
 }
 

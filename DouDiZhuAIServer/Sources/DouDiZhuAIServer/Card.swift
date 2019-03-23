@@ -9,7 +9,7 @@ import Foundation
 public class Card: Comparable, Codable {
     private var identifier: String = ""
     
-    init(identifier:String) {
+    internal init(identifier:String) {
         self.identifier = identifier
     }
     

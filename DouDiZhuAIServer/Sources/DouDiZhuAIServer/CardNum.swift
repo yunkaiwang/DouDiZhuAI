@@ -8,6 +8,13 @@ import Foundation
 
 class CardNum: Comparable, Hashable, Codable {
     private var num:Int;
+    public static let max = CardNum(num: 2)
+    public static let min = CardNum(num: 3)
+    public static let numRank = [
+    2: 13, 1: 12, 13: 11, 12: 10,
+    11: 9, 10: 8, 9: 7, 8: 6, 7: 5,
+    6: 4, 5: 3, 4: 2, 3: 1
+    ]
     
     var hashValue: Int {
         return num.hashValue
@@ -23,6 +30,10 @@ class CardNum: Comparable, Hashable, Codable {
     
     func getNum()->Int {
         return self.num
+    }
+    
+    func getRank() -> Int {
+        return CardNum.numRank[self.num] ?? 0
     }
     
     static func < (lhs: CardNum, rhs: CardNum) -> Bool {
@@ -48,6 +59,10 @@ class CardNum: Comparable, Hashable, Codable {
     
     static func == (lhs:CardNum, rhs: Int) -> Bool {
         return lhs.getNum() == rhs
+    }
+    
+    static func != (lhs:CardNum, rhs: Int) -> Bool {
+        return lhs.getNum() != rhs
     }
     
     static func - (lhs: CardNum, rhs: CardNum) -> Int {

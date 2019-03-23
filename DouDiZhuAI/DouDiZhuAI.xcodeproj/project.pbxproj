@@ -14,7 +14,9 @@
 		3F1B820C222E1640001680B2 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B820B222E1640001680B2 /* Message.swift */; };
 		3F1B8214222F5E6C001680B2 /* SuitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8213222F5E6C001680B2 /* SuitType.swift */; };
 		3F1B8216222F5FDC001680B2 /* PlayerNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8215222F5FDC001680B2 /* PlayerNum.swift */; };
-		3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51D921FBF26D002AC4A0 /* Play.swift */; };
+		3F49D9BE2242BBDD00449531 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9BD2242BBDD00449531 /* Play.swift */; };
+		3F49D9C02242BBF900449531 /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9BF2242BBF900449531 /* utilities.swift */; };
+		3F49D9F2224472EF00449531 /* PlayType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9F1224472EF00449531 /* PlayType.swift */; };
 		3F6A51DC21FE55F1002AC4A0 /* CardNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */; };
 		3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */; };
 		3F6A51E022016735002AC4A0 /* NullCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A51DF22016735002AC4A0 /* NullCard.swift */; };
@@ -28,13 +30,11 @@
 		3F79392E21EC1832003A590F /* JokerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392D21EC1832003A590F /* JokerType.swift */; };
 		3F79393021EC1958003A590F /* NumCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79392F21EC1958003A590F /* NumCard.swift */; };
 		3F79393221EC196F003A590F /* JokerCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393121EC196F003A590F /* JokerCard.swift */; };
-		3F79393421EC1A3A003A590F /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393321EC1A3A003A590F /* utilities.swift */; };
 		3F79393621EC1F17003A590F /* FTButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79393521EC1F17003A590F /* FTButtonNode.swift */; };
 		3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394321ED818A003A590F /* CardButtonNode.swift */; };
 		3F79394621F02814003A590F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F79394521F02814003A590F /* Assets.xcassets */; };
 		3F79394821F2C061003A590F /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394721F2C061003A590F /* Player.swift */; };
 		3F79394E21FA5003003A590F /* extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F79394D21FA5003003A590F /* extension.swift */; };
-		E970AD61EB1B46D0C64D5804 /* Pods_DouDiZhuAI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -51,7 +51,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DouDiZhuAI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F1B81B7222C91DA001680B2 /* DouDiZhuAI.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = DouDiZhuAI.xcodeproj; sourceTree = "<group>"; };
 		3F1B81CD222C9A74001680B2 /* DouDiZhuClientDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DouDiZhuClientDelegate.swift; sourceTree = "<group>"; };
 		3F1B81D1222D7B2A001680B2 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
@@ -60,7 +59,9 @@
 		3F1B820B222E1640001680B2 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		3F1B8213222F5E6C001680B2 /* SuitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitType.swift; sourceTree = "<group>"; };
 		3F1B8215222F5FDC001680B2 /* PlayerNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNum.swift; sourceTree = "<group>"; };
-		3F6A51D921FBF26D002AC4A0 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Play.swift; path = ../../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary/Play.swift; sourceTree = "<group>"; };
+		3F49D9BD2242BBDD00449531 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
+		3F49D9BF2242BBF900449531 /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
+		3F49D9F1224472EF00449531 /* PlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayType.swift; sourceTree = "<group>"; };
 		3F6A51DB21FE55F1002AC4A0 /* CardNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNum.swift; sourceTree = "<group>"; };
 		3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suit.swift; sourceTree = "<group>"; };
 		3F6A51DF22016735002AC4A0 /* NullCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NullCard.swift; sourceTree = "<group>"; };
@@ -76,7 +77,6 @@
 		3F79392D21EC1832003A590F /* JokerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JokerType.swift; sourceTree = "<group>"; };
 		3F79392F21EC1958003A590F /* NumCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumCard.swift; sourceTree = "<group>"; };
 		3F79393121EC196F003A590F /* JokerCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JokerCard.swift; sourceTree = "<group>"; };
-		3F79393321EC1A3A003A590F /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = utilities.swift; path = ../../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary/utilities.swift; sourceTree = "<group>"; };
 		3F79393521EC1F17003A590F /* FTButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTButtonNode.swift; sourceTree = "<group>"; };
 		3F79394321ED818A003A590F /* CardButtonNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardButtonNode.swift; sourceTree = "<group>"; };
 		3F79394521F02814003A590F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -91,7 +91,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E970AD61EB1B46D0C64D5804 /* Pods_DouDiZhuAI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,7 +100,6 @@
 		3F1B81472215314A001680B2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2EA3CF0FD876629BAD40E500 /* Pods_DouDiZhuAI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -136,12 +134,14 @@
 			isa = PBXGroup;
 			children = (
 				3F79390B21EAE019003A590F /* AppDelegate.swift */,
+				3F49D9BD2242BBDD00449531 /* Play.swift */,
+				3F49D9F1224472EF00449531 /* PlayType.swift */,
+				3F49D9BF2242BBF900449531 /* utilities.swift */,
 				3F79390F21EAE019003A590F /* Actions.sks */,
 				3F79394521F02814003A590F /* Assets.xcassets */,
 				3F79391121EAE019003A590F /* GameScene.swift */,
 				3F79394D21FA5003003A590F /* extension.swift */,
 				3F79394721F2C061003A590F /* Player.swift */,
-				3F79393321EC1A3A003A590F /* utilities.swift */,
 				3F6A51DD21FE7A4A002AC4A0 /* Suit.swift */,
 				3F1B8213222F5E6C001680B2 /* SuitType.swift */,
 				3F1B8215222F5FDC001680B2 /* PlayerNum.swift */,
@@ -152,7 +152,6 @@
 				3F79392F21EC1958003A590F /* NumCard.swift */,
 				3F79392D21EC1832003A590F /* JokerType.swift */,
 				3F1B81D3222D7D2C001680B2 /* DouDiZhuGame.swift */,
-				3F6A51D921FBF26D002AC4A0 /* Play.swift */,
 				3F79391521EAE019003A590F /* Main.storyboard */,
 				3F79393521EC1F17003A590F /* FTButtonNode.swift */,
 				3F79392721EBBEDF003A590F /* GameSceneViewController.swift */,
@@ -304,6 +303,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F49D9C02242BBF900449531 /* utilities.swift in Sources */,
+				3F49D9F2224472EF00449531 /* PlayType.swift in Sources */,
+				3F49D9BE2242BBDD00449531 /* Play.swift in Sources */,
 				3F6A51E022016735002AC4A0 /* NullCard.swift in Sources */,
 				3F79393621EC1F17003A590F /* FTButtonNode.swift in Sources */,
 				3F79391221EAE019003A590F /* GameScene.swift in Sources */,
@@ -319,11 +321,9 @@
 				3F79394421ED818A003A590F /* CardButtonNode.swift in Sources */,
 				3F1B81CE222C9A74001680B2 /* DouDiZhuClientDelegate.swift in Sources */,
 				3F1B8216222F5FDC001680B2 /* PlayerNum.swift in Sources */,
-				3F6A51DA21FBF26D002AC4A0 /* Play.swift in Sources */,
 				3F6A51DE21FE7A4A002AC4A0 /* Suit.swift in Sources */,
 				3F1B81D4222D7D2C001680B2 /* DouDiZhuGame.swift in Sources */,
 				3F79392E21EC1832003A590F /* JokerType.swift in Sources */,
-				3F79393421EC1A3A003A590F /* utilities.swift in Sources */,
 				3F1B81D2222D7B2A001680B2 /* GameState.swift in Sources */,
 				3F79390C21EAE019003A590F /* AppDelegate.swift in Sources */,
 				3F79393221EC196F003A590F /* JokerCard.swift in Sources */,

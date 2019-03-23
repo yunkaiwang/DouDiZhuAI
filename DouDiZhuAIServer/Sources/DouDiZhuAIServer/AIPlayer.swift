@@ -15,7 +15,8 @@ class AIPlayer: Player {
     private var player2PlayedCards: [Card] = []
     private var player3PlayedCards: [Card] = []
     private var landlordCards: [Card] = []
-    private var lastPlayedCards: [Card] = []
+//    private var lastPlayedCards: [Card] = []
+    private var currentPlay: Play? = nil
     private var lastPlayedPlayer: String = ""
     private var nextPlayer: String = ""
     private var cardsLeft: [Card] = [] // all cards that other players may have
@@ -38,7 +39,7 @@ class AIPlayer: Player {
             return suggestNewPlay(playerCards: self.getCards())
         }
         
-        return suggestPlay(playerCards: self.getCards(), currentPlay: checkPlay(cards: lastPlayedCard), lastPlayedCards: lastPlayedCard)
+        return suggestPlay(playerCards: self.getCards(), lastPlay: self.currentPlay ?? Play())
     }
     
     public func receiveMessage(_ message: Message) throws {
@@ -107,7 +108,11 @@ class AIPlayer: Player {
     private func playerMakePlay(_ id: String, cards: [Card]) {
         self.removeCardsFromRemainingCards(cards)
         if cards.count != 0 {
-            self.lastPlayedCards = cards
+            do {
+                try self.currentPlay = Play(cards)
+            } catch {
+                exit(1)
+            }
             self.lastPlayedPlayer = id
         }
     }
@@ -118,10 +123,10 @@ class AIPlayer: Player {
         }
         
         var play: [Card] = []
-        if self.id == lastPlayedPlayer || lastPlayedPlayer == "" || lastPlayedCards.count == 0 {
+        if self.id == lastPlayedPlayer || lastPlayedPlayer == "" || currentPlay?.playType() == .none {
             play = suggestNewPlay(playerCards: self.getCards())
         } else {
-            play = suggestPlay(playerCards: self.getCards(), currentPlay: checkPlay(cards: lastPlayedCards), lastPlayedCards: lastPlayedCards)
+            play = suggestPlay(playerCards: self.getCards(), lastPlay: currentPlay ?? Play())
         }
         
         do {
@@ -143,5 +148,27 @@ class AIPlayer: Player {
             print("AI player cannot make the decision due to some unknown error...")
             DouDiZhuGame.shared.handleError()
         }
+    }
+    
+    private func calculateTotalCardRank(_ cards: [Card]) -> Int {
+        var totalRank: Int = 0
+        
+        for card in cards {
+            if card is NumCard {
+                totalRank += (card as! NumCard).getRank()
+            } else if card is JokerCard {
+                totalRank += (card as! JokerCard).getRank()
+            } else {
+                continue
+            }
+        }
+        
+        return totalRank
+    }
+    
+    private func calculateNumTurnNeeded(_ cards: [Card], previousPlay: [Card]) -> Int {
+        
+        
+        return 0
     }
 }
