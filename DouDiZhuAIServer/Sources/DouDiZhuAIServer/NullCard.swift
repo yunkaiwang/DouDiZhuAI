@@ -16,5 +16,9 @@ class NullCard: Card {
     required init(from decoder: Decoder) throws {
         fatalError("init(from:) has not been implemented")
     }
+    
+    public override func getRank() -> Int {
+        return 0
+    }
 }
 

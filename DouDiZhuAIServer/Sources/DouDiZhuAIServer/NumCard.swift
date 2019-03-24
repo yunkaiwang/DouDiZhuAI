@@ -29,7 +29,7 @@ class NumCard: Card {
         return self.suit
     }
     
-    public func getRank() -> Int {
+    public override func getRank() -> Int {
         return self.num.getRank()
     }
     

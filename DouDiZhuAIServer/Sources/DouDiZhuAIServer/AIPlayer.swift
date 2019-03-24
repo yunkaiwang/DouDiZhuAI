@@ -106,7 +106,9 @@ class AIPlayer: Player {
     }
     
     private func playerMakePlay(_ id: String, cards: [Card]) {
-        self.removeCardsFromRemainingCards(cards)
+        if id != self.id {
+            self.removeCardsFromRemainingCards(cards)
+        }
         if cards.count != 0 {
             do {
                 try self.currentPlay = Play(cards)
@@ -150,25 +152,133 @@ class AIPlayer: Player {
         }
     }
     
+    public func calculateHeuristic() -> Int {
+        let rank = calculateTotalCardRank(self.getCards())
+        let numTurn = calculateNumTurnNeeded(self.getCards())
+        
+        return (20 - numTurn) * rank
+    }
+    
     private func calculateTotalCardRank(_ cards: [Card]) -> Int {
         var totalRank: Int = 0
         
         for card in cards {
-            if card is NumCard {
-                totalRank += (card as! NumCard).getRank()
-            } else if card is JokerCard {
-                totalRank += (card as! JokerCard).getRank()
-            } else {
-                continue
-            }
+            totalRank += card.getRank()
         }
         
         return totalRank
     }
     
-    private func calculateNumTurnNeeded(_ cards: [Card], previousPlay: [Card]) -> Int {
+    private func calculateNumTurnNeeded(_ cards: [Card]) -> Int {
+        let parsed = parseCards(cards: cards)
         
+        if cards.count == 0 {
+            return 0
+        } else if cards.count == 1 {
+            return 1
+        } else if cards.count == 2 {
+            if parsed.jokerCards.count == 2 { // rocket play
+                return 1
+            } else if parsed.max_card_count == 2 { // pair play
+                return 1
+            }
+            
+            // two different cards, so need 2 turns to play
+            return 2
+        } else if cards.count == 3 {
+            if parsed.max_card_count == 3 { // trio play
+                return 1;
+            } else if parsed.max_card_count == 2 || parsed.jokerCards.count == 2 { // has a pair or rocket
+                return 2;
+            }
+            return 3
+        } else if cards.count == 4 {
+            if parsed.max_card_count == 4 || parsed.max_card_count == 3 { // bomb, trio + 1
+                return 1
+            } else if parsed.jokerCards.count == 2 { // has a rocket, still need to check how to play the rest of the cards, if a pair is left, then we need 2 turns, otherwise we need 3 turns
+                return 1 + parsed.max_card_count == 2 ? 1 : 2
+            } else if parsed.max_card_count == 1 { // has to make four solo plays
+                return 4
+            }
+            
+            var leftCards: [Card] = []
+            for card in parsed.jokerCards {
+                leftCards.append(card)
+            }
+            
+            for card in parsed.numCards {
+                if (parsed.card_count[card.getNum()] ?? 0) != 2 {
+                    leftCards.append(card)
+                }
+            }
+            
+            // if no card is left, then it means we have two pairs, otherwise, we have a pair plus two other cards and they cannot be played together, so we need 3 turn
+            return leftCards.count == 0 ? 2 : 3
+        } else if cards.count == 5 {
+            if parsed.max_card_count == 4 { // bomb and a solo card
+                return 2
+            } else if parsed.jokerCards.count == 2 { // has a rocket, think about how to play the rest
+                return 1 + calculateNumTurnNeeded(parsed.numCards)
+            } else if parsed.max_card_count == 3 {
+                if parsed.jokerCards.count != 0 { // has a joker card, so need to play a 3+1 and a solo play
+                    return 2
+                } else {
+                    var leftCards: [NumCard] = []
+                    
+                    for card in parsed.numCards {
+                        if (parsed.card_count[card.getNum()] ?? 0) != 3 {
+                            leftCards.append(card)
+                        }
+                    }
+                    
+                    if leftCards[0].getNum() == leftCards[1].getNum() { // left is a pair, make a 3+2 play
+                        return 1
+                    } else { // 2 solo cards are left, can make a 3+1 and solo play
+                        return 2
+                    }
+                }
+            } else if parsed.max_card_count == 2 {
+                var leftCards: [NumCard] = []
+                
+                for card in parsed.numCards {
+                    if (parsed.card_count[card.getNum()] ?? 0) != 2 {
+                        leftCards.append(card)
+                    }
+                }
+                if leftCards.count == 0 || leftCards.count == 1 { // we have 2 pairs
+                    return 3
+                } else {
+                    return 4
+                }
+            } else {
+                // no joker cards, no 2, and is a chain of length 5, so we need only 1 turn
+                if parsed.max.getNum() - parsed.min.getNum() == 5 && parsed.max.getNum() != 2 && parsed.jokerCards.count == 0 {
+                    return 1
+                }
+                
+                // all other cases, we have 5 solo cards, so we need 5 turns
+                return 5
+            }
+        }
         
-        return 0
+        var contained: [Bool] = [Bool](repeating: false, count: cards.count)
+        let maxPlay = suggestNewPlay(playerCards: cards)
+        for card in maxPlay {
+            for i in 0..<cards.count {
+                if cards[i] == card {
+                    contained[i] = true
+                    break
+                }
+            }
+        }
+        
+        var remainingCards: [Card] = []
+        for i in 0..<cards.count {
+            if !contained[i] {
+                remainingCards.append(cards[i])
+            }
+        }
+        
+        return 1 + calculateNumTurnNeeded(remainingCards)
     }
 }

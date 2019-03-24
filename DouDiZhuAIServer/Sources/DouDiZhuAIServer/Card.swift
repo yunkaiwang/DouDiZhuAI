@@ -6,14 +6,23 @@
 
 import Foundation
 
-public class Card: Comparable, Codable {
+protocol CardProtocol {
+    func getIdentifier()->String
+    func getRank()->Int
+}
+
+public class Card: Comparable, Codable, CardProtocol {
     private var identifier: String = ""
     
     internal init(identifier:String) {
         self.identifier = identifier
     }
     
-    func getIdentifier()->String {
+    public func getRank() -> Int {
+        return 0
+    }
+    
+    public func getIdentifier()->String {
         return self.identifier
     }
     

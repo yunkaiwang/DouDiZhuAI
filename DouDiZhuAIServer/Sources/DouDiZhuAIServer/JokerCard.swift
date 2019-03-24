@@ -26,7 +26,7 @@ class JokerCard: Card {
         return self.type == JokerType.black
     }
     
-    public func getRank() -> Int {
+    public override func getRank() -> Int {
         return isRedJoker() ? 15 : 14
     }
     
