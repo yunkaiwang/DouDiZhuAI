@@ -113,7 +113,7 @@ class DouDiZhuGame {
                 }
             }
             
-            try aiPlayer.receiveMessage(Message.joinGameSucceeded(player: aiPlayer, players: playerIDs))
+            aiPlayer.receiveMessage(Message.joinGameSucceeded(player: aiPlayer, players: playerIDs))
             playerAddedAIPlayers[player]!.append(aiPlayer)
             try notifyPlayers(Message.newUserJoined(player: aiPlayer))
         } else {
@@ -276,17 +276,16 @@ class DouDiZhuGame {
     }
     
     private func newGame() throws {
-        deck.newGame()
-
         self.state = .started
         self.landlord = nil
         self.currentPlay = .none
-        
+        deck.newGame()
+
         for player in self.players {
             player.startNewGame(cards: deck.getPlayerCard(playerNum: player.getPlayerNum()))
             let message: Message = Message.startGame(player: player, cards: deck.getPlayerCard(playerNum: player.getPlayerNum()))
             if player is AIPlayer {
-                try (player as! AIPlayer).receiveMessage(message)
+                (player as! AIPlayer).receiveMessage(message)
             } else {
                 try self.notifyPlayer(message, socket: player.getSocket())
             }
@@ -381,7 +380,7 @@ class DouDiZhuGame {
     private func notifyPlayers(_ message: Message) throws {
         try self.players.forEach({
             if $0 is AIPlayer {
-                try ($0 as! AIPlayer).receiveMessage(message)
+                ($0 as! AIPlayer).receiveMessage(message)
             } else {
                 try self.notifyPlayer(message, socket: $0.getSocket())
             }

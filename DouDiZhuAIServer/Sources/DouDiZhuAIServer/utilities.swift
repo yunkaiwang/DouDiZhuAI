@@ -151,9 +151,13 @@ func suggestTrioPlusPlay(playerCards: [Card], lastPlay: Play)->[Card] {
         }
     }
     
-    let suggestAddonCard = suggestSPTPlay(playerCards:leftCards, lastPlay: Play(), play: lastPlay.playType() == .trioPlusSolo ? .solo : .pair)
+    var suggestAddonCard = suggestSPTPlay(playerCards:leftCards, lastPlay: Play(), play: lastPlay.playType() == .trioPlusSolo ? .solo : .pair)
     if suggestAddonCard.count == 0 {
-        return []
+        if lastPlay.playType() != .none {
+            return []
+        } else {
+            suggestAddonCard = suggestSPTPlay(playerCards:leftCards, lastPlay: Play(), play: .solo)
+        }
     }
     
     return suggestedTrio + suggestAddonCard

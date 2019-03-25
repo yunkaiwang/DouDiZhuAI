@@ -210,67 +210,6 @@ class DouDiZhuGame {
         return (self.currentPlay ?? Play()) < play
     }
     
-//    private func isCurrentPlayValid(cards: [Card]) -> Bool {
-//        let cardPlay = checkPlay(cards: cards)
-//
-//        if self.player?.id == self.lastPlayedPlayerID || self.lastPlayedPlayerID == "" {
-//            return cardPlay != .none && cardPlay != .invalid
-//        } else if cardPlay == .rocket || (cardPlay == .bomb && self.currentPlay != . bomb && self.currentPlay != .rocket) {
-//            return true
-//        } else if cardPlay == .none || cardPlay == .invalid || (self.currentPlay != .none && self.currentPlay != cardPlay) {
-//            return false
-//        } else if (self.currentPlay == .none) {
-//            return true
-//        }
-//
-//        switch currentPlay {
-//        case .solo, .pair, .trio, .bomb:
-//            return cards[0] > self.lastPlayedCard[0]
-//        case .soloChain, .pairChain, .airplane:
-//            return cards.max()! > self.lastPlayedCard.max()!
-//        case .trioPlusPair, .trioPlusSolo, .airplanePlusPair, .airplanePlusSolo:
-//            let cards_parsed = parseCards(cards: cards)
-//            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
-//
-//            var cardTrio: Card = NullCard.shared
-//            var lastTrio: Card = NullCard.shared
-//            for card in lastPlayedCard_parsed.numCards {
-//                if lastPlayedCard_parsed.card_count[card.getNum()]! == 3 {
-//                    lastTrio = card
-//                    break
-//                }
-//            }
-//            for card in cards_parsed.numCards {
-//                if cards_parsed.card_count[card.getNum()]! == 3 {
-//                    cardTrio = card
-//                    break
-//                }
-//            }
-//            return cardTrio > lastTrio
-//        case .spaceShuttle, .spaceShuttlePlusFourPair, .spaceShuttlePlusFourSolo, .bombPlusDualSolo, .bombPlusDualPair:
-//            let cards_parsed = parseCards(cards: cards)
-//            let lastPlayedCard_parsed = parseCards(cards: lastPlayedCard)
-//
-//            var cardBomb: Card = NullCard.shared
-//            var lastBomb: Card = NullCard.shared
-//            for card in lastPlayedCard_parsed.numCards {
-//                if lastPlayedCard_parsed.card_count[card.getNum()]! == 4 {
-//                    cardBomb = card
-//                    break
-//                }
-//            }
-//            for card in cards_parsed.numCards {
-//                if cards_parsed.card_count[card.getNum()]! == 4 {
-//                    lastBomb = card
-//                    break
-//                }
-//            }
-//            return cardBomb > lastBomb
-//        default:
-//            return false
-//        }
-//    }
-    
     private func createPlayerCards() {
         for card in self.playerCardButtons {
             card.removeFromParent()
@@ -306,7 +245,6 @@ class DouDiZhuGame {
         do {
             let play = try Play(self.userSelectedCards)
             if isCurrentPlayValid(play: play) {
-                
                 DouDiZhuGame.gameScene?.enablePlayButton()
             } else {
                 DouDiZhuGame.gameScene?.disablePlayButton()
@@ -440,7 +378,6 @@ extension DouDiZhuGame: DouDiZhuClientDelegate {
             
             self.player = Player(id: playerID, num: PlayerNum.one)
             setExistingPlayer(playerIDs: message.existingPlayers)
-            
             DouDiZhuGame.gameScene?.enterGameScene()
             return
         case .newUserJoined:

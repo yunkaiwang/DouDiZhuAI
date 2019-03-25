@@ -28,6 +28,7 @@
 		3F1B821922302235001680B2 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8217223021B5001680B2 /* GameState.swift */; };
 		3F1B821B2231F8CF001680B2 /* DecisionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B821A2231F8CF001680B2 /* DecisionState.swift */; };
 		3F49D9F02244729400449531 /* PlayType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9EE2244728E00449531 /* PlayType.swift */; };
+		3FAF1FF52248717300C9A37E /* utilities2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF1FF222484A7D00C9A37E /* utilities2.swift */; };
 		OBJ_375 /* a_.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_104 /* a_.c */; };
 		OBJ_376 /* aes_.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_105 /* aes_.c */; };
 		OBJ_377 /* ameth_lib.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* ameth_lib.c */; };
@@ -665,6 +666,7 @@
 		3F1B821A2231F8CF001680B2 /* DecisionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionState.swift; sourceTree = "<group>"; };
 		3F49D9E62242D41F00449531 /* DouDiZhuSharedLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DouDiZhuSharedLibrary.xcodeproj; path = ../DouDiZhuSharedLibrary/DouDiZhuSharedLibrary.xcodeproj; sourceTree = "<group>"; };
 		3F49D9EE2244728E00449531 /* PlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayType.swift; sourceTree = "<group>"; };
+		3FAF1FF222484A7D00C9A37E /* utilities2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities2.swift; sourceTree = "<group>"; };
 		"COpenSSL::COpenSSL::Product" /* COpenSSL.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = COpenSSL.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"DouDiZhuAIServer::DouDiZhuAIServer::Product" /* DouDiZhuAIServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = DouDiZhuAIServer; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_100 /* PerfectCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerfectCrypto.swift; sourceTree = "<group>"; };
@@ -1673,6 +1675,7 @@
 				3F1B8207222E0741001680B2 /* AIPlayer.swift */,
 				3F1B8205222D9037001680B2 /* PlayerNum.swift */,
 				3F1B8202222D8D44001680B2 /* utilities.swift */,
+				3FAF1FF222484A7D00C9A37E /* utilities2.swift */,
 				3F1B81FF222D8D15001680B2 /* Play.swift */,
 				3F49D9EE2244728E00449531 /* PlayType.swift */,
 				3F1B81E3222D8ACF001680B2 /* Deck.swift */,
@@ -2457,6 +2460,7 @@
 				3F1B81DF222D8625001680B2 /* MessageType.swift in Sources */,
 				3F1B81E8222D8B1D001680B2 /* Suit.swift in Sources */,
 				3F1B821922302235001680B2 /* GameState.swift in Sources */,
+				3FAF1FF52248717300C9A37E /* utilities2.swift in Sources */,
 				3F1B81F8222D8C68001680B2 /* JokerType.swift in Sources */,
 				3F1B821B2231F8CF001680B2 /* DecisionState.swift in Sources */,
 				3F1B8201222D8D1A001680B2 /* Play.swift in Sources */,

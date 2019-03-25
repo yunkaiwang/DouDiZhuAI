@@ -15,11 +15,11 @@ class AIPlayer: Player {
     private var player2PlayedCards: [Card] = []
     private var player3PlayedCards: [Card] = []
     private var landlordCards: [Card] = []
-//    private var lastPlayedCards: [Card] = []
     private var currentPlay: Play? = nil
     private var lastPlayedPlayer: String = ""
     private var nextPlayer: String = ""
     private var cardsLeft: [Card] = [] // all cards that other players may have
+    private var bestPlay: [Card] = []
     
     convenience init() {
         self.init(nil)
@@ -31,59 +31,58 @@ class AIPlayer: Player {
     }
     
     public func makeBeLandlordDecision(_ pillage: Bool)-> Bool {
-        return Int.random(in: 0...1) == 0
+        if pillage {
+            return self.calculateHeuristic(self.getCards()) > 88.44
+        }
+        return Double(self.calculateHeuristic(self.getCards())) > 90
     }
     
-    public func makePlay(lastPlayedPlayer: String, lastPlayedCard: [Card])->[Card] {
-        if self.id == lastPlayedPlayer || lastPlayedPlayer == "" || lastPlayedCard.count == 0 {
-            return suggestNewPlay(playerCards: self.getCards())
-        }
-        
-        return suggestPlay(playerCards: self.getCards(), lastPlay: self.currentPlay ?? Play())
-    }
-    
-    public func receiveMessage(_ message: Message) throws {
-        guard let playerID = message.playerID else {
-            print("No player ID is provided within the message, this should never happen")
-            throw GameError.unknowError
-        }
-        
-        print("AI player received a message", message.type, self.getCards().count)
-        
-        switch message.type {
-        case .joinGameSucceded:
-            return
-        case .newUserJoined:
-            self.addNewPlayer(playerID)
-        case .gameStarted:
-            // may be start a new thread and start computing whether or not the AI should be the landlord or not
-            self.removeCardsFromRemainingCards(self.getCards())
-        case .makePlay:
-            playerMakePlay(playerID, cards: message.cards)
-        case .informLandlord:
-            self.landlordID = playerID
-            self.landlordCards = message.cards
-        case .abortGame:
-            // do nothing when the game is aborted, if implement as a multi-thread program, we can stop the other threads here
-            return
-        case .playerTurn:
-            playerTurn(playerID)
-        case .playerDecisionTurn, .playerPillageTurn:
-            playerDecisionTurn(playerID, message.type == .playerPillageTurn ? true: false)
-        default:
-            print("unknow message received by AI, this should not happen")
-            return
-        }
-    }
-    
-    // check whether or not a specific card is still left on the table
-    private func cardStillLeftOnTable(_ card: Card)->Bool {
-        for left_card in self.cardsLeft {
-            if left_card.getIdentifier() == card.getIdentifier() {
-                return true
+    public func receiveMessage(_ message: Message) {
+        DispatchQueue.global(qos: .background).async {
+            if message.type == .abortGame {
+                return
+            }
+            
+            guard let playerID = message.playerID else {
+                print("AI player received an unknown message, ignoring the message..")
+                return
+            }
+            
+            print("AI player received a message", message.type, self.getCards().count)
+            
+            switch message.type {
+            case .joinGameSucceded:
+                return
+            case .newUserJoined:
+                self.addNewPlayer(playerID)
+            case .gameStarted:
+                // may be start a new thread and start computing whether or not the AI should be the landlord or not
+                self.removeCardsFromRemainingCards(self.getCards())
+                
+                print("AI player cards: ")
+                for card in self.getCards() {
+                    print(card.getIdentifier())
+                }
+                
+            case .makePlay:
+                self.playerMakePlay(playerID, cards: message.cards)
+            case .informLandlord:
+                self.landlordID = playerID
+                self.landlordCards = message.cards
+            case .abortGame:
+                // do nothing when the game is aborted, if implement as a multi-thread program, we can stop the other threads here
+                return
+            case .playerTurn:
+                self.playerTurn(playerID)
+            case .playerDecisionTurn, .playerPillageTurn:
+                self.playerDecisionTurn(playerID, message.type == .playerPillageTurn ? true: false)
+            case .playerWantToBeLandlord, .playerWantToBeFarmer:
+                return
+            default:
+                print("\(message.type) received by AI, this should not be received by AI")
+                return
             }
         }
-        return false
     }
     
     private func removeCardsFromRemainingCards(_ cards: [Card]) {
@@ -107,6 +106,11 @@ class AIPlayer: Player {
     
     private func playerMakePlay(_ id: String, cards: [Card]) {
         if id != self.id {
+            if id == self.player2 {
+                self.player2PlayedCards += cards
+            } else {
+                self.player3PlayedCards += cards
+            }
             self.removeCardsFromRemainingCards(cards)
         }
         if cards.count != 0 {
@@ -119,54 +123,33 @@ class AIPlayer: Player {
         }
     }
     
-    private func playerTurn(_ id: String) {
-        if id != self.id { // it's other players turn, so ignore
-            return
-        }
-        
-        var play: [Card] = []
-        if self.id == lastPlayedPlayer || lastPlayedPlayer == "" || currentPlay?.playType() == .none {
-            play = suggestNewPlay(playerCards: self.getCards())
-        } else {
-            play = suggestPlay(playerCards: self.getCards(), lastPlay: currentPlay ?? Play())
-        }
-        
-        do {
-            try DouDiZhuGame.shared.playerMakePlay(self.id, cards: play)
-        } catch {
-            print("AI player cannot make a play due to some unknown error...")
-            DouDiZhuGame.shared.handleError()
-        }
-    }
-    
     private func playerDecisionTurn(_ id: String, _ pillage: Bool) {
         if id != self.id { // it's other players turn, so ignore
             return
         }
         
         do {
-            try DouDiZhuGame.shared.playerMadeDecision(playerID: self.id, decision: Int.random(in: 0...1) == 0)
+            try DouDiZhuGame.shared.playerMadeDecision(playerID: self.id, decision: makeBeLandlordDecision(pillage))
         } catch {
             print("AI player cannot make the decision due to some unknown error...")
             DouDiZhuGame.shared.handleError()
         }
     }
     
-    public func calculateHeuristic() -> Int {
-        let rank = calculateTotalCardRank(self.getCards())
-        let numTurn = calculateNumTurnNeeded(self.getCards())
-        
-        return (20 - numTurn) * rank
+    public func calculateHeuristic(_ cards: [Card]) -> Double {
+        let rank = calculateAverageCardRank(cards)
+        let numTurn = calculateNumTurnNeeded(cards)
+        return Double((20 - numTurn)) * rank
     }
     
-    private func calculateTotalCardRank(_ cards: [Card]) -> Int {
+    private func calculateAverageCardRank(_ cards: [Card]) -> Double {
         var totalRank: Int = 0
         
         for card in cards {
             totalRank += card.getRank()
         }
-        
-        return totalRank
+
+        return Double(totalRank) / Double(cards.count)
     }
     
     private func calculateNumTurnNeeded(_ cards: [Card]) -> Int {
@@ -280,5 +263,240 @@ class AIPlayer: Player {
         }
         
         return 1 + calculateNumTurnNeeded(remainingCards)
+    }
+    
+    private func playerTurn(_ id: String) {
+        if id != self.id { // it's other players turn, so ignore
+            return
+        }
+        
+        do {
+            try DouDiZhuGame.shared.playerMakePlay(self.id, cards: findBestPlay())
+        } catch {
+            print("AI player cannot make a play due to some unknown error...")
+            DouDiZhuGame.shared.handleError()
+        }
+    }
+    
+    private func findAllPossiblePlays(cards: [Card], lastPlay: Play?) -> [[Card]] {
+        var listPlays: [[Card]] = []
+        let rocket = suggestRocketPlay(playerCards: cards)
+        if rocket.count != 0 {
+            listPlays.append(rocket)
+        }
+        
+        if lastPlay == nil {
+            let dum = Play()
+            listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .solo)
+            listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .pair)
+            listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .trio)
+            listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .bomb)
+            listPlays += suggestAllPossibleSoloChainPlay(playerCards: cards, lastPlay: dum)
+            listPlays += suggestAllPossiblePairChainPlay(playerCards: cards, lastPlay: dum)
+            listPlays += suggestAllPossibleTrioPlusPlay(playerCards: cards, lastPlay: dum)
+            var play = suggestBombPlusPlay(playerCards: cards, lastPlay: dum)
+            if play.count != 0 {
+                listPlays.append(play)
+            }
+            play = suggestAirplanePlay(playerCards: cards, lastPlay: dum)
+            if play.count != 0 {
+                listPlays.append(play)
+            }
+            play = suggestSpaceShuttlePlay(playerCards: cards, lastPlay: dum)
+            if play.count != 0 {
+                listPlays.append(play)
+            }
+        } else {
+            switch lastPlay!.playType() {
+            case .solo:
+                listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: lastPlay!, play: .solo)
+            case .pair:
+                listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: lastPlay!, play: .pair)
+            case .trio:
+                listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: lastPlay!, play: .trio)
+            case .bomb:
+                listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: lastPlay!, play: .bomb)
+            case .soloChain:
+                listPlays += suggestAllPossibleSoloChainPlay(playerCards: cards, lastPlay: lastPlay!)
+            case .pairChain:
+                listPlays += suggestAllPossiblePairChainPlay(playerCards: cards, lastPlay: lastPlay!)
+            case .trioPlusSolo, .trioPlusPair:
+                listPlays += suggestAllPossibleTrioPlusPlay(playerCards: cards, lastPlay: lastPlay!)
+            case .airplane, .airplanePlusSolo, .airplanePlusPair:
+                let play = suggestAirplanePlay(playerCards: cards, lastPlay: lastPlay!)
+                if play.count != 0 {
+                    listPlays.append(play)
+                }
+            case .spaceShuttle, .spaceShuttlePlusFourSolo, .spaceShuttlePlusFourPair:
+                let play = suggestSpaceShuttlePlay(playerCards: cards, lastPlay: lastPlay!)
+                if play.count != 0 {
+                    listPlays.append(play)
+                }
+            default:
+                listPlays = []
+            }
+        }
+        
+        return listPlays
+    }
+    
+    private func canPass() -> Bool {
+        return self.id != self.lastPlayedPlayer && self.currentPlay != nil
+    }
+    
+    private func findBestPlay() -> [Card] {
+        let possiblePlays: [[Card]] = findAllPossiblePlays(cards: self.getCards(), lastPlay: canPass() ? self.currentPlay : nil)
+        
+        // no possible play, simply return
+        if possiblePlays.count == 0 {
+            return []
+        }
+        
+        var bestScore: Double = 0, bestPlay: [Card] = []
+        
+        for play in possiblePlays {
+            do {
+                if play.count == 0 {
+                    continue
+                }
+                let p = try Play(play)
+                let score = conductBRS(depth: 1, playerTurn: false, playerCards: getRemainingCardsAfterPlay(cards: self.getCards(), play: play), otherCards: self.cardsLeft, lastPlay: p, playerMadeLastPlay: true)
+                print("received one score", score,"for play", play, "average rank", self.calculateAverageCardRank(getRemainingCardsAfterPlay(cards: self.getCards(), play: play)), "numTurn", self.calculateNumTurnNeeded(getRemainingCardsAfterPlay(cards: self.getCards(), play: play)))
+                if score > bestScore {
+                    bestScore = score
+                    bestPlay = play
+                }
+                
+                if bestScore == Double(Int.max) {
+                    break
+                }
+            } catch {
+                continue
+            }
+        }
+        
+        if canPass() { // check if pass is a better solution
+            let score = conductBRS(depth: 1, playerTurn: false, playerCards: self.getCards(), otherCards: self.cardsLeft, lastPlay: self.currentPlay!, playerMadeLastPlay: false)
+            print("if pass score is", score, "averaege", self.calculateAverageCardRank(self.getCards()), "numTurn", self.calculateNumTurnNeeded(self.getCards()))
+            if score > bestScore {
+                bestScore = score
+                bestPlay = []
+            }
+        }
+        
+        print("best play is")
+        for c in bestPlay {
+            print(c.getIdentifier())
+        }
+        
+        return bestPlay
+    }
+    
+    private func getRemainingCardsAfterPlay(cards: [Card], play: [Card]) -> [Card] {
+        var remainingCards: [Card] = []
+        for card in cards {
+            var isPlayed: Bool = false
+            for playedCard in play {
+                if card.getIdentifier() == playedCard.getIdentifier() {
+                    isPlayed = true
+                    break
+                }
+            }
+            if !isPlayed {
+                remainingCards.append(card)
+            }
+        }
+        return remainingCards
+    }
+    
+    // this function checks whether the AI 'think' the landlord has played all the cards, this is done by check whether the number of cards left by the other farmer is less than or equal to the amount of cards left
+    private func checkIfLandlordHasFinishedHisPlay(leftCards: [Card]) -> Bool {
+        if self.landlordID == self.player2 {
+            return leftCards.count <= 17 - self.player3PlayedCards.count
+        } else {
+            return leftCards.count <= 17 - self.player2PlayedCards.count
+        }
+    }
+    
+    private func conductBRS(depth: Int, playerTurn: Bool, playerCards: [Card], otherCards: [Card], lastPlay: Play, playerMadeLastPlay: Bool) -> Double {
+        if depth == 3 { // search for a depth of 6
+            return calculateHeuristic(playerCards)
+        } else if playerCards.count == 0 { // player played all his card, he won the game, so return maximum score
+            return Double(Int.max)
+        } else if (self.landlordID == self.id && otherCards.count == 0) || (self.landlordID != self.id && checkIfLandlordHasFinishedHisPlay(leftCards: otherCards)) { // other player win the game has played all the cards as a team, or the landlord may have spent all the cards
+            return Double(Int.min)
+        }
+        
+        if playerTurn {
+            let possiblePlays: [[Card]] = findAllPossiblePlays(cards: playerCards, lastPlay: playerMadeLastPlay ? nil : lastPlay)
+            
+            if possiblePlays.count == 0 {
+                return conductBRS(depth: depth+1, playerTurn: false, playerCards: playerCards, otherCards: otherCards, lastPlay: lastPlay, playerMadeLastPlay: false)
+            }
+            
+            var bestScore: Double = 0
+            
+            for play in possiblePlays {
+                do {
+                    let p = try Play(play)
+                    let score = conductBRS(depth: depth+1, playerTurn: false, playerCards: getRemainingCardsAfterPlay(cards: playerCards, play: play), otherCards: otherCards, lastPlay: p, playerMadeLastPlay: true)
+                    
+                    if score > bestScore {
+                        bestScore = score
+                    }
+                    
+                    if bestScore == Double(Int.max) {
+                        break
+                    }
+                } catch {
+                    continue
+                }
+            }
+            
+            if !playerMadeLastPlay { // player may choose to pass
+                let score = conductBRS(depth: depth+1, playerTurn: false, playerCards: playerCards, otherCards: otherCards, lastPlay: lastPlay, playerMadeLastPlay: false)
+                
+                if score > bestScore {
+                    bestScore = score
+                }
+            }
+            
+            return bestScore
+        }
+        
+        let possiblePlays: [[Card]] = findAllPossiblePlays(cards: otherCards, lastPlay: playerMadeLastPlay ? lastPlay : nil)
+        
+        if possiblePlays.count == 0 {
+            return conductBRS(depth: depth+1, playerTurn: true, playerCards: playerCards, otherCards: otherCards, lastPlay: lastPlay, playerMadeLastPlay: true)
+        }
+        
+        var worstScore: Double = Double(Int.max)
+        
+        for play in possiblePlays {
+            do {
+                let p = try Play(play)
+                let score = conductBRS(depth: depth+1, playerTurn: true, playerCards: playerCards, otherCards: getRemainingCardsAfterPlay(cards: otherCards, play: play), lastPlay: p, playerMadeLastPlay: false)
+                
+                if score < worstScore {
+                    worstScore = score
+                }
+                
+                if worstScore == Double(Int.min) {
+                    break
+                }
+            } catch {
+                continue
+            }
+        }
+        
+        if playerMadeLastPlay { // other player may choose to pass
+            let score = conductBRS(depth: depth+1, playerTurn: true, playerCards: playerCards, otherCards: otherCards, lastPlay: lastPlay, playerMadeLastPlay: true)
+            
+            if score < worstScore {
+                worstScore = score
+            }
+        }
+        
+        return worstScore
     }
 }
