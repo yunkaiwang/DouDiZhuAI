@@ -542,7 +542,7 @@ func suggestBombPlusPlay(playerCards: [Card], lastPlay: Play)->[Card] {
         i += 1
     }
     
-    var soloArr: [Card] = [], pairArr: [Card] = [], trioArr: [Card] = [], bombArr: [Card] = []
+    var soloArr: [Card] = [], pairArr: [Card] = [], trioArr: [Card] = []
     playerCard_parsed = parseCards(cards: remaining_cards)
     remaining_cards.sort()
     i = 0
@@ -566,11 +566,6 @@ func suggestBombPlusPlay(playerCards: [Card], lastPlay: Play)->[Card] {
                 trioArr.append(remaining_cards[remaining_cards.count - 2 - i])
                 trioArr.append(remaining_cards[remaining_cards.count - 3 - i])
                 i += 2
-            } else {
-                bombArr.append(card)
-                bombArr.append(remaining_cards[remaining_cards.count - 2 - i])
-                bombArr.append(remaining_cards[remaining_cards.count - 3 - i])
-                bombArr.append(remaining_cards[remaining_cards.count - 4 - i])
             }
         } else {
             if lastPlay.playType() == .bombPlusDualPair {
@@ -623,15 +618,17 @@ func suggestBombPlusPlay(playerCards: [Card], lastPlay: Play)->[Card] {
         pairArr.append(trioArr.popLast()!)
         pairArr.append(trioArr.popLast()!)
         return pairArr + bomb
-    } else if bombArr.count > 0 {
-        return bombArr + bomb
     }
     
     soloArr += pairArr
     soloArr.sort()
     addOn = []
-    addOn.append(soloArr.popLast()!)
-    addOn.append(soloArr.popLast()!)
+    if soloArr.count > 1 {
+        addOn.append(soloArr.popLast()!)
+        addOn.append(soloArr.popLast()!)
+    } else {
+        return []
+    }
     
     return bomb + addOn
 }

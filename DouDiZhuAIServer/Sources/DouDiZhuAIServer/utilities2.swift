@@ -33,20 +33,29 @@ func suggestAllPossibleSPTBPlay(playerCards: [Card], lastPlay: Play, play: PlayT
     
     let lastPrimalCard = lastPlay.getPrimalCard()
     var remaining_cards: [NumCard] = []
+    var remaining_jokerCard: [JokerCard] = []
     for card in playerCards {
         if lastPrimalCard is NullCard {
-            remaining_cards.append(card as! NumCard)
-        } else {
+            if card is NumCard {
+                remaining_cards.append(card as! NumCard)
+            } else {
+                remaining_jokerCard.append(card as! JokerCard)
+            }
+        } else if lastPrimalCard is NumCard && card is NumCard {
             let card_c = card as! NumCard
             if card_c.getNum() > (lastPrimalCard as! NumCard).getNum() {
                 remaining_cards.append(card_c)
+            }
+        } else {
+            if card > lastPrimalCard {
+                remaining_jokerCard.append(card as! JokerCard)
             }
         }
     }
     
     let playerCards_parsed = parseCards(cards: remaining_cards)
     
-    if playerCards_parsed.max_card_count < req {
+    if playerCards_parsed.max_card_count < req && play != .solo {
         return possibles
     }
     
@@ -55,7 +64,7 @@ func suggestAllPossibleSPTBPlay(playerCards: [Card], lastPlay: Play, play: PlayT
     while i < remaining_cards.count {
         let card = remaining_cards[remaining_cards.count - i - 1]
         if playerCards_parsed.card_count[card.getNum()]! == req {
-            var arr: [Card] = []
+            var arr: [Card] = [card]
             for j in 0..<req-1 {
                 arr.append(remaining_cards[remaining_cards.count - i - j - 2])
             }
@@ -68,6 +77,9 @@ func suggestAllPossibleSPTBPlay(playerCards: [Card], lastPlay: Play, play: PlayT
         let possiblePairs = suggestAllPossibleSPTBPlay(playerCards: remaining_cards, lastPlay: lastPlay, play: .pair)
         for p in possiblePairs {
             possibles.append([p[0]])
+        }
+        for c in remaining_jokerCard {
+            possibles.append([c])
         }
     } else if play == .pair {
         let possiblePairs = suggestAllPossibleSPTBPlay(playerCards: remaining_cards, lastPlay: lastPlay, play: .trio)

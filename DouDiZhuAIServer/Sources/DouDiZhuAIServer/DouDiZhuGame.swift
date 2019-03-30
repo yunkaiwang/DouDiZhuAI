@@ -101,10 +101,10 @@ class DouDiZhuGame {
         }
     }
     
-    public func handleAddAIPlayer(_ socket: WebSocket) throws {
-        guard let player = playerForSocket(socket) else { return }
+    public func handleAddAIPlayer(_ socket: WebSocket?, dump: Bool) throws {
+//        guard let player = playerForSocket(socket) else { return }
         
-        let aiPlayer = AIPlayer()
+        let aiPlayer = AIPlayer(dump: dump)
         if try self.handleJoin(aiPlayer) {
             var playerIDs: [String] = []
             for p in self.players {
@@ -114,7 +114,7 @@ class DouDiZhuGame {
             }
             
             aiPlayer.receiveMessage(Message.joinGameSucceeded(player: aiPlayer, players: playerIDs))
-            playerAddedAIPlayers[player]!.append(aiPlayer)
+//            playerAddedAIPlayers[player]!.append(aiPlayer)
             try notifyPlayers(Message.newUserJoined(player: aiPlayer))
         } else {
             try notifyPlayer(Message.addAIPlayerFailed(), socket: socket)
@@ -131,7 +131,7 @@ class DouDiZhuGame {
         try self.handlePlayerLeft(aiPlayer)
     }
     
-    public func handleStartGame(_ socket: WebSocket) throws {
+    public func handleStartGame(_ socket: WebSocket?) throws {
         if self.state != .created || self.players.count < 3 {
             try notifyPlayer(Message.startGameFailed(), socket: socket)
             return
@@ -221,8 +221,8 @@ class DouDiZhuGame {
         if id != self.activePlayer?.id {
             return
         }
-    
         let play: Play = try Play(cards)
+        
         if !isCurrentPlayValid(play: play) {
             print("aborting since invalid play")
             throw GameError.invalidPlay
@@ -431,6 +431,7 @@ class DouDiZhuGame {
         if self.activePlayer == self.lastPlayedPlayer || self.lastPlayedPlayer == nil {
             return play.playType() != .none
         }
+        
         return (self.currentPlay ?? Play()) < play
     }
 }

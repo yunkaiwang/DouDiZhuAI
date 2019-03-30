@@ -20,9 +20,11 @@ class AIPlayer: Player {
     private var nextPlayer: String = ""
     private var cardsLeft: [Card] = [] // all cards that other players may have
     private var bestPlay: [Card] = []
+    public var dump: Bool = false
     
-    convenience init() {
+    convenience init(dump: Bool) {
         self.init(nil)
+        self.dump = dump
     }
     
     private override init(_ socket: WebSocket?) {
@@ -31,6 +33,10 @@ class AIPlayer: Player {
     }
     
     public func makeBeLandlordDecision(_ pillage: Bool)-> Bool {
+        if self.dump {
+            return Int.random(in: 0...1) == 0
+        }
+        
         if pillage {
             return self.calculateHeuristic(self.getCards()) > 88.44
         }
@@ -47,9 +53,7 @@ class AIPlayer: Player {
                 print("AI player received an unknown message, ignoring the message..")
                 return
             }
-            
-            print("AI player received a message", message.type, self.getCards().count)
-            
+        
             switch message.type {
             case .joinGameSucceded:
                 return
@@ -58,25 +62,16 @@ class AIPlayer: Player {
             case .gameStarted:
                 // may be start a new thread and start computing whether or not the AI should be the landlord or not
                 self.removeCardsFromRemainingCards(self.getCards())
-                
-                print("AI player cards: ")
-                for card in self.getCards() {
-                    print(card.getIdentifier())
-                }
-                
             case .makePlay:
                 self.playerMakePlay(playerID, cards: message.cards)
             case .informLandlord:
                 self.landlordID = playerID
                 self.landlordCards = message.cards
-            case .abortGame:
-                // do nothing when the game is aborted, if implement as a multi-thread program, we can stop the other threads here
-                return
             case .playerTurn:
                 self.playerTurn(playerID)
             case .playerDecisionTurn, .playerPillageTurn:
                 self.playerDecisionTurn(playerID, message.type == .playerPillageTurn ? true: false)
-            case .playerWantToBeLandlord, .playerWantToBeFarmer:
+            case .playerWantToBeLandlord, .playerWantToBeFarmer, .gameEnd, .abortGame:
                 return
             default:
                 print("\(message.type) received by AI, this should not be received by AI")
@@ -345,6 +340,13 @@ class AIPlayer: Player {
     }
     
     private func findBestPlay() -> [Card] {
+        if self.dump {
+            if canPass() {
+                return suggestPlay(playerCards: self.getCards(), lastPlay: self.currentPlay ?? Play())
+            }
+            return suggestNewPlay(playerCards: self.getCards())
+        }
+        
         let possiblePlays: [[Card]] = findAllPossiblePlays(cards: self.getCards(), lastPlay: canPass() ? self.currentPlay : nil)
         
         // no possible play, simply return
@@ -353,18 +355,16 @@ class AIPlayer: Player {
         }
         
         var bestScore: Double = 0, bestPlay: [Card] = []
+        var firstScore: Bool = true
         
         for play in possiblePlays {
             do {
-                if play.count == 0 {
-                    continue
-                }
                 let p = try Play(play)
                 let score = conductBRS(depth: 1, playerTurn: false, playerCards: getRemainingCardsAfterPlay(cards: self.getCards(), play: play), otherCards: self.cardsLeft, lastPlay: p, playerMadeLastPlay: true)
-                print("received one score", score,"for play", play, "average rank", self.calculateAverageCardRank(getRemainingCardsAfterPlay(cards: self.getCards(), play: play)), "numTurn", self.calculateNumTurnNeeded(getRemainingCardsAfterPlay(cards: self.getCards(), play: play)))
-                if score > bestScore {
+                if score > bestScore || firstScore {
                     bestScore = score
                     bestPlay = play
+                    firstScore = false
                 }
                 
                 if bestScore == Double(Int.max) {
@@ -377,16 +377,10 @@ class AIPlayer: Player {
         
         if canPass() { // check if pass is a better solution
             let score = conductBRS(depth: 1, playerTurn: false, playerCards: self.getCards(), otherCards: self.cardsLeft, lastPlay: self.currentPlay!, playerMadeLastPlay: false)
-            print("if pass score is", score, "averaege", self.calculateAverageCardRank(self.getCards()), "numTurn", self.calculateNumTurnNeeded(self.getCards()))
             if score > bestScore {
                 bestScore = score
                 bestPlay = []
             }
-        }
-        
-        print("best play is")
-        for c in bestPlay {
-            print(c.getIdentifier())
         }
         
         return bestPlay
@@ -419,7 +413,7 @@ class AIPlayer: Player {
     }
     
     private func conductBRS(depth: Int, playerTurn: Bool, playerCards: [Card], otherCards: [Card], lastPlay: Play, playerMadeLastPlay: Bool) -> Double {
-        if depth == 3 { // search for a depth of 6
+        if depth == 3 { // search for a depth of 4
             return calculateHeuristic(playerCards)
         } else if playerCards.count == 0 { // player played all his card, he won the game, so return maximum score
             return Double(Int.max)

@@ -48,4 +48,3 @@ do {
 } catch PerfectError.networkError(let err, let msg) {
     print("Network error thrown: \(err) \(msg)")
 }
-
