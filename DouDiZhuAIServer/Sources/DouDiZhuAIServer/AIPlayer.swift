@@ -280,12 +280,13 @@ class AIPlayer: Player {
             listPlays.append(rocket)
         }
         
+        listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: lastPlay ?? Play(), play: .bomb)
+        
         if lastPlay == nil {
             let dum = Play()
             listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .solo)
             listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .pair)
             listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .trio)
-            listPlays += suggestAllPossibleSPTBPlay(playerCards: cards, lastPlay: dum, play: .bomb)
             listPlays += suggestAllPossibleSoloChainPlay(playerCards: cards, lastPlay: dum)
             listPlays += suggestAllPossiblePairChainPlay(playerCards: cards, lastPlay: dum)
             listPlays += suggestAllPossibleTrioPlusPlay(playerCards: cards, lastPlay: dum)
