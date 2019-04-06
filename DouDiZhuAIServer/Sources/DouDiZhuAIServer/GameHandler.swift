@@ -44,7 +44,7 @@ class GameHandler: WebSocketSessionHandler {
                 case .joinGame:
                     try DouDiZhuGame.shared.handleNewUserJoin(socket)
                 case .addAIPlayer:
-                    try DouDiZhuGame.shared.handleAddAIPlayer(socket, dump: false)
+                    try DouDiZhuGame.shared.handleAddAIPlayer(socket)
                 case .removeAIPlayer:
                     try DouDiZhuGame.shared.handleRemoveAIPlayer(socket)
                 case .startGame:

@@ -20,11 +20,9 @@ class AIPlayer: Player {
     private var nextPlayer: String = ""
     private var cardsLeft: [Card] = [] // all cards that other players may have
     private var bestPlay: [Card] = []
-    public var dump: Bool = false
     
-    convenience init(dump: Bool) {
+    convenience init() {
         self.init(nil)
-        self.dump = dump
     }
     
     private override init(_ socket: WebSocket?) {
@@ -33,10 +31,6 @@ class AIPlayer: Player {
     }
     
     public func makeBeLandlordDecision(_ pillage: Bool)-> Bool {
-        if self.dump {
-            return Int.random(in: 0...1) == 0
-        }
-        
         if pillage {
             return self.calculateHeuristic(self.getCards()) > 88.44
         }
@@ -264,9 +258,9 @@ class AIPlayer: Player {
         if id != self.id { // it's other players turn, so ignore
             return
         }
-        
+        let cards = findBestPlay()
         do {
-            try DouDiZhuGame.shared.playerMakePlay(self.id, cards: findBestPlay())
+            try DouDiZhuGame.shared.playerMakePlay(self.id, cards: cards)
         } catch {
             print("AI player cannot make a play due to some unknown error...")
             DouDiZhuGame.shared.handleError()
@@ -341,13 +335,6 @@ class AIPlayer: Player {
     }
     
     private func findBestPlay() -> [Card] {
-        if self.dump {
-            if canPass() {
-                return suggestPlay(playerCards: self.getCards(), lastPlay: self.currentPlay ?? Play())
-            }
-            return suggestNewPlay(playerCards: self.getCards())
-        }
-        
         let possiblePlays: [[Card]] = findAllPossiblePlays(cards: self.getCards(), lastPlay: canPass() ? self.currentPlay : nil)
         
         // no possible play, simply return
@@ -362,6 +349,7 @@ class AIPlayer: Player {
             do {
                 let p = try Play(play)
                 let score = conductBRS(depth: 1, playerTurn: false, playerCards: getRemainingCardsAfterPlay(cards: self.getCards(), play: play), otherCards: self.cardsLeft, lastPlay: p, playerMadeLastPlay: true)
+                
                 if score > bestScore || firstScore {
                     bestScore = score
                     bestPlay = play
@@ -378,6 +366,7 @@ class AIPlayer: Player {
         
         if canPass() { // check if pass is a better solution
             let score = conductBRS(depth: 1, playerTurn: false, playerCards: self.getCards(), otherCards: self.cardsLeft, lastPlay: self.currentPlay!, playerMadeLastPlay: false)
+            
             if score > bestScore {
                 bestScore = score
                 bestPlay = []
@@ -414,7 +403,7 @@ class AIPlayer: Player {
     }
     
     private func conductBRS(depth: Int, playerTurn: Bool, playerCards: [Card], otherCards: [Card], lastPlay: Play, playerMadeLastPlay: Bool) -> Double {
-        if depth == 3 { // search for a depth of 4
+        if depth == 4 { // search for a depth of 4
             return calculateHeuristic(playerCards)
         } else if playerCards.count == 0 { // player played all his card, he won the game, so return maximum score
             return Double(Int.max)

@@ -101,10 +101,10 @@ class DouDiZhuGame {
         }
     }
     
-    public func handleAddAIPlayer(_ socket: WebSocket?, dump: Bool) throws {
-//        guard let player = playerForSocket(socket) else { return }
+    public func handleAddAIPlayer(_ socket: WebSocket) throws {
+        guard let player = playerForSocket(socket) else { return }
         
-        let aiPlayer = AIPlayer(dump: dump)
+        let aiPlayer = AIPlayer()
         if try self.handleJoin(aiPlayer) {
             var playerIDs: [String] = []
             for p in self.players {
@@ -114,7 +114,7 @@ class DouDiZhuGame {
             }
             
             aiPlayer.receiveMessage(Message.joinGameSucceeded(player: aiPlayer, players: playerIDs))
-//            playerAddedAIPlayers[player]!.append(aiPlayer)
+            playerAddedAIPlayers[player]!.append(aiPlayer)
             try notifyPlayers(Message.newUserJoined(player: aiPlayer))
         } else {
             try notifyPlayer(Message.addAIPlayerFailed(), socket: socket)
@@ -224,7 +224,6 @@ class DouDiZhuGame {
         let play: Play = try Play(cards)
         
         if !isCurrentPlayValid(play: play) {
-            print("aborting since invalid play")
             throw GameError.invalidPlay
         }
         let player: Player = findPlayerWithID(id)!

@@ -1,8 +1,7 @@
 //
 //  Play.swift
 //
-//  Created by yunkai wang on 2019-01-25.
-//  Copyright © 2019 yunkai wang. All rights reserved.
+//  Created by yunkai wang on 2019-03-04.
 //
 
 import Foundation
@@ -175,9 +174,9 @@ class Play: Comparable {
                     throw playError.invalidPlay
                 }
                 
-                let rangeSize = (max - min) / 2
+                let rangeSize = max - min
                 
-                if rangeSize == cards.count {
+                if rangeSize == cards.count / 2 {
                     self.type = .pairChain
                     self.serialLength = rangeSize
                     self.primalCard = findCardWithNum(numCards, num: min)
@@ -203,8 +202,8 @@ class Play: Comparable {
                         throw playError.invalidPlay
                     }
                     
-                    let rangeSize = (max - min) / 3
-                    if rangeSize == cards.count {
+                    let rangeSize = max - min
+                    if rangeSize == cards.count / 3 {
                         self.type = .airplane
                         self.serialLength = rangeSize
                         self.primalCard = findMinCardWithCount(card_count, cards: numCards, count: 3)

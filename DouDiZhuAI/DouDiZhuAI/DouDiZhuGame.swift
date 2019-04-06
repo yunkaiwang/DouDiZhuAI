@@ -24,7 +24,6 @@ class DouDiZhuGame {
     private (set) var lastPlayedPlayerID: String = ""
     private (set) var playerCardButtons:[CardButtonNode] = []
     private (set) var currentPlay: Play? = nil
-//    private (set) var lastPlayedCard: [Card] = []
     private (set) var otherPlayers: [String:PlayerNum] = [:]
     private (set) var player2CardCount: Int = 17
     private (set) var player3CardCount: Int = 17
@@ -332,7 +331,7 @@ class DouDiZhuGame {
         self.stopTimer()
         countDown = 30
         DouDiZhuGame.gameScene?.updateCountDown(countDown)
-        
+
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(DouDiZhuGame.timePassed), userInfo: nil, repeats: true)
     }
     

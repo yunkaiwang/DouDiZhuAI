@@ -14,6 +14,7 @@
 		3F1B820C222E1640001680B2 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B820B222E1640001680B2 /* Message.swift */; };
 		3F1B8214222F5E6C001680B2 /* SuitType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8213222F5E6C001680B2 /* SuitType.swift */; };
 		3F1B8216222F5FDC001680B2 /* PlayerNum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B8215222F5FDC001680B2 /* PlayerNum.swift */; };
+		3F35B5DB2253EEC30066F059 /* Starscream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F35B5DA2253EEC30066F059 /* Starscream.framework */; };
 		3F49D9BE2242BBDD00449531 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9BD2242BBDD00449531 /* Play.swift */; };
 		3F49D9C02242BBF900449531 /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9BF2242BBF900449531 /* utilities.swift */; };
 		3F49D9F2224472EF00449531 /* PlayType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F49D9F1224472EF00449531 /* PlayType.swift */; };
@@ -59,6 +60,7 @@
 		3F1B820B222E1640001680B2 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		3F1B8213222F5E6C001680B2 /* SuitType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitType.swift; sourceTree = "<group>"; };
 		3F1B8215222F5FDC001680B2 /* PlayerNum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNum.swift; sourceTree = "<group>"; };
+		3F35B5DA2253EEC30066F059 /* Starscream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Starscream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F49D9BD2242BBDD00449531 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
 		3F49D9BF2242BBF900449531 /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
 		3F49D9F1224472EF00449531 /* PlayType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayType.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F35B5DB2253EEC30066F059 /* Starscream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +103,7 @@
 		3F1B81472215314A001680B2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3F35B5DA2253EEC30066F059 /* Starscream.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
